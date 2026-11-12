@@ -12,3 +12,6 @@ __pycache__/
 .cache/
 .venv/
 .env.local
+
+# QR pictures for the demo links (made for sharing, specific to one site)
+qr-demo/

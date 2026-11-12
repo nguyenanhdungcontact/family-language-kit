@@ -2,6 +2,7 @@ name: Build the TV app (APK)
 
 # Builds the small Android TV / Google TV app that shows the meteor dashboard full screen,
 # and publishes it as a download:  https://github.com/<you>/<repo>/releases/latest/download/family-language-tv.apk
+# It runs when the app/ folder changes, or by hand: Actions › Build the TV app (APK) › Run workflow.
 
 on:
   push:

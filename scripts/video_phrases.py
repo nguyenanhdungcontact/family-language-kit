@@ -19,7 +19,7 @@ Environment:
   GEMINI_API_KEY     needed when AI_PROVIDER=gemini
   GEMINI_MODEL       one model, or several separated by commas, tried in order. The free tier gives
                      each model about 20 requests a day; when one runs out the next takes over.
-                     Default: gemini-3.6-flash,gemini-3.7-flash,gemini-3.5-flash,gemini-3.5-flash-lite
+                     Default: gemini-3.6-flash,gemini-3.5-flash,gemini-3.5-flash-lite,gemini-3.1-flash-lite,gemini-flash-lite-latest
   ANTHROPIC_API_KEY  needed when AI_PROVIDER=claude
   CLAUDE_MODEL       default claude-haiku-5-5
   MAX_PER_RUN        most videos per run, default 10
@@ -45,7 +45,7 @@ LANG_CODES = [k for k in LANGUAGES if not k.startswith("_")]
 PROVIDER = (os.environ.get("AI_PROVIDER") or "gemini").strip().lower()
 GEMINI_KEY = os.environ.get("GEMINI_API_KEY", "").strip()
 GEMINI_MODELS = [m.strip() for m in (os.environ.get("GEMINI_MODEL") or
-                 "gemini-3.6-flash,gemini-3.7-flash,gemini-3.5-flash,gemini-3.5-flash-lite").split(",") if m.strip()]
+                 "gemini-3.6-flash,gemini-3.5-flash,gemini-3.5-flash-lite,gemini-3.1-flash-lite,gemini-flash-lite-latest").split(",") if m.strip()]
 GEMINI_MODEL = GEMINI_MODELS[0]          # the model that answered last (written into each phrases file)
 CLAUDE_KEY = os.environ.get("ANTHROPIC_API_KEY", "").strip()
 CLAUDE_MODEL = (os.environ.get("CLAUDE_MODEL") or "claude-haiku-5-5").strip()
@@ -215,7 +215,7 @@ def ask_gemini(prompt: str, schema: dict = None) -> dict:
             continue
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
         r = None
-        for attempt in range(3):
+        for attempt in range(2):
             try:
                 r = requests.post(url, headers={"x-goog-api-key": GEMINI_KEY}, json=body, timeout=150)
             except requests.exceptions.RequestException as e:
