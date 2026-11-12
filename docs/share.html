@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>QR Codes · Family Language Kit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,700;9..144,800&display=swap" rel="stylesheet">
+<style>
+/* One card to hand over: every screen of the kit as a QR code. Add ?to=Name to the address for a greeting.
+   Prints on one sheet of paper. */
+:root{
+  --bg:#f6f1e4; --surface:#fffdf7; --surface2:#f0eadb; --line:rgba(52,70,42,.15);
+  --ink:#26331f; --ink2:#55624c; --accent:#4f7d45; --accent-ink:#fff; --warm:#b9631a; --warm-soft:rgba(192,106,31,.12);
+  --head:'Fraunces',Georgia,serif; --body:'Be Vietnam Pro',system-ui,-apple-system,'PingFang SC','Noto Sans SC','Microsoft YaHei',sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){ :root{
+  --bg:#0b0f2a; --surface:#151b44; --surface2:#1d2456; --line:rgba(200,208,255,.16);
+  --ink:#eef0ff; --ink2:#b3b9e6; --accent:#8fa2ff; --accent-ink:#0b0f2a; --warm:#ffd36e; --warm-soft:rgba(255,211,110,.13);
+  color-scheme:dark;
+}}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);line-height:1.5;-webkit-font-smoothing:antialiased;
+  padding:calc(22px + env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) calc(36px + env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left))}
+.wrap{max-width:900px;margin:0 auto}
+.hi{display:flex;gap:8px;flex-wrap:wrap;font-family:var(--head);font-weight:700;font-size:14.5px;color:var(--warm)}
+.hi span{padding:3px 12px;border-radius:99px;background:var(--warm-soft)}
+h1{font-family:var(--head);font-weight:800;font-size:clamp(28px,6vw,46px);line-height:1.08;letter-spacing:-.01em;margin-top:14px;text-wrap:balance}
+.lede{color:var(--ink2);font-size:17px;margin-top:10px;max-width:38em}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-top:22px}
+figure{padding:16px 14px 14px;border-radius:20px;background:var(--surface);border:.5px solid var(--line);text-align:center}
+figure.main{border:1.5px solid var(--accent)}
+.q{width:168px;height:168px;max-width:100%;margin:0 auto;padding:8px;border-radius:14px;background:#fff;display:grid;place-items:center}
+.q img,.q canvas{width:100%!important;height:auto!important}
+figcaption{margin-top:10px}
+figcaption b{display:block;font-family:var(--head);font-size:19px;font-weight:800;line-height:1.2}
+figcaption span{display:block;font-size:13.5px;color:var(--ink2);margin-top:2px}
+figcaption a{display:inline-block;margin-top:6px;font-size:12.5px;color:var(--accent);font-weight:600;overflow-wrap:anywhere;text-underline-offset:3px}
+.foot{margin-top:22px;color:var(--ink2);font-size:14.5px}
+.foot a{color:var(--accent);font-weight:600}
+:focus-visible{outline:3px solid var(--warm);outline-offset:2px}
+@media print{ body{background:#fff;color:#000;padding:0} figure{break-inside:avoid;border:1px solid #bbb} .foot a{color:#000} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hi"><span>你好!</span><span>Xin chào!</span><span>Hello!</span></div>
+  <h1 id="title">Scan, tap, learn</h1>
+  <p class="lede" id="lede">Point a phone camera at a code. Everything opens in the browser: nothing to install, no account.</p>
+  <div class="grid" id="grid"></div>
+  <p class="foot">Sharing with someone? Add <code>?to=TheirName</code> to this page's address for a personal greeting. <a href="./">Back to the kit</a></p>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+(() => {
+  const base = location.href.replace(/[?#].*$/, '').replace(/[^/]*$/, '');
+  const to = (new URLSearchParams(location.search).get('to') || '').replace(/[<>&"]/g, '').slice(0, 40);
+  if (to) {
+    document.getElementById('title').textContent = `For ${to}: scan, tap, learn`;
+    document.getElementById('lede').textContent = 'A little language corner for the whole family. Point a phone camera at a code: nothing to install, no account.';
+  }
+  const items = [
+    { main: 1, path: '?lang=zh', title: 'Chinese · 中文', sub: 'Videos with phrases + games (for the kids)' },
+    { main: 1, path: '?lang=vi', title: 'Vietnamese · Tiếng Việt', sub: 'Videos with phrases + games (for Dad)' },
+    { path: 'game.html?lang=zh', title: 'Word asteroids', sub: 'Game. Turn the phone sideways' },
+    { path: 'bricks.html?lang=vi', title: 'Word bricks', sub: 'Game. One calm thumb' },
+    { path: 'tv.html?lang=zh', title: 'TV meteor shower', sub: 'Open on a TV or laptop' },
+    { path: 'guide.html', title: 'Setup guide', sub: 'Make your own copy in nine steps' },
+  ];
+  document.getElementById('grid').innerHTML = items.map((it, i) => `<figure class="${it.main ? 'main' : ''}"><div class="q" id="q${i}"></div>
+    <figcaption><b>${it.title}</b><span>${it.sub}</span><a href="${base + it.path}">${(base + it.path).replace(/^https?:\/\//, '')}</a></figcaption></figure>`).join('');
+  items.forEach((it, i) => { if (window.QRCode) new QRCode(document.getElementById('q' + i), { text: base + it.path, width: 300, height: 300, colorDark: '#111111', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M }); });
+})();
+</script>
+</body>
+</html>

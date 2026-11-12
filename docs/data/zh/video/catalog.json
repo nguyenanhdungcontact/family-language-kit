@@ -1,5 +1,22 @@
 {
- "rows": [],
+ "rows": [
+  {
+   "id": "kids",
+   "title": "Cartoons, songs & stories 动画·儿歌·故事"
+  },
+  {
+   "id": "learn",
+   "title": "Learn Chinese step by step 学中文"
+  },
+  {
+   "id": "life",
+   "title": "Daily life, food & travel 生活·美食·旅行"
+  },
+  {
+   "id": "culture",
+   "title": "Festivals, legends & culture 节日·文化"
+  }
+ ],
  "videos": [
   {
    "id": "RByG3EGz_GM",
@@ -55,6 +72,18 @@
    "published": "2026-08-29",
    "level": "HSK 3",
    "n": 11
+  },
+  {
+   "id": "CzOoe9HMfv0",
+   "row": "life",
+   "title": "中国高中生VLOG📚学习浓度75%的一周Chinese high school student VLOG 📚 A week with a learning concentration of 75%",
+   "channel": "阿家家家家家Lily",
+   "dur": "7:41",
+   "added": "2026-11-12",
+   "published": "2024-10-23",
+   "level": "HSK 3",
+   "n": 10
   }
- ]
+ ],
+ "updated": "2026-11-12"
 }

@@ -1,0 +1,131 @@
+{
+ "id": "lLobDlkQl4Q",
+ "created": "2026-11-12",
+ "source": "youtube-manual",
+ "language": "vi",
+ "ai": "gemini-3.6-flash",
+ "summary": "The speaker reviews popular vegetarian dishes at a Vietnamese restaurant, focusing on vegetarian Huế noodle soup and Hanoi-style grilled fish dish. She explains the fresh ingredients, shares personal stories about food in Vietnam, and recommends trying local fruit tea.",
+ "level": "A2",
+ "phrases": [
+  {
+   "t": 6.04,
+   "d": 1.07,
+   "phrase": "Chào các bạn",
+   "pron": "chao kak ban",
+   "quote": "Chào các bạn.",
+   "meaning": "Hello everyone / Hi friends",
+   "usage": "A friendly and warm greeting to use when speaking to a group of friends or colleagues.",
+   "example": "Chào các bạn, hôm nay mọi người thế nào?",
+   "example_pron": "",
+   "example_en": "Hello everyone, how is everyone doing today?"
+  },
+  {
+   "t": 19.99,
+   "d": 8.31,
+   "phrase": "ngon nhất",
+   "pron": "ngon nuh-ut",
+   "quote": "thì mình biết một quán chay có thể nói là đối với mình thì nó là quán chay ngon nhất ở Việt Nam đó.",
+   "meaning": "most delicious / best tasting",
+   "usage": "Use this phrase to enthusiastically recommend your favorite dish or restaurant.",
+   "example": "Phở ở đây là ngon nhất.",
+   "example_pron": "",
+   "example_en": "The pho here is the most delicious."
+  },
+  {
+   "t": 175.94,
+   "d": 4.35,
+   "phrase": "chua chua",
+   "pron": "choo-ah choo-ah",
+   "quote": "Thì thường cái vị của nó là chua chua này, ngọt ngọt một chút này.",
+   "meaning": "slightly sour / pleasantly tart",
+   "usage": "In Vietnamese, repeating an adjective softens its intensity, meaning 'a bit sour'.",
+   "example": "Món này có vị chua chua rất dễ ăn.",
+   "example_pron": "",
+   "example_en": "This dish has a slightly sour taste that is very easy to eat."
+  },
+  {
+   "t": 270.8,
+   "d": 5.1,
+   "phrase": "thơm lắm",
+   "pron": "thum lum",
+   "quote": "Mình rất là thích cái rau này. Cái rau răm này thơm lắm.",
+   "meaning": "very fragrant / smells so good",
+   "usage": "Say this whenever tea, coffee, food, or herbs smell delightfully fresh.",
+   "example": "Cốc cà phê này thơm lắm!",
+   "example_pron": "",
+   "example_en": "This cup of coffee smells so good!"
+  },
+  {
+   "t": 328.38,
+   "d": 3.37,
+   "phrase": "Nói chung là",
+   "pron": "noy choong la",
+   "quote": "Nói chung là tất cả các vị mình thấy nó rất là cân bằng.",
+   "meaning": "In general / Overall",
+   "usage": "A very natural conversational phrase to summarize your thoughts before giving a general opinion.",
+   "example": "Nói chung là đồ ăn ở đây rất ngon.",
+   "example_pron": "",
+   "example_en": "In general, the food here is very delicious."
+  },
+  {
+   "t": 372.56,
+   "d": 5.43,
+   "phrase": "Ngoài ra",
+   "pron": "ngwah rah",
+   "quote": "Ngoài ra ấy mình cũng muốn nói là cái đồ uống ở đây nó rất là ngon. Thật sự mà nói rất là ngon.",
+   "meaning": "Besides / In addition",
+   "usage": "Great transition word when you want to add another detail or recommendation.",
+   "example": "Ngoài ra, quán này còn có trà rất ngon.",
+   "example_pron": "",
+   "example_en": "Besides, this shop also has very delicious tea."
+  },
+  {
+   "t": 440.03,
+   "d": 1.59,
+   "phrase": "mời mọi người",
+   "pron": "moi moy ngwoi",
+   "quote": "Thế bây giờ mời mọi người ăn nhá.",
+   "meaning": "please enjoy, everyone / inviting everyone to eat",
+   "usage": "A polite phrase spoken before eating together with colleagues or friends.",
+   "example": "Mời mọi người ăn cơm!",
+   "example_pron": "",
+   "example_en": "Please enjoy the meal, everyone!"
+  },
+  {
+   "t": 452.9,
+   "d": 3.86,
+   "phrase": "nhất định phải",
+   "pron": "nuh-ut din fai",
+   "quote": "thì nhất định phải thử cái trà ổi này nhá.",
+   "meaning": "definitely must",
+   "usage": "Use this when giving strong, warm recommendations to travel or try something out.",
+   "example": "Bạn nhất định phải thử món trà này.",
+   "example_pron": "",
+   "example_en": "You definitely must try this tea drink."
+  },
+  {
+   "t": 741.26,
+   "d": 4.64,
+   "phrase": "Ngày xưa",
+   "pron": "ngay soo-ah",
+   "quote": "Mà bình thường ấy thì đặc sản nó rất là đắt. Ngày xưa ấy đặc sản thì nó rất là đắt.",
+   "meaning": "In the past / Formerly",
+   "usage": "A natural way to start talking about earlier times, past memories, or childhood.",
+   "example": "Ngày xưa mình sống ở Đà Nẵng.",
+   "example_pron": "",
+   "example_en": "In the past, I lived in Da Nang."
+  },
+  {
+   "t": 1094.07,
+   "d": 5.25,
+   "phrase": "Cảm ơn mọi người",
+   "pron": "kam un moy ngwoi",
+   "quote": "Vì thế cảm ơn mọi người rất nhiều và tạm biệt.",
+   "meaning": "Thank you everyone",
+   "usage": "A polite and affectionate way to express gratitude to a group of people.",
+   "example": "Cảm ơn mọi người đã giúp đỡ mình.",
+   "example_pron": "",
+   "example_en": "Thank you everyone for helping me."
+  }
+ ]
+}

@@ -12,7 +12,7 @@
 {"w": "anh", "pron": "ahn", "pos": "pronoun", "en": "you / I (a man a bit older)", "ex": "Anh khỏe không?", "ex_en": "How are you? (to a man)"},
 {"w": "chị", "pron": "chee", "pos": "pronoun", "en": "you / I (a woman a bit older)", "ex": "Chị ơi, cho em hỏi.", "ex_en": "Excuse me (to a woman), may I ask?"},
 {"w": "em", "pron": "em", "pos": "pronoun", "en": "you / I (someone younger)", "ex": "Em ăn cơm chưa?", "ex_en": "Have you eaten yet?"},
-{"w": "tên", "pron": "ten", "pos": "noun", "en": "name", "ex": "Tôi tên là Aaron.", "ex_en": "My name is Aaron."},
+{"w": "tên", "pron": "ten", "pos": "noun", "en": "name", "ex": "Tôi tên là Alex.", "ex_en": "My name is Alex."},
 {"w": "khỏe không", "pron": "khweh khohng", "pos": "phrase", "en": "how are you?", "ex": "Dạo này anh khỏe không?", "ex_en": "How have you been lately?"},
 {"w": "tôi khỏe", "pron": "toy khweh", "pos": "phrase", "en": "I'm fine", "ex": "Tôi khỏe, cảm ơn.", "ex_en": "I'm fine, thanks."},
 {"w": "rất vui", "pron": "zut vooy", "pos": "phrase", "en": "very happy, glad", "ex": "Rất vui được làm việc với bạn.", "ex_en": "Glad to work with you."},

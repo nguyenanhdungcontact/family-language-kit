@@ -199,7 +199,7 @@ def _schema(upper: bool) -> dict:
     }
 
 
-_gemini_used_up = set()        # models whose free daily allowance is finished (for this run)
+_gemini_used_up = set()        # models to skip for the rest of this run: daily allowance finished, or overloaded
 
 
 def ask_gemini(prompt: str, schema: dict = None) -> dict:
@@ -233,7 +233,9 @@ def ask_gemini(prompt: str, schema: dict = None) -> dict:
             _gemini_used_up.add(model)
             continue
         if r.status_code in (500, 502, 503, 504):
-            raise Temporary(f"Gemini is busy ({r.status_code})")
+            print(f"    … {model} is overloaded right now, trying the next model", flush=True)
+            _gemini_used_up.add(model)                  # skip it for the rest of this run
+            continue
         if r.status_code != 200:
             raise RuntimeError(f"Gemini HTTP {r.status_code}: {r.text[:400]}")
         GEMINI_MODEL = model
@@ -242,7 +244,7 @@ def ask_gemini(prompt: str, schema: dict = None) -> dict:
             return json.loads(cand["content"]["parts"][0]["text"])
         except (KeyError, IndexError, json.JSONDecodeError):
             raise RuntimeError(f"Gemini returned something odd: finishReason={cand.get('finishReason')}")
-    raise Temporary("every Gemini model in GEMINI_MODEL has used up today's free allowance")
+    raise Temporary("every Gemini model in GEMINI_MODEL is busy or has used up today's free allowance")
 
 
 def ask_claude(prompt: str, schema: dict = None) -> dict:

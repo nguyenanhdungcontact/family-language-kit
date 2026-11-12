@@ -1,0 +1,34 @@
+{
+ "rows": [
+  {
+   "id": "learn",
+   "title": "Learn Vietnamese step by step"
+  },
+  {
+   "id": "street",
+   "title": "Real conversations & street interviews"
+  },
+  {
+   "id": "food",
+   "title": "Food, coffee & travel in Vietnam"
+  },
+  {
+   "id": "life",
+   "title": "Culture & everyday life"
+  }
+ ],
+ "videos": [
+  {
+   "id": "lLobDlkQl4Q",
+   "row": "learn",
+   "title": "Món chay Việt ngon nhất | học tiếng Việt qua vlog",
+   "channel": "Slow Vietnamese",
+   "dur": "18:27",
+   "added": "2026-11-12",
+   "published": "2026-06-06",
+   "level": "A2",
+   "n": 10
+  }
+ ],
+ "updated": "2026-11-12"
+}
