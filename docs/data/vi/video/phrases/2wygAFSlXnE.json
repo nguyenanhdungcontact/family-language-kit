@@ -1,0 +1,119 @@
+{
+ "id": "2wygAFSlXnE",
+ "created": "2026-11-12",
+ "source": "youtube-manual",
+ "language": "vi",
+ "ai": "gemini-3.1-flash-lite",
+ "summary": "This video introduces common compound words in Vietnamese by breaking them down into simpler components. It helps beginners understand how Vietnamese words are constructed and how to expand their vocabulary easily.",
+ "level": "A1",
+ "phrases": [
+  {
+   "t": 79.94,
+   "d": 1.52,
+   "phrase": "Xe đạp",
+   "pron": "seh dap",
+   "quote": "Xe đạp",
+   "meaning": "Bicycle",
+   "usage": "Use this when talking about your commute or renting a bike to travel.",
+   "example": "Tôi đi xe đạp đến trường.",
+   "example_pron": "",
+   "example_en": "I go to school by bicycle."
+  },
+  {
+   "t": 259.22,
+   "d": 2.8,
+   "phrase": "máy lạnh",
+   "pron": "my lain",
+   "quote": "Mình gọi là máy lạnh",
+   "meaning": "Air conditioner",
+   "usage": "Essential for asking if a room has AC in a hotel or cafe.",
+   "example": "Phòng này có máy lạnh không?",
+   "example_pron": "",
+   "example_en": "Does this room have an air conditioner?"
+  },
+  {
+   "t": 384.02,
+   "d": 2.0,
+   "phrase": "buổi sáng",
+   "pron": "bway sang",
+   "quote": "buổi sáng",
+   "meaning": "Morning",
+   "usage": "Perfect for scheduling meetings or planning activities with colleagues.",
+   "example": "Hẹn bạn buổi sáng mai nhé.",
+   "example_pron": "",
+   "example_en": "Let's meet tomorrow morning."
+  },
+  {
+   "t": 454.02,
+   "d": 2.0,
+   "phrase": "Ăn sáng",
+   "pron": "an sang",
+   "quote": "Ăn sáng",
+   "meaning": "Eat breakfast",
+   "usage": "Great for inviting colleagues to grab a bite before work.",
+   "example": "Chúng mình cùng đi ăn sáng nhé.",
+   "example_pron": "",
+   "example_en": "Let's go eat breakfast together."
+  },
+  {
+   "t": 552.02,
+   "d": 2.0,
+   "phrase": "dễ thương",
+   "pron": "yeh tu-ung",
+   "quote": "Dễ thương",
+   "meaning": "Cute / lovely",
+   "usage": "A very natural way to compliment children, pets, or someone's style.",
+   "example": "Con chó này thật dễ thương.",
+   "example_pron": "",
+   "example_en": "This dog is so cute."
+  },
+  {
+   "t": 698.02,
+   "d": 2.0,
+   "phrase": "dễ hiểu",
+   "pron": "yeh hieu",
+   "quote": "Dễ hiểu, đúng không?",
+   "meaning": "Easy to understand",
+   "usage": "Use this when a colleague explains a task clearly to you.",
+   "example": "Anh giải thích rất dễ hiểu.",
+   "example_pron": "",
+   "example_en": "You explain things very clearly."
+  },
+  {
+   "t": 825.02,
+   "d": 6.0,
+   "phrase": "sân bay",
+   "pron": "sun by",
+   "quote": "Cái sân để mình có thể bay thì mình nói là sân bay",
+   "meaning": "Airport",
+   "usage": "Use this when you are at the airport or need a taxi to get there.",
+   "example": "Làm ơn đưa tôi đến sân bay.",
+   "example_pron": "",
+   "example_en": "Please take me to the airport."
+  },
+  {
+   "t": 894.02,
+   "d": 4.0,
+   "phrase": "Đáng yêu",
+   "pron": "dang yew",
+   "quote": "Mình cũng có thể nói là gì? Đáng yêu",
+   "meaning": "Adorable",
+   "usage": "Similar to 'dễ thương', use this to express affection for something delightful.",
+   "example": "Quà của bạn thật đáng yêu.",
+   "example_pron": "",
+   "example_en": "Your gift is adorable."
+  },
+  {
+   "t": 1049.02,
+   "d": 5.0,
+   "phrase": "đồ ăn",
+   "pron": "do an",
+   "quote": "Đồ ăn là những cái để mình ăn thì mình nói là đồ ăn",
+   "meaning": "Food",
+   "usage": "Very common when ordering food or talking about dining in Vietnam.",
+   "example": "Đồ ăn Việt Nam rất ngon.",
+   "example_pron": "",
+   "example_en": "Vietnamese food is very delicious."
+  }
+ ]
+}

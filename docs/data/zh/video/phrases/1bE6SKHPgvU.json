@@ -1,0 +1,119 @@
+{
+ "id": "1bE6SKHPgvU",
+ "created": "2026-11-12",
+ "source": "youtube-manual",
+ "language": "zh-Hans",
+ "ai": "gemini-3.5-flash-lite",
+ "summary": "This video tells the classic story of the Little Mermaid, who dreams of the human world and falls in love with a prince. After a magical deal with a witch and an exciting adventure, she finally finds true love and happiness.",
+ "level": "HSK 2",
+ "phrases": [
+  {
+   "t": 21.3,
+   "d": 1.63,
+   "phrase": "很久很久以前",
+   "pron": "hěn jiǔ hěn jiǔ yǐ qián",
+   "quote": "很久很久以前",
+   "meaning": "once upon a time",
+   "usage": "Use this classic phrase at the very beginning when you want to start telling a fairy tale or story to your friends.",
+   "example": "很久很久以前有一只小猫。",
+   "example_pron": "hěn jiǔ hěn jiǔ yǐ qián yǒu yì zhī xiǎo māo.",
+   "example_en": "Once upon a time, there was a little cat."
+  },
+  {
+   "t": 42.97,
+   "d": 2.8,
+   "phrase": "18岁",
+   "pron": "shí bā suì",
+   "quote": "卡莉娜你已经18岁了",
+   "meaning": "18 years old",
+   "usage": "Use this when talking about someone's age, especially when they are growing up or having a birthday.",
+   "example": "我哥哥今年18岁。",
+   "example_pron": "wǒ gē ge jīn nián shí bā suì.",
+   "example_en": "My older brother is 18 years old this year."
+  },
+  {
+   "t": 71.77,
+   "d": 2.37,
+   "phrase": "请您放心",
+   "pron": "qǐng nín fàng xīn",
+   "quote": "爸爸请您尽管放心吧",
+   "meaning": "please rest assured",
+   "usage": "Use this polite phrase when you want to reassure your parents or teachers that everything will be okay and they don't need to worry.",
+   "example": "妈妈请您放心吧。",
+   "example_pron": "mā ma qǐng nín fàng xīn ba.",
+   "example_en": "Mom, please rest assured."
+  },
+  {
+   "t": 120.0,
+   "d": 0.9,
+   "phrase": "当然了",
+   "pron": "dāng rán le",
+   "quote": "当然了",
+   "meaning": "of course",
+   "usage": "Use this cheerful expression when someone asks you a question and you want to say 'yes, absolutely!'",
+   "example": "当然了，我很喜欢吃.",
+   "example_pron": "dāng rán le, wǒ hěn xǐ huan chī.",
+   "example_en": "Of course, I like eating it very much."
+  },
+  {
+   "t": 206.27,
+   "d": 1.1,
+   "phrase": "生日快乐",
+   "pron": "shēng rì kuài lè",
+   "quote": "生日快乐",
+   "meaning": "happy birthday",
+   "usage": "Use this warm greeting whenever it is someone's birthday to wish them a wonderful day.",
+   "example": "祝你生日快乐！",
+   "example_pron": "zhù nǐ shēng rì kuài lè!",
+   "example_en": "Happy birthday to you!"
+  },
+  {
+   "t": 390.6,
+   "d": 1.7,
+   "phrase": "我要赶紧",
+   "pron": "wǒ yào gǎn jǐn",
+   "quote": "我要赶紧去救他",
+   "meaning": "I need to hurry",
+   "usage": "Use this when you are in a rush to do something quickly, like getting ready for school.",
+   "example": "我要赶紧去上学。",
+   "example_pron": "wǒ yào gǎn jǐn qù shàng xué.",
+   "example_en": "I need to hurry to go to school."
+  },
+  {
+   "t": 517.93,
+   "d": 2.47,
+   "phrase": "我很想",
+   "pron": "wǒ hěn xiǎng",
+   "quote": "可是我真的很想再见到王子",
+   "meaning": "I really want",
+   "usage": "Use this when you want to express a strong wish or desire to do something or see someone.",
+   "example": "我很想吃冰淇淋。",
+   "example_pron": "wǒ hěn xiǎng chī bīng qí lín.",
+   "example_en": "I really want to eat ice cream."
+  },
+  {
+   "t": 651.97,
+   "d": 3.57,
+   "phrase": "无法",
+   "pron": "wú fǎ",
+   "quote": "可是现在的她无法发出任何声音",
+   "meaning": "unable to / cannot",
+   "usage": "Use this when something prevents you from doing an action, like not being able to speak or move.",
+   "example": "我今天无法去公园。",
+   "example_pron": "wǒ jīn tiān wú fǎ qù gōng yuán.",
+   "example_en": "I am unable to go to the park today."
+  },
+  {
+   "t": 896.07,
+   "d": 1.7,
+   "phrase": "我愿意",
+   "pron": "wǒ yuàn yì",
+   "quote": "好我愿意",
+   "meaning": "I do / I am willing",
+   "usage": "Use this when you happily agree to do something or accept an invitation from a friend.",
+   "example": "我愿意和你玩。",
+   "example_pron": "wǒ yuàn yì hé nǐ wán.",
+   "example_en": "I am willing to play with you."
+  }
+ ]
+}

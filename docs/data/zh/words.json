@@ -75,5 +75,10 @@
 {"w": "恭喜发财", "pron": "gōngxǐ fācái", "pos": "idiom", "en": "wishing you wealth (Lunar New Year greeting)", "ex": "恭喜发财，红包拿来！", "ex_en": "Wishing you wealth, now hand over the red envelope!"},
 {"w": "马马虎虎", "pron": "mǎmǎhūhū", "pos": "idiom", "en": "so-so; careless", "ex": "我的中文马马虎虎。", "ex_en": "My Chinese is so-so."},
 {"w": "一石二鸟", "pron": "yì shí èr niǎo", "pos": "idiom", "en": "to kill two birds with one stone", "ex": "边走路边听中文，一石二鸟。", "ex_en": "Listening to Chinese while walking: two birds, one stone."},
-{"w": "好好学习", "pron": "hǎohǎo xuéxí", "pos": "idiom", "en": "study hard", "ex": "好好学习，天天向上。", "ex_en": "Study hard and improve every day."}
+{"w": "好好学习", "pron": "hǎohǎo xuéxí", "pos": "idiom", "en": "study hard", "ex": "好好学习，天天向上。", "ex_en": "Study hard and improve every day."},
+{"w": "衣服", "pron": "yīfu", "pos": "noun", "en": "clothes", "ex": "这是我的新衣服。", "ex_en": "This is my new clothing.", "added": "2026-11-12"},
+{"w": "裤子", "pron": "kùzi", "pos": "noun", "en": "pants", "ex": "我的裤子太长了。", "ex_en": "My pants are too long.", "added": "2026-11-12"},
+{"w": "鞋子", "pron": "xiézi", "pos": "noun", "en": "shoes", "ex": "请穿上你的鞋子。", "ex_en": "Please put on your shoes.", "added": "2026-11-12"},
+{"w": "帽子", "pron": "màozi", "pos": "noun", "en": "hat", "ex": "这顶帽子很酷。", "ex_en": "This hat is very cool.", "added": "2026-11-12"},
+{"w": "穿", "pron": "chuān", "pos": "verb", "en": "to wear", "ex": "快穿衣服吧！", "ex_en": "Hurry up and wear your clothes!", "added": "2026-11-12"}
 ]

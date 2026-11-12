@@ -73,5 +73,10 @@
 {"w": "một, hai, ba, dô!", "pron": "moht, hai, bah, yo", "pos": "phrase", "en": "one, two, three, cheers!", "ex": "Nào, một, hai, ba, dô!", "ex_en": "Come on: one, two, three, cheers!"},
 {"w": "chúc sức khỏe", "pron": "chook suke khweh", "pos": "phrase", "en": "to your health", "ex": "Chúc sức khỏe cả nhà!", "ex_en": "Good health to the whole family!"},
 {"w": "từ từ thôi", "pron": "tu tu toy", "pos": "phrase", "en": "slowly, take it easy", "ex": "Từ từ thôi, không vội.", "ex_en": "Take it easy, no rush."},
-{"w": "trời ơi", "pron": "chuh-ee uh-ee", "pos": "phrase", "en": "oh my goodness!", "ex": "Trời ơi, kẹt xe quá!", "ex_en": "Oh my, the traffic!"}
+{"w": "trời ơi", "pron": "chuh-ee uh-ee", "pos": "phrase", "en": "oh my goodness!", "ex": "Trời ơi, kẹt xe quá!", "ex_en": "Oh my, the traffic!"},
+{"w": "chợ", "pron": "chuh", "pos": "noun", "en": "market", "ex": "Tôi muốn đi chợ.", "ex_en": "I want to go to the market.", "added": "2026-11-12"},
+{"w": "siêu thị", "pron": "see-oo tee", "pos": "noun", "en": "supermarket", "ex": "Siêu thị ở gần đây.", "ex_en": "The supermarket is near here.", "added": "2026-11-12"},
+{"w": "quán ăn", "pron": "wan-an", "pos": "noun", "en": "restaurant / eatery", "ex": "Có quán ăn nào ngon không?", "ex_en": "Is there a good restaurant?", "added": "2026-11-12"},
+{"w": "bệnh viện", "pron": "ben vee-en", "pos": "noun", "en": "hospital", "ex": "Bệnh viện ở đâu?", "ex_en": "Where is the hospital?", "added": "2026-11-12"},
+{"w": "công viên", "pron": "kong vee-en", "pos": "noun", "en": "park", "ex": "Chúng ta đi công viên nhé?", "ex_en": "Shall we go to the park?", "added": "2026-11-12"}
 ]
