@@ -1,0 +1,131 @@
+{
+ "id": "npbZiv3FRqM",
+ "created": "2026-11-13",
+ "source": "youtube-manual",
+ "language": "vi",
+ "ai": "gemini-3.1-flash-lite",
+ "summary": "In this fun video, a woman introduces her mother to various American snacks sent from abroad. They taste and discuss the flavors, comparing them to familiar Vietnamese treats.",
+ "level": "A2",
+ "phrases": [
+  {
+   "t": 0.0,
+   "d": 2.0,
+   "phrase": "Chào các bạn!",
+   "pron": "Chao kak ban",
+   "quote": "Chào các bạn!",
+   "meaning": "Hello friends",
+   "usage": "A friendly way to greet a group of people, perfect for starting a conversation.",
+   "example": "Chào các bạn, mình là Lan.",
+   "example_pron": "",
+   "example_en": "Hello friends, I am Lan."
+  },
+  {
+   "t": 109.0,
+   "d": 3.0,
+   "phrase": "Ngon hả?",
+   "pron": "Ngawn ha",
+   "quote": "Ngon hả? Nó có vị như thế nào hả mẹ?",
+   "meaning": "Is it delicious?",
+   "usage": "Use this when you want to ask someone if they are enjoying their food.",
+   "example": "Món này ngon hả?",
+   "example_pron": "",
+   "example_en": "Is this dish delicious?"
+  },
+  {
+   "t": 170.94,
+   "d": 1.0,
+   "phrase": "Thơm không?",
+   "pron": "Tawm khong",
+   "quote": "Thơm không?",
+   "meaning": "Does it smell good?",
+   "usage": "Great for asking friends about the aroma of a meal or drink.",
+   "example": "Trà này thơm không?",
+   "example_pron": "",
+   "example_en": "Does this tea smell good?"
+  },
+  {
+   "t": 193.39,
+   "d": 2.61,
+   "phrase": "khát nước",
+   "pron": "khat nuok",
+   "quote": "Ăn cái này nhiều thì mẹ thấy khát nước không? - khát nước",
+   "meaning": "thirsty",
+   "usage": "Useful when you need a drink or want to express that you are thirsty.",
+   "example": "Tôi đang rất khát nước.",
+   "example_pron": "",
+   "example_en": "I am very thirsty."
+  },
+  {
+   "t": 239.36,
+   "d": 1.0,
+   "phrase": "Mẹ ăn đi",
+   "pron": "Me an dee",
+   "quote": "Mẹ ăn đi rồi mẹ xem thế nào.",
+   "meaning": "Mom, please eat",
+   "usage": "A polite, encouraging way to offer food to someone (you can replace 'Mẹ' with a friend's name).",
+   "example": "Bạn ăn đi, món này ngon lắm.",
+   "example_pron": "",
+   "example_en": "Please eat, this dish is very delicious."
+  },
+  {
+   "t": 367.0,
+   "d": 2.0,
+   "phrase": "chua chua cay cay",
+   "pron": "chua chua kai kai",
+   "quote": "chua chua cay cay á",
+   "meaning": "sour and spicy",
+   "usage": "A common way to describe food that has a balance of sour and spicy notes.",
+   "example": "Canh này chua chua cay cay.",
+   "example_pron": "",
+   "example_en": "This soup is sour and spicy."
+  },
+  {
+   "t": 444.0,
+   "d": 2.0,
+   "phrase": "Mẹ thử miếng đi",
+   "pron": "Me thu mieng dee",
+   "quote": "Rồi. Mẹ thử miếng đi.",
+   "meaning": "Mom, try a piece",
+   "usage": "Use this to invite someone to sample a bit of food.",
+   "example": "Bạn thử miếng bánh này đi.",
+   "example_pron": "",
+   "example_en": "Try a piece of this cake."
+  },
+  {
+   "t": 720.0,
+   "d": 2.0,
+   "phrase": "Mời mọi người nhá",
+   "pron": "Moy moy nguoi nya",
+   "quote": "Mời mọi người nhá.",
+   "meaning": "Inviting everyone (to eat)",
+   "usage": "A polite gesture used before eating with others to show respect.",
+   "example": "Mời mọi người ăn cơm.",
+   "example_pron": "",
+   "example_en": "I invite everyone to eat (let's eat)."
+  },
+  {
+   "t": 1014.0,
+   "d": 4.0,
+   "phrase": "ngon",
+   "pron": "ngawn",
+   "quote": "Đây là các cái đồ ăn vặt của người ta nhưng mà ngon.",
+   "meaning": "delicious",
+   "usage": "The most essential word to use when you like the taste of something.",
+   "example": "Cà phê này ngon quá!",
+   "example_pron": "",
+   "example_en": "This coffee is so delicious!"
+  },
+  {
+   "t": 1042.0,
+   "d": 6.0,
+   "phrase": "Cảm ơn mọi người",
+   "pron": "Kam awn moy nguoi",
+   "quote": "Cảm ơn mọi người đã xem video này và có lẽ là mình sẽ dừng video này ở đây nhé.",
+   "meaning": "Thank you everyone",
+   "usage": "A standard and polite way to end a speech, presentation, or a casual group meeting.",
+   "example": "Cảm ơn mọi người đã giúp đỡ.",
+   "example_pron": "",
+   "example_en": "Thank you everyone for the help."
+  }
+ ]
+}
