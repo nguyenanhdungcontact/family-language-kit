@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Setup Guide · Family Language Kit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one reading column (max 760px) of numbered steps; every step is a card you can tick off.
+   Each step is counted three ways: English, 中文, Tiếng Việt — the guide teaches while it explains. */
+:root{
+  --bg:#f6f1e4; --surface:#fffdf7; --surface2:#f0eadb; --line:rgba(52,70,42,.15);
+  --ink:#26331f; --ink2:#55624c; --ink3:#868e79;
+  --accent:#4f7d45; --accent-ink:#fff; --accent-soft:rgba(79,125,69,.13);
+  --warm:#b9631a; --warm-soft:rgba(192,106,31,.12);
+  --sky:#2d6f86; --sky-soft:rgba(45,111,134,.12);
+  --code-bg:#22301f; --code-ink:#e9f2df;
+  --shadow:0 8px 24px rgba(52,62,36,.10);
+  --head:'Fraunces',Georgia,serif; --body:'Be Vietnam Pro',system-ui,-apple-system,'PingFang SC','Noto Sans SC','Microsoft YaHei',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){ :root{
+  --bg:#0b0f2a; --surface:#151b44; --surface2:#1d2456; --line:rgba(200,208,255,.16);
+  --ink:#eef0ff; --ink2:#b3b9e6; --ink3:#7d85bb;
+  --accent:#8fa2ff; --accent-ink:#0b0f2a; --accent-soft:rgba(143,162,255,.17);
+  --warm:#ffd36e; --warm-soft:rgba(255,211,110,.13);
+  --sky:#8fd0e0; --sky-soft:rgba(143,208,224,.13);
+  --code-bg:#070a20; --code-ink:#dfe5ff;
+  --shadow:0 8px 26px rgba(0,0,0,.4);
+  color-scheme:dark;
+}}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:70px;-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16.5px;line-height:1.62;-webkit-font-smoothing:antialiased;
+  padding:env(safe-area-inset-top) max(18px, env(safe-area-inset-right)) calc(60px + env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left))}
+a{color:var(--accent);font-weight:600;text-underline-offset:3px}
+button{font:inherit;color:inherit;cursor:pointer}
+.col{max-width:760px;margin:0 auto}
+h1,h2,h3{font-family:var(--head);text-wrap:balance;letter-spacing:-.01em}
+p+p{margin-top:.8em}
+code,kbd{font-family:var(--mono);font-size:.86em}
+code{background:var(--surface2);padding:.1em .38em;border-radius:6px;overflow-wrap:anywhere}
+kbd{display:inline-block;min-width:1.9em;text-align:center;padding:.12em .45em;border-radius:7px;border:1px solid var(--line);border-bottom-width:3px;background:var(--surface);font-weight:600}
+
+/* ---------- Progress bar (sticky) ---------- */
+.bar{position:sticky;top:0;z-index:20;margin:0 calc(-1 * max(18px, env(safe-area-inset-left)));padding:10px max(18px, env(safe-area-inset-left));background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:.5px solid var(--line)}
+.bar .in{max-width:760px;margin:0 auto;display:flex;align-items:center;gap:12px;font-size:13.5px;font-weight:600;color:var(--ink2)}
+.bar .track{flex:1;height:8px;border-radius:8px;background:var(--surface2);overflow:hidden}
+.bar .track i{display:block;height:100%;width:0;background:var(--accent);border-radius:8px;transition:width .4s}
+.bar a{font-size:13.5px;white-space:nowrap}
+
+/* ---------- Hero ---------- */
+.hero{padding:34px 0 8px}
+.hero .hi{display:flex;gap:10px;flex-wrap:wrap;font-family:var(--head);font-weight:700;font-size:15px;color:var(--warm)}
+.hero .hi span{padding:3px 12px;border-radius:99px;background:var(--warm-soft)}
+.hero h1{font-weight:800;font-size:clamp(34px,7.2vw,58px);line-height:1.04;margin-top:16px}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.hero .lede{font-size:clamp(17px,2.4vw,20px);color:var(--ink2);margin-top:16px;max-width:36em}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:22px}
+.facts div{padding:13px 15px;border-radius:16px;background:var(--surface);border:.5px solid var(--line)}
+.facts b{display:block;font-family:var(--head);font-size:22px;line-height:1.15}
+.facts span{font-size:13.5px;color:var(--ink2)}
+
+section{margin-top:44px}
+section>h2{font-size:clamp(25px,4.4vw,32px);font-weight:800;line-height:1.15}
+section>.sub{color:var(--ink2);margin-top:6px}
+
+/* ---------- What's in the box ---------- */
+.box{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:16px}
+.box article{border-radius:20px;background:var(--surface);border:.5px solid var(--line);overflow:hidden;display:flex;flex-direction:column}
+.box .pic{height:118px;position:relative;overflow:hidden;background:#101544}
+.box .tx{padding:13px 15px 15px}
+.box h3{font-size:18px;font-weight:700}
+.box p{font-size:14.5px;color:var(--ink2);line-height:1.5;margin-top:3px}
+/* tiny drawings of each screen */
+.pic.sky i{position:absolute;height:2px;width:54px;border-radius:2px;background:linear-gradient(90deg,transparent,#ffc58a);transform:rotate(38deg);transform-origin:100% 50%}
+.pic.sky b{position:absolute;color:#f1f3ff;font:600 15px var(--body);white-space:nowrap}
+.pic.sky b small{display:block;font-weight:400;font-size:10px;color:#aeb6e6}
+.pic.tv{background:#0f1436;display:grid;grid-template-columns:1.25fr 1fr;gap:8px;padding:12px}
+.pic.tv .v{border-radius:8px;background:linear-gradient(135deg,#3b4aa8,#1c7a8a);position:relative}
+.pic.tv .v::after{content:"你好，我是小明";position:absolute;left:6px;right:6px;bottom:6px;font:600 10px var(--body);color:#fff;text-align:center;background:rgba(0,0,0,.45);border-radius:5px;padding:2px}
+.pic.tv .l{display:flex;flex-direction:column;gap:5px}
+.pic.tv .l u{display:block;height:17px;border-radius:5px;background:rgba(255,255,255,.1);text-decoration:none}
+.pic.tv .l u:nth-child(2){background:rgba(255,211,110,.35)}
+.pic.ph{background:var(--surface2);display:flex;justify-content:center;align-items:flex-end;gap:14px}
+.pic.ph .p{width:70px;height:104px;border-radius:12px 12px 0 0;background:#151b44;border:3px solid #26331f;border-bottom:0;padding:6px;display:flex;flex-direction:column;gap:4px}
+.pic.ph .p u{display:block;border-radius:4px;background:rgba(255,255,255,.14);height:9px;text-decoration:none}
+.pic.ph .p u:first-child{height:34px;background:linear-gradient(135deg,#c06a1f,#e0a64a)}
+.pic.ph .p.wide{width:120px;height:86px}
+.pic.game{background:#05061a}
+.pic.game s{position:absolute;border-radius:46% 54% 50% 50%;background:#5b5f7a;display:grid;place-items:center;color:#fff;font:700 12px var(--body);text-decoration:none}
+.pic.game .ship{position:absolute;left:46%;bottom:10px;width:0;height:0;border:9px solid transparent;border-bottom:18px solid #ffd36e}
+.pic.game .bk{position:absolute;top:12px;height:20px;border-radius:5px;background:#2c3f7a;color:#f3ecd8;font:700 11px var(--body);display:grid;place-items:center;padding:0 7px}
+
+/* ---------- How it works ---------- */
+.map{margin-top:16px;padding:16px;border-radius:20px;background:var(--surface);border:.5px solid var(--line);overflow-x:auto}
+.map svg{display:block;min-width:560px;width:100%;height:auto}
+.map text{font-family:var(--body);fill:var(--ink)}
+.map .s{fill:var(--ink2);font-size:11.5px}
+.map .n{fill:var(--surface2);stroke:var(--line)}
+.map .a{stroke:var(--accent);stroke-width:2;fill:none}
+.map .w{stroke:var(--warm);stroke-width:2;fill:none;stroke-dasharray:5 4}
+
+/* ---------- "My address" personaliser ---------- */
+.mine{margin-top:16px;padding:16px;border-radius:20px;background:var(--accent-soft);border:1px solid var(--accent)}
+.mine h3{font-size:19px}
+.mine .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+.mine label{flex:1;min-width:150px;font-size:13px;font-weight:600;color:var(--ink2)}
+.mine input{display:block;width:100%;margin-top:4px;height:46px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:0 12px;font:500 16px var(--mono)}
+.mine .out{margin-top:10px;font-size:14.5px;overflow-wrap:anywhere}
+
+/* ---------- Steps ---------- */
+.step{margin-top:18px;border-radius:22px;background:var(--surface);border:.5px solid var(--line);box-shadow:var(--shadow);overflow:hidden}
+.step>header{display:flex;gap:14px;align-items:center;padding:16px 18px;cursor:pointer}
+.step .num{flex:none;width:54px;height:54px;border-radius:16px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-family:var(--head);font-weight:800;font-size:26px}
+.step.done .num{background:var(--surface2);color:var(--accent)}
+.step .tri{font-size:12.5px;font-weight:600;color:var(--warm);letter-spacing:.01em}
+.step h3{font-size:clamp(19px,3.2vw,23px);font-weight:800;line-height:1.2}
+.step .time{font-size:13px;color:var(--ink3)}
+.step .hd{flex:1;min-width:0}
+.step .chev{flex:none;color:var(--ink3);font-size:20px;transition:transform .2s}
+.step.open .chev{transform:rotate(90deg)}
+.step .body{display:none;padding:2px 18px 18px}
+.step.open .body{display:block}
+.step ol,.step ul{margin:10px 0 0 1.25em}
+.step li{margin-top:7px;padding-left:2px}
+.step li::marker{color:var(--accent);font-weight:700}
+.step h4{font-family:var(--body);font-size:15px;font-weight:700;margin-top:18px;color:var(--ink)}
+.done-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:18px;padding-top:14px;border-top:1px dashed var(--line)}
+.tick{height:46px;padding:0 18px;border-radius:14px;border:0;background:var(--accent);color:var(--accent-ink);font-weight:700}
+.step.done .tick{background:var(--surface2);color:var(--ink2)}
+.done-row span{font-size:14px;color:var(--ink2)}
+
+/* click-path chips, look like the buttons you will see */
+.path{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:10px;font-size:14px}
+.path b{padding:5px 11px;border-radius:9px;background:var(--surface2);border:1px solid var(--line);font-weight:600;white-space:nowrap}
+.path b.go{background:#2da44e;color:#fff;border-color:transparent}
+.path i{font-style:normal;color:var(--ink3)}
+.note{margin-top:12px;padding:11px 14px;border-radius:14px;background:var(--warm-soft);font-size:14.5px;line-height:1.5}
+.note.tip{background:var(--sky-soft)}
+.note b{color:var(--warm)} .note.tip b{color:var(--sky)}
+
+/* copy-able blocks */
+.copy{position:relative;margin-top:10px}
+.copy pre{background:var(--code-bg);color:var(--code-ink);border-radius:14px;padding:14px 16px 14px;padding-right:74px;font:400 13.5px/1.55 var(--mono);white-space:pre-wrap;overflow-wrap:anywhere}
+.copy.say pre{font-family:var(--body);font-size:15px;background:var(--surface2);color:var(--ink);border:1px dashed var(--accent)}
+.copy button{position:absolute;right:8px;top:8px;height:32px;padding:0 12px;border-radius:9px;border:0;background:rgba(255,255,255,.14);color:var(--code-ink);font-size:13px;font-weight:600}
+.copy.say button{background:var(--accent);color:var(--accent-ink)}
+.who{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--sky);margin-top:14px}
+
+.qrs{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:12px}
+.qrs figure{padding:12px;border-radius:16px;background:var(--surface2);text-align:center}
+.qrs .q{width:132px;height:132px;margin:0 auto;padding:7px;border-radius:12px;background:#fff;display:grid;place-items:center}
+.qrs .q img,.qrs .q canvas{width:100%!important;height:auto!important}
+.qrs figcaption{font-size:13.5px;font-weight:600;margin-top:8px}
+.qrs figcaption small{display:block;font-weight:400;color:var(--ink2);overflow-wrap:anywhere}
+
+/* tables */
+.tbl{overflow-x:auto;margin-top:12px;border-radius:16px;border:.5px solid var(--line);background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:440px;font-size:14.5px}
+th,td{text-align:left;padding:9px 13px;border-bottom:.5px solid var(--line);vertical-align:top}
+th{font-size:12.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink3);font-weight:700}
+tr:last-child td{border-bottom:0}
+td:first-child{white-space:nowrap}
+
+details{margin-top:10px;border-radius:16px;background:var(--surface);border:.5px solid var(--line);padding:0 16px}
+summary{cursor:pointer;font-weight:700;padding:13px 0;list-style:none;display:flex;gap:10px}
+summary::before{content:"?";flex:none;width:24px;height:24px;border-radius:50%;background:var(--warm-soft);color:var(--warm);display:grid;place-items:center;font-size:14px}
+details[open]{padding-bottom:14px}
+details p,details li{color:var(--ink2);font-size:15px}
+details ul{margin-left:1.2em}
+
+footer{margin-top:54px;padding-top:22px;border-top:.5px solid var(--line);color:var(--ink2);font-size:14.5px;text-align:center}
+footer .big{font-family:var(--head);font-weight:800;font-size:24px;color:var(--ink)}
+#toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom));transform:translate(-50%,16px);opacity:0;pointer-events:none;z-index:70;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:14px;font-weight:600;transition:opacity .25s,transform .25s}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+:focus-visible{outline:3px solid var(--warm);outline-offset:2px}
+@media (max-width:520px){ .step>header{padding:14px} .step .num{width:46px;height:46px;font-size:22px} .step .body{padding:2px 14px 16px} }
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+@media print{ .bar,.copy button,.tick{display:none} .step .body{display:block} .step{box-shadow:none;break-inside:avoid} }
+</style>
+</head>
+<body>
+<div class="bar"><div class="in"><span id="pcount">0 of 9 steps</span><div class="track"><i id="pfill"></i></div><a href="./">Open the kit ›</a></div></div>
+
+<div class="col">
+<div class="hero">
+  <div class="hi"><span>你好!</span><span>Xin chào!</span><span>Hello!</span></div>
+  <h1>Your family's own <em>language corner</em>, in nine small steps</h1>
+  <p class="lede">This kit turns the TV into a quiet shower of Chinese and Vietnamese words, and the phones into video lessons and two slightly addictive games. This page shows how to make a copy that belongs to <b>your</b> family, with your own accounts. No coding. A helpful AI does the fiddly parts.</p>
+  <div class="facts">
+    <div><b>≈ 45 min</b><span>one evening, snacks recommended</span></div>
+    <div><b>$0</b><span>everything runs on free plans</span></div>
+    <div><b>0 lines</b><span>of code you have to write</span></div>
+    <div><b>2 languages</b><span>中文 for the kids, Tiếng Việt for Dad</span></div>
+  </div>
+</div>
+
+<section id="box">
+  <h2>What's in the box</h2>
+  <p class="sub">Four screens, one shared word list. Save a word on the phone and it flies across the TV a minute later.</p>
+  <div class="box">
+    <article><div class="pic sky"><i style="left:8%;top:22%"></i><b style="left:27%;top:30%">朋友<small>péngyou · friend</small></b><i style="left:48%;top:8%"></i><b style="left:66%;top:16%">ngon<small>delicious</small></b><i style="left:30%;top:62%"></i><b style="left:49%;top:70%">加油<small>jiāyóu · go for it!</small></b></div>
+      <div class="tx"><h3>TV meteor shower</h3><p>Words drift across the big screen while life goes on. Every 15 seconds one lights up with its meaning and an example.</p></div></article>
+    <article><div class="pic tv"><div class="v"></div><div class="l"><u></u><u></u><u></u><u></u><u></u></div></div>
+      <div class="tx"><h3>TV channel</h3><p>Real YouTube videos picked fresh every day, with subtitles and a list of useful phrases. Works with the remote.</p></div></article>
+    <article><div class="pic ph"><div class="p"><u></u><u></u><u></u><u></u></div><div class="p wide"><u></u><u></u><u></u></div></div>
+      <div class="tx"><h3>Phone &amp; iPad videos</h3><p>The same videos in your pocket. Tap a phrase to jump to the moment it is said. Tap ☆ to keep it.</p></div></article>
+    <article><div class="pic game"><s style="left:12%;top:16%;width:52px;height:46px">谢谢</s><s style="left:56%;top:8%;width:66px;height:56px;background:#7a5fb0">cà phê</s><span class="bk" style="left:34%;top:66px">你好</span><div class="ship"></div></div>
+      <div class="tx"><h3>Two games</h3><p>Word asteroids and word bricks. Break a word, see and hear what it means. "One more round" guaranteed.</p></div></article>
+  </div>
+</section>
+
+<section id="try">
+  <h2>First, play with the demo</h2>
+  <p class="sub">Before setting anything up, try the finished thing. Scan with a phone camera, or tap the links.</p>
+  <div class="qrs">
+    <figure><div class="q" data-qr="demo:?lang=zh"></div><figcaption>Chinese · 中文<small>videos + games</small></figcaption></figure>
+    <figure><div class="q" data-qr="demo:?lang=vi"></div><figcaption>Vietnamese · Tiếng Việt<small>videos + games</small></figcaption></figure>
+    <figure><div class="q" data-qr="demo:game.html?lang=zh"></div><figcaption>Word asteroids<small>turn the phone sideways</small></figcaption></figure>
+    <figure><div class="q" data-qr="demo:tv.html?lang=zh"></div><figcaption>TV meteor shower<small>best on a big screen</small></figcaption></figure>
+  </div>
+  <p class="note tip"><b>The demo is shared.</b> Words you save there land in the demo's word list, which everyone trying it sees. Your own copy gets a private one (step 5).</p>
+</section>
+
+<section id="how">
+  <h2>How it works, in one picture</h2>
+  <p class="sub">Your copy lives in three free places. You own all of them.</p>
+  <div class="map">
+    <svg viewBox="0 0 700 300" role="img" aria-label="A home computer finds videos and asks an AI for phrases, then saves them to GitHub. GitHub publishes the website. The TV, iPad and phones open the website and share saved words through Firebase.">
+      <defs><marker id="ar" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--accent)"/></marker>
+            <marker id="aw" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--warm)"/></marker></defs>
+      <rect class="n" x="14" y="26" width="170" height="92" rx="16"/><text x="30" y="56" font-weight="700" font-size="15">Daily robot</text><text class="s" x="30" y="76">your computer, each morning:</text><text class="s" x="30" y="92">finds videos on YouTube,</text><text class="s" x="30" y="108">asks AI for phrases + words</text>
+      <rect class="n" x="264" y="26" width="170" height="92" rx="16"/><text x="280" y="56" font-weight="700" font-size="15">GitHub</text><text class="s" x="280" y="76">keeps the kit's files and</text><text class="s" x="280" y="92">publishes them as your</text><text class="s" x="280" y="108">family website, for free</text>
+      <rect class="n" x="514" y="14" width="172" height="52" rx="14"/><text x="530" y="45" font-weight="700" font-size="14.5">TV</text><text class="s" x="560" y="45">meteors + channel</text>
+      <rect class="n" x="514" y="78" width="172" height="52" rx="14"/><text x="530" y="109" font-weight="700" font-size="14.5">iPad</text><text class="s" x="574" y="109">videos + games</text>
+      <rect class="n" x="514" y="142" width="172" height="52" rx="14"/><text x="530" y="173" font-weight="700" font-size="14.5">Phones</text><text class="s" x="592" y="173">videos + games</text>
+      <rect class="n" x="264" y="206" width="170" height="76" rx="16"/><text x="280" y="236" font-weight="700" font-size="15">Firebase</text><text class="s" x="280" y="256">remembers ★ saved words</text><text class="s" x="280" y="272">and ✓ watched videos</text>
+      <path class="a" d="M184,72 H258" marker-end="url(#ar)"/><text class="s" x="196" y="64">saves</text>
+      <path class="a" d="M434,60 C470,60 478,40 508,40" marker-end="url(#ar)"/><path class="a" d="M434,74 C470,74 478,104 508,104" marker-end="url(#ar)"/><path class="a" d="M434,88 C470,88 470,168 508,168" marker-end="url(#ar)"/>
+      <path class="w" d="M600,198 C600,250 500,246 440,246" marker-end="url(#aw)"/><text class="s" x="486" y="270">devices sync through it</text>
+    </svg>
+  </div>
+</section>
+
+<section id="steps">
+  <h2>The nine steps</h2>
+  <p class="sub">Tap a step to open it. Tick it when done; this page remembers. Steps 1 and 2 already give you a working site. The rest make it fresh, private and yours.</p>
+
+  <div class="mine" id="mine">
+    <h3>✍️ Type your GitHub name once, and this guide rewrites itself for you</h3>
+    <div class="row">
+      <label>Your GitHub username<input id="ghUser" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="e.g. aaron-family"></label>
+      <label>Your copy's name<input id="ghRepo" autocomplete="off" autocapitalize="off" spellcheck="false" value="family-language-kit"></label>
+    </div>
+    <p class="out">Your family site will be: <a data-link="site" href="#"></a></p>
+  </div>
+
+  <!-- 1 -->
+  <article class="step" data-step="1"><header><div class="num">1</div><div class="hd"><div class="tri">第一步 dì yī bù · Bước một</div><h3>Get your own copy</h3><div class="time">3 minutes · needs: an email address</div></div><div class="chev">›</div></header>
+  <div class="body">
+    <p>GitHub is a free home for projects. Your copy of the kit will live there, and GitHub will also serve it as a website.</p>
+    <ol>
+      <li>No GitHub account yet? Create one at <a href="https://github.com/signup" target="_blank" rel="noopener">github.com/signup</a>. Pick a username you like: it becomes part of your family site's address.</li>
+      <li>Open the kit: <a data-link="template" href="#" target="_blank" rel="noopener"></a></li>
+      <li>Press the green button, then fill in the name.</li>
+    </ol>
+    <div class="path"><b class="go">Use this template ▾</b><i>›</i><b>Create a new repository</b><i>›</i><b>Repository name: family-language-kit</b><i>›</i><b>◉ Public</b><i>›</i><b class="go">Create repository</b></div>
+    <p class="note"><b>Keep it Public.</b> GitHub's free plan only publishes websites from public projects. Nothing personal is in there: just videos lists and vocabulary.</p>
+    <div class="done-row"><button class="tick">✓ Done</button><span>You now own a full copy, demo videos included.</span></div>
+  </div></article>
+
+  <!-- 2 -->
+  <article class="step" data-step="2"><header><div class="num">2</div><div class="hd"><div class="tri">第二步 dì èr bù · Bước hai</div><h3>Switch on your family website</h3><div class="time">2 minutes · then a 1-minute wait</div></div><div class="chev">›</div></header>
+  <div class="body">
+    <p>In your new copy on GitHub: <a data-link="pages" href="#" target="_blank" rel="noopener">open the Pages settings</a>, or click your way there:</p>
+    <div class="path"><b>⚙ Settings</b><i>›</i><b>Pages</b><i>›</i><b>Source: Deploy from a branch</b><i>›</i><b>Branch: main</b><i>›</i><b>Folder: /docs</b><i>›</i><b class="go">Save</b></div>
+    <p style="margin-top:12px">Make a cup of tea (茶 chá · trà). After about a minute your site is live at <a data-link="site" href="#" target="_blank" rel="noopener"></a>. Open it on your phone:</p>
+    <div class="qrs"><figure><div class="q" data-qr="site:"></div><figcaption>Your family site<small data-text="site"></small></figcaption></figure></div>
+    <p class="note tip"><b>That's already a working kit.</b> If you stop here you have the TV shower, the videos and the games with the starter content. The next steps add daily new videos, private sync and the TV app.</p>
+    <div class="done-row"><button class="tick">✓ Done</button><span>The site opens on my phone.</span></div>
+  </div></article>
+
+  <!-- 3 -->
+  <article class="step" data-step="3"><header><div class="num">3</div><div class="hd"><div class="tri">第三步 dì sān bù · Bước ba</div><h3>Hire your AI helper</h3><div class="time">10 minutes · needs: a computer (Mac or Windows)</div></div><div class="chev">›</div></header>
+  <div class="body">
+    <p>From here on you don't type commands. You tell an AI coding helper what you want in plain English and it does the clicking and typing on your computer. Pick one:</p>
+    <div class="tbl"><table>
+      <tr><th>Helper</th><th>Get it</th><th>Good to know</th></tr>
+      <tr><td><b>Claude Code</b></td><td><a href="https://claude.com/claude-code" target="_blank" rel="noopener">claude.com/claude-code</a><br>(desktop app, "Code" tab)</td><td>Needs a Claude subscription. This kit was built with it.</td></tr>
+      <tr><td><b>Antigravity</b></td><td><a href="https://antigravity.google" target="_blank" rel="noopener">antigravity.google</a></td><td>Google's helper; sign in with a Google account.</td></tr>
+    </table></div>
+    <h4>Bring your copy onto the computer</h4>
+    <ol>
+      <li>Install <a href="https://desktop.github.com" target="_blank" rel="noopener">GitHub Desktop</a> and sign in with your GitHub account.</li>
+      <li>In GitHub Desktop: <b>File › Clone repository</b>, choose <code data-text="repo"></code>, press <b>Clone</b>. Remember the folder it picks (usually <code>Documents/GitHub/family-language-kit</code>).</li>
+      <li>Open that folder in your AI helper (<b>Open folder</b> / <b>Select folder</b>).</li>
+    </ol>
+    <span class="who">Say this to your AI helper</span>
+    <div class="copy say"><pre>Hi! This folder is my family's copy of the Family Language Kit. Please read AGENTS.md and README.md, then tell me in three sentences what this project does and check that Python 3 and git are installed on this computer. If something is missing, install it for me or tell me exactly what to click.</pre><button>Copy</button></div>
+    <p class="note tip"><b>The golden rule:</b> when anything in this guide feels confusing, paste the step into your helper and add "do this with me". It has read the project's instructions and knows where everything is.</p>
+    <div class="done-row"><button class="tick">✓ Done</button><span>My helper can see the folder.</span></div>
+  </div></article>
+
+  <!-- 4 -->
+  <article class="step" data-step="4"><header><div class="num">4</div><div class="hd"><div class="tri">第四步 dì sì bù · Bước bốn</div><h3>Collect two free keys</h3><div class="time">10 minutes · needs: a Google account</div></div><div class="chev">›</div></header>
+  <div class="body">
+    <p>The daily robot needs two library cards: one to search YouTube, one to ask an AI teacher for phrases. Both are free and both come from Google. A key is a long password made of letters and numbers: treat it like one.</p>
+    <h4>Key 1: Gemini (the AI teacher)</h4>
+    <ol><li>Open <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a> and sign in.</li><li>Press <b>Create API key</b>, then copy it.</li></ol>
+    <h4>Key 2: YouTube Data API (the video finder)</h4>
+    <ol>
+      <li>Open <a href="https://console.cloud.google.com/apis/library/youtube.googleapis.com" target="_blank" rel="noopener">the YouTube Data API v3 page</a> in Google Cloud. Create a project if it asks (any name), then press <b>Enable</b>.</li>
+      <li>Go to <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener">Credentials</a>.</li>
+    </ol>
+    <div class="path"><b>+ Create credentials</b><i>›</i><b>API key</b><i>›</i><b>Copy</b></div>
+    <h4>Put the keys where the robot looks</h4>
+    <p>On your computer the keys live in a small file called <code>.env.local</code> inside the project folder. That file is on the kit's "never upload" list, so it stays on your computer.</p>
+    <span class="who">Say this to your AI helper</span>
+    <div class="copy say"><pre>Create the file .env.local in this project with two lines, GEMINI_API_KEY= and YOUTUBE_API_KEY=, then open it so I can paste my two keys in myself. Don't print the keys back to me and never commit this file.</pre><button>Copy</button></div>
+    <p>Then give the same two keys to GitHub, so its own small daily job can run too: <a data-link="secrets" href="#" target="_blank" rel="noopener">open your copy's secrets page</a> and add them one at a time.</p>
+    <div class="path"><b>⚙ Settings</b><i>›</i><b>Secrets and variables</b><i>›</i><b>Actions</b><i>›</i><b class="go">New repository secret</b></div>
+    <div class="tbl"><table><tr><th>Name (exactly)</th><th>Secret</th></tr><tr><td><code>GEMINI_API_KEY</code></td><td>your Gemini key</td></tr><tr><td><code>YOUTUBE_API_KEY</code></td><td>your YouTube key</td></tr></table></div>
+    <p class="note"><b>Free means small.</b> Gemini's free plan allows about 20 requests a day per model. The kit is tuned for that (6 new videos per language a day) and quietly switches to another Gemini model when one runs out. Prefer Claude as the teacher? Add <code>ANTHROPIC_API_KEY</code> and a repository <i>variable</i> <code>AI_PROVIDER</code> = <code>claude</code>.</p>
+    <div class="done-row"><button class="tick">✓ Done</button><span>Two keys, in two places.</span></div>
+  </div></article>
+
+  <!-- 5 -->
+  <article class="step" data-step="5"><header><div class="num">5</div><div class="hd"><div class="tri">第五步 dì wǔ bù · Bước năm</div><h3>Make the devices share one word list</h3><div class="time">8 minutes · optional, but it's the magic part</div></div><div class="chev">›</div></header>
+  <div class="body">
+    <p>Firebase is a free Google notebook in the cloud. The TV, iPad and phones all write their ★ saved words and ✓ watched videos into it, so they stay in step. Right now your copy still points at the demo's notebook. Give your family its own:</p>
+    <ol>
+      <li>Open <a href="https://console.firebase.google.com" target="_blank" rel="noopener">console.firebase.google.com</a> › <b>Create a project</b> (any name; Analytics is not needed).</li>
+      <li>In the left menu: <b>Build › Realtime Database › Create Database</b>. Pick the location nearest you and <b>Start in locked mode</b>.</li>
+      <li>Open the <b>Rules</b> tab, replace everything with the rules below, and press <b>Publish</b>.</li>
+    </ol>
+    <div class="copy"><pre>{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "sync": {
+      "$id": {
+        ".read": "$id.length >= 23",
+        ".write": "$id.length >= 23",
+        "flags": {
+          "$video": {
+            ".validate": "newData.hasChildren(['t']) && newData.child('t').isNumber()"
+          }
+        }
+      }
+    }
+  }
+}</pre><button>Copy</button></div>
+    <ol start="4"><li>Go back to the <b>Data</b> tab and copy the address at the top. It looks like <code>https://your-project-default-rtdb.firebaseio.com</code>.</li>
+    <li>Your family needs a secret room name. Here is a fresh random one, made on your device just now:</li></ol>
+    <div class="copy"><pre id="famCode">…</pre><button>Copy</button></div>
+    <span class="who">Say this to your AI helper</span>
+    <div class="copy say"><pre id="syncSay">In docs/config.js set syncDb to MY_FIREBASE_ADDRESS and syncCode to MY_FAMILY_CODE, set familyName to "The ______ family", then commit and push with the message "Our own family sync".</pre><button>Copy</button></div>
+    <p class="note"><b>What's in the notebook?</b> Only video ids and vocabulary. No names, no accounts. Anyone who knows the room name could read or change the word list, which is why it is long and random.</p>
+    <div class="done-row"><button class="tick">✓ Done</button><span>Save a word on the phone, see it on the TV.</span></div>
+  </div></article>
+
+  <!-- 6 -->
+  <article class="step" data-step="6"><header><div class="num">6</div><div class="hd"><div class="tri">第六步 dì liù bù · Bước sáu</div><h3>Wake up the daily robot</h3><div class="time">5 minutes · then it runs by itself</div></div><div class="chev">›</div></header>
+  <div class="body">
+    <p>Every day the robot looks for new videos with real Chinese and Vietnamese subtitles, asks the AI teacher for 8 to 12 useful phrases in each, adds five new words per language, and publishes everything to your site.</p>
+    <span class="who">Say this to your AI helper</span>
+    <div class="copy say"><pre>Run the daily update once now (scripts/run_local.sh on a Mac, scripts\run_local.bat on Windows) and show me what it added. Then schedule it to run every morning at 6:30 on this computer: use scripts/install_daily_mac.sh on a Mac, or Windows Task Scheduler on Windows.</pre><button>Copy</button></div>
+    <h4>Prefer doing it by hand?</h4>
+    <div class="tbl"><table>
+      <tr><th></th><th>Run once</th><th>Every morning</th></tr>
+      <tr><td><b>Mac</b></td><td><code>./scripts/run_local.sh</code></td><td><code>./scripts/install_daily_mac.sh</code></td></tr>
+      <tr><td><b>Windows</b></td><td>double-click <code>scripts\run_local.bat</code></td><td>Task Scheduler › Create Basic Task › Daily › start <code>run_local.bat</code></td></tr>
+    </table></div>
+    <p class="note"><b>Why your own computer?</b> YouTube happily hands subtitles to a home internet connection but usually refuses GitHub's servers. So GitHub's daily job adds the new words, and your computer adds the new videos. If the computer is asleep at 6:30, it catches up when it wakes.</p>
+    <p>Check GitHub's side once: <a data-link="actions" href="#" target="_blank" rel="noopener">open the Actions tab</a>. If it asks, press <b>I understand my workflows, go ahead and enable them</b>.</p>
+    <div class="done-row"><button class="tick">✓ Done</button><span>New videos appeared in the rows.</span></div>
+  </div></article>
+
+  <!-- 7 -->
+  <article class="step" data-step="7"><header><div class="num">7</div><div class="hd"><div class="tri">第七步 dì qī bù · Bước bảy</div><h3>Put it on the TV</h3><div class="time">10 minutes · depends on your TV</div></div><div class="chev">›</div></header>
+  <div class="body">
+    <h4>Google TV, Android TV, Fire TV: install the little app</h4>
+    <ol>
+      <li>Build your app once: <a data-link="apk-run" href="#" target="_blank" rel="noopener">open "Build the TV app"</a> and press <b>Run workflow</b>. Three minutes later it appears under <a data-link="releases" href="#" target="_blank" rel="noopener">Releases</a>.</li>
+      <li>On the TV, install the free app <b>Downloader</b> (by AFTVnews) from the app store.</li>
+      <li>Open Downloader and type this address (or its short code from <a href="https://go.aftvnews.com" target="_blank" rel="noopener">go.aftvnews.com</a>):</li>
+    </ol>
+    <div class="copy"><pre data-text="apk"></pre><button>Copy</button></div>
+    <ol start="4"><li>The TV asks permission to install from Downloader. Allow it (<b>Settings › Apps › Security › Install unknown apps › Downloader</b>), then press <b>Install</b>.</li>
+    <li>Open <b>Family Language TV</b>. Words start falling.</li></ol>
+    <h4>Apple TV, Samsung, LG and others</h4>
+    <ul>
+      <li><b>TV with a web browser:</b> open <code data-text="tv"></code> and bookmark it.</li>
+      <li><b>Apple TV / AirPlay:</b> open that address in Safari on an iPhone, iPad or Mac and use <b>Screen Mirroring</b>.</li>
+      <li><b>Chromecast:</b> open it in Chrome on a laptop, then <b>⋮ › Cast…</b>.</li>
+    </ul>
+    <h4>Remote control cheat sheet</h4>
+    <div class="tbl"><table>
+      <tr><th>Where</th><th>Key</th><th>What happens</th></tr>
+      <tr><td rowspan="4">Meteor shower</td><td><kbd>OK</kbd> or <kbd>▶</kbd></td><td>Words one by one. Then <kbd>◀</kbd> <kbd>▶</kbd> change word, <kbd>OK</kbd> says it, <kbd>Back</kbd> returns.</td></tr>
+      <tr><td><kbd>▲</kbd></td><td>Open the TV channel (videos).</td></tr>
+      <tr><td><kbd>▼</kbd> <kbd>▼</kbd></td><td>Switch language: 中文 ⇄ Tiếng Việt.</td></tr>
+      <tr><td><kbd>◀</kbd></td><td>Light / dark / automatic.</td></tr>
+      <tr><td rowspan="4">Watching a video</td><td><kbd>▲</kbd></td><td>Study mode: small video, phrase list, meaning card.</td></tr>
+      <tr><td><kbd>▶</kbd></td><td>In study mode: save the phrase ★. Otherwise: skip 10 seconds.</td></tr>
+      <tr><td><kbd>◀</kbd></td><td>In study mode: hear the sentence again.</td></tr>
+      <tr><td><kbd>▼</kbd></td><td>Menu: speed, subtitles (Chinese/Vietnamese, English, off), mark as watched.</td></tr>
+    </table></div>
+    <div class="done-row"><button class="tick">✓ Done</button><span>The living room is raining vocabulary.</span></div>
+  </div></article>
+
+  <!-- 8 -->
+  <article class="step" data-step="8"><header><div class="num">8</div><div class="hd"><div class="tri">第八步 dì bā bù · Bước tám</div><h3>Put it on every phone and iPad</h3><div class="time">1 minute per device</div></div><div class="chev">›</div></header>
+  <div class="body">
+    <p>Each person scans the code for their language. The device remembers the choice; the 🌏 button switches.</p>
+    <div class="qrs">
+      <figure><div class="q" data-qr="site:?lang=zh"></div><figcaption>Kids · 中文</figcaption></figure>
+      <figure><div class="q" data-qr="site:?lang=vi"></div><figcaption>Dad · Tiếng Việt</figcaption></figure>
+    </div>
+    <ul>
+      <li><b>iPhone / iPad:</b> in Safari tap <b>Share ⬆ › Add to Home Screen</b>. It opens full screen like an app.</li>
+      <li><b>Android:</b> in Chrome tap <b>⋮ › Add to Home screen</b>.</li>
+      <li>Videos: tap a phrase to hear that moment, <b>☆</b> to save it, <b>🔊</b> to hear the word read slowly. Swipe a phrase right to save without stopping the video.</li>
+      <li>Games: turn the phone sideways for asteroids. Saved ★ words come back as gold targets with a power-up, so saving words pays off.</li>
+    </ul>
+    <div class="done-row"><button class="tick">✓ Done</button><span>Everyone has an icon on their home screen.</span></div>
+  </div></article>
+
+  <!-- 9 -->
+  <article class="step" data-step="9"><header><div class="num">9</div><div class="hd"><div class="tri">第九步 dì jiǔ bù · Bước chín</div><h3>Make it yours</h3><div class="time">whenever you feel like it</div></div><div class="chev">›</div></header>
+  <div class="body">
+    <p>Everything is a plain text file in your copy, and your AI helper can change any of it. Things families usually ask for:</p>
+    <span class="who">Say things like this to your AI helper</span>
+    <div class="copy say"><pre>My kids are 7 and 10 and love football and Minecraft. Update the Chinese learner description in video/languages.json and add matching search phrases and kid-safe YouTube channels to video/zh/sources.json.</pre><button>Copy</button></div>
+    <div class="copy say"><pre>Add these Vietnamese words to docs/data/vi/words.json with pronunciation, meaning and an example each: bún chả, đi bộ, cuối tuần.</pre><button>Copy</button></div>
+    <div class="copy say"><pre>Add the YouTube video https://www.youtube.com/watch?v=XXXXXXXXXXX to video/zh/picks.json and run the daily update for Chinese.</pre><button>Copy</button></div>
+    <div class="copy say"><pre>Grandma wants to learn Spanish. Add a third language "es" everywhere it is needed (docs/config.js, video/languages.json, video/es/, docs/data/es/words.json with 60 starter words) and run the daily update for it.</pre><button>Copy</button></div>
+    <p>No helper nearby? Words can also be added right on the TV page: open <b>Word list</b> and type <code>word | meaning</code>.</p>
+    <div class="done-row"><button class="tick">✓ Done</button><span>It feels like ours now.</span></div>
+  </div></article>
+</section>
+
+<section id="faq">
+  <h2>When something sulks</h2>
+  <details><summary>My site shows a "404" page</summary><p>Step 2 needs a minute or two the first time. Check that the folder is <code>/docs</code> (not <code>/ (root)</code>) and that the project is Public. Still nothing after ten minutes? Ask your helper: "check why GitHub Pages is not publishing".</p></details>
+  <details><summary>No new videos arrived today</summary><ul><li>The computer was off all day: the robot runs when it wakes up.</li><li>The AI teacher's free allowance was used up: it continues tomorrow by itself.</li><li>Look at the log: on a Mac <code>~/Library/Logs/family-language-kit.log</code>. Or say to your helper: "run the daily update now and explain what happened".</li></ul></details>
+  <details><summary>A video says it cannot be played</summary><p>Some channels forbid playing their videos outside youtube.com, and videos get deleted. The TV skips to the next one by itself. On the phone, the <b>YT↗</b> button opens it in the YouTube app.</p></details>
+  <details><summary>The subtitles or pinyin look a bit off</summary><p>Many videos only have automatic subtitles, and the AI teacher is good but not perfect. Videos with subtitles made by the channel itself are preferred. If a video is poor, archive it (🗂) and it leaves the rows on every device.</p></details>
+  <details><summary>The TV does not read words aloud</summary><p>Most TVs have no voice for Chinese or Vietnamese built in. Phones, iPads and computers do: the 🔊 buttons and the games speak there.</p></details>
+  <details><summary>Does this cost anything, ever?</summary><p>Not at these sizes. GitHub (site and daily job), Gemini's free plan, YouTube's free search allowance (10,000 units a day; the kit uses about 1,300) and Firebase's free plan are all far bigger than one family needs. No credit card is required for any of them.</p></details>
+  <details><summary>What do the kids see? Is it safe?</summary><p>Video search runs with YouTube's strict SafeSearch, only from the topics and channels in <code>sources.json</code>, and you can remove any video with 🗂. It is still YouTube, so the first few times, watch together. 一起看 yìqǐ kàn · cùng xem.</p></details>
+</section>
+
+<footer>
+  <div class="big">加油! Cố lên!</div>
+  <p style="margin-top:6px">Both mean "you can do it". Ten words a week is five hundred a year.</p>
+  <p style="margin-top:14px"><a href="./">Open the kit</a> · <a href="share.html">QR codes to share</a> · <a data-link="repo" href="#">The project on GitHub</a></p>
+</footer>
+</div>
+<div id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+(() => {
+  const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+  const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
+  let toastT;
+  const toast = m => { const el = $('#toast'); el.textContent = m; el.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('show'), 1800); };
+
+  /* Where is this guide being read? On <owner>.github.io/<repo>/ the demo address is that site. */
+  const gh = location.hostname.match(/^([^.]+)\.github\.io$/);
+  const DEMO_OWNER = gh ? gh[1] : 'nguyenanhdungcontact';
+  const DEMO_REPO = gh ? (location.pathname.split('/')[1] || 'family-language-kit') : 'family-language-kit';
+  const demoSite = gh ? `https://${DEMO_OWNER}.github.io/${DEMO_REPO}/` : location.href.replace(/[?#].*$/, '').replace(/[^/]*$/, '');
+
+  const uIn = $('#ghUser'), rIn = $('#ghRepo');
+  uIn.value = store.get('guide.user') || ''; rIn.value = store.get('guide.repo') || 'family-language-kit';
+  const clean = v => v.trim().replace(/^@/, '').replace(/[^A-Za-z0-9._-]/g, '');
+
+  function drawQR(el, text) {
+    el.innerHTML = '';
+    if (window.QRCode) new QRCode(el, { text, width: 236, height: 236, colorDark: '#111111', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M });
+    else el.textContent = 'QR needs internet';
+  }
+  function paint() {
+    const user = clean(uIn.value), repo = clean(rIn.value) || 'family-language-kit';
+    store.set('guide.user', user); store.set('guide.repo', repo);
+    const who = user || 'YOUR-NAME', low = who.toLowerCase();
+    const repoUrl = `https://github.com/${who}/${repo}`, site = `https://${low}.github.io/${repo}/`;
+    const L = {
+      site, repo: repoUrl,
+      template: `https://github.com/${DEMO_OWNER}/${DEMO_REPO}`,
+      pages: `${repoUrl}/settings/pages`, secrets: `${repoUrl}/settings/secrets/actions`, actions: `${repoUrl}/actions`,
+      'apk-run': `${repoUrl}/actions/workflows/build-apk.yml`, releases: `${repoUrl}/releases`,
+    };
+    const T = { site, repo: `${who}/${repo}`, apk: `${repoUrl}/releases/latest/download/family-language-tv.apk`, tv: `${site}tv.html` };
+    $$('[data-link]').forEach(a => { const k = a.dataset.link; a.href = L[k]; if (!a.textContent.trim() || a.dataset.auto) { a.textContent = L[k].replace('https://', ''); a.dataset.auto = '1'; } });
+    $$('[data-text]').forEach(e => { e.textContent = T[e.dataset.text]; });
+    $$('[data-qr]').forEach(el => { const [kind, path] = el.dataset.qr.split(/:(.*)/); drawQR(el, (kind === 'demo' ? demoSite : site) + (path || '')); });
+  }
+  uIn.addEventListener('input', paint); rIn.addEventListener('input', paint);
+
+  /* A fresh family code, made in this browser: 24 random letters and digits in groups of six */
+  function newCode() {
+    const abc = 'abcdefghjkmnpqrstuvwxyz23456789', b = new Uint8Array(24);
+    crypto.getRandomValues(b);
+    let s = ''; for (let i = 0; i < 24; i++) s += abc[b[i] % abc.length];
+    return s.replace(/(.{6})(?=.)/g, '$1-');
+  }
+  let code = store.get('guide.code'); if (!code) { code = newCode(); store.set('guide.code', code); }
+  $('#famCode').textContent = code;
+  $('#syncSay').textContent = $('#syncSay').textContent.replace('MY_FAMILY_CODE', `"${code}"`).replace('MY_FIREBASE_ADDRESS', '"(paste the address from Firebase here)"');
+
+  /* Copy buttons */
+  document.addEventListener('click', async e => {
+    const b = e.target.closest('.copy button'); if (!b) return;
+    const text = b.parentNode.querySelector('pre').textContent;
+    try { await navigator.clipboard.writeText(text); toast('Copied'); }
+    catch (x) { const r = document.createRange(); r.selectNodeContents(b.parentNode.querySelector('pre')); const s = getSelection(); s.removeAllRanges(); s.addRange(r); toast('Selected: press copy'); }
+  });
+
+  /* Steps: open/close, tick, progress */
+  const steps = $$('.step');
+  const done = new Set((store.get('guide.done') || '').split(',').filter(Boolean));
+  function progress() {
+    steps.forEach(s => { const on = done.has(s.dataset.step); s.classList.toggle('done', on); s.querySelector('.tick').textContent = on ? '↺ Not done yet' : '✓ Done'; s.querySelector('.num').textContent = on ? '✓' : s.dataset.step; });
+    $('#pcount').textContent = done.size === steps.length ? 'All 9 steps done 🎉' : `${done.size} of ${steps.length} steps`;
+    $('#pfill').style.width = (done.size / steps.length * 100) + '%';
+  }
+  steps.forEach(s => {
+    s.querySelector('header').addEventListener('click', () => s.classList.toggle('open'));
+    s.querySelector('.tick').addEventListener('click', () => {
+      const k = s.dataset.step;
+      if (done.has(k)) done.delete(k); else {
+        done.add(k); s.classList.remove('open');
+        const next = steps.find(x => !done.has(x.dataset.step));
+        if (next) { next.classList.add('open'); next.scrollIntoView({ block: 'start' }); toast('好! Tốt lắm! Next one.'); } else toast('太棒了! Tuyệt vời! All done.');
+      }
+      store.set('guide.done', [...done].join(',')); progress();
+    });
+  });
+  (steps.find(x => !done.has(x.dataset.step)) || steps[0]).classList.add('open');
+  progress(); paint();
+})();
+</script>
+</body>
+</html>

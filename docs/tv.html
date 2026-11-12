@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Word meteor shower</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<script>
+/* 6:00–18:00 uses the bright garden look, evenings use the starry sky (Auto); Light or Dark can also be fixed. */
+/* Theme: 'auto' (by the clock), 'day' or 'night'. Shared by the dashboard and the video pages. */
+window.themePref = function(){
+  const q = new URLSearchParams(location.search).get('theme');
+  if (q === 'day' || q === 'night') return q;
+  try { const v = localStorage.getItem('tvv.theme'); if (v === 'day' || v === 'night') return v; } catch(e){}
+  return 'auto';
+};
+window.applyTheme = function(){
+  const pref = themePref(), h = new Date().getHours();
+  const day = pref === 'auto' ? (h >= 6 && h < 18) : pref === 'day';
+  document.documentElement.classList.toggle('day', day);
+  document.documentElement.classList.toggle('night', !day);
+};
+window.setThemePref = function(v){ try { localStorage.setItem('tvv.theme', v); } catch(e){} applyTheme(); };
+applyTheme(); setInterval(applyTheme, 60000);
+</script>
+<script src="config.js"></script>
+<script src="learn-core.js"></script>
+<style>
+  :root {
+    --space-deep: #141d4a;
+    --space-mid: #2a2163;
+    --nebula: rgba(120, 90, 220, 0.28);
+    --nebula-2: rgba(60, 150, 200, 0.18);
+    --head: #f2f8ff;
+    --glow: rgba(160, 205, 255, 0.85);
+    --tail: #ffc58a;
+    --text: #f1f3ff;
+    --muted: #aeb6e6;
+    --panel: rgba(16, 20, 58, 0.78);
+    --panel-edge: rgba(190, 200, 255, 0.22);
+    --rail: rgba(14, 18, 52, 0.72);
+    --card: rgba(255, 255, 255, 0.045);
+    --card-hover: rgba(255, 255, 255, 0.09);
+    --c-hot: #ffb86b;
+    --c-work: #8cc8ff;
+    --c-life: #7fe0b8;
+    --c-heart: #ff9fb8;
+    color-scheme: dark;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --space-deep: #060a24;
+      --space-mid: #170f3c;
+      --nebula: rgba(110, 70, 210, 0.24);
+      --nebula-2: rgba(40, 120, 180, 0.16);
+      --panel: rgba(8, 11, 38, 0.8);
+      --rail: rgba(7, 10, 34, 0.74);
+    }
+  }
+  :root[data-theme="dark"] {
+    --space-deep: #060a24;
+    --space-mid: #170f3c;
+    --nebula: rgba(110, 70, 210, 0.24);
+    --nebula-2: rgba(40, 120, 180, 0.16);
+    --panel: rgba(8, 11, 38, 0.8);
+    --rail: rgba(7, 10, 34, 0.74);
+  }
+  *, *::before, *::after { box-sizing: inherit; }
+  html { height: 100%; scroll-padding-top: env(safe-area-inset-top, 0px); }
+  body {
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    background: var(--space-deep);
+    color: var(--text);
+    font-family: "Be Vietnam Pro", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+
+  #sky {
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse 50% 45% at 80% 22%, var(--nebula), transparent 70%),
+      radial-gradient(ellipse 40% 40% at 45% 90%, var(--nebula-2), transparent 70%),
+      linear-gradient(170deg, var(--space-mid), var(--space-deep) 65%);
+  }
+  #stars { position: fixed; inset: 0; width: 100%; height: 100%; }
+
+
+  /* ---------- Meteor field (whole screen) ---------- */
+  #field { position: fixed; top: 0; bottom: 0; right: 0; left: 0; overflow: hidden; }
+  .meteor {
+    position: absolute; left: 0; top: 0;
+    will-change: transform;
+    font-size: calc(var(--s) * clamp(1.3rem, 2.3vw, 3rem));
+    opacity: calc(0.45 + var(--s) * 0.55);
+    cursor: pointer;
+    transition: opacity .6s ease;
+  }
+  .meteor .tail {
+    position: absolute; left: 0; top: 0;
+    width: calc(var(--s) * 34vmin); height: 2px;
+    transform-origin: 0 50%;
+    transform: translateY(-1px) rotate(var(--tail-angle));
+    background: linear-gradient(90deg, var(--tail), rgba(255, 197, 138, 0.35) 30%, transparent);
+    border-radius: 2px;
+    filter: blur(0.4px);
+  }
+  .meteor .head {
+    position: absolute; left: -0.22em; top: -0.22em;
+    width: 0.44em; height: 0.44em; border-radius: 50%;
+    background: var(--head);
+    box-shadow: 0 0 0.5em 0.15em var(--glow), 0 0 1.4em 0.3em rgba(255, 190, 120, 0.35);
+  }
+  .meteor .label { position: absolute; left: 0.55em; top: 0.1em; white-space: nowrap; line-height: 1.1; }
+  .meteor .w {
+    display: block;
+    font-family: "Bricolage Grotesque", "Segoe UI", Roboto, Arial, sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    text-shadow: 0 0 18px rgba(150, 190, 255, 0.45);
+  }
+  .meteor .vi { display: block; margin-top: 0.15em; font-size: 0.48em; color: var(--muted); max-width: 24em; overflow: hidden; text-overflow: ellipsis; }
+  .meteor.lit { opacity: 1; z-index: 5; }
+  .meteor.lit .w { color: #fff; text-shadow: 0 0 22px var(--glow), 0 0 44px rgba(255, 190, 120, 0.5); }
+  .meteor.lit .head { transform: scale(1.5); }
+  .meteor.dim { opacity: 0.25; }
+
+  #card {
+    position: fixed;
+    left: clamp(16px, 3vw, 56px);
+    bottom: calc(clamp(16px, 5vh, 56px) + env(safe-area-inset-bottom, 0px));
+    max-width: min(560px, calc(100vw - 48px));
+    padding: clamp(13px, 1.55vw, 21px) clamp(14px, 1.8vw, 25px);
+    background: var(--panel);
+    border: 1px solid var(--panel-edge);
+    border-radius: 16px 16px 16px 5px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    opacity: 0; transform: translateY(16px);
+    transition: opacity .5s ease, transform .5s ease;
+    pointer-events: none;
+    z-index: 10;
+  }
+  #card.show { opacity: 1; transform: none; }
+  #card h2 {
+    margin: 0;
+    font-family: "Bricolage Grotesque", "Segoe UI", Roboto, Arial, sans-serif;
+    font-weight: 800;
+    font-size: clamp(1.4rem, 2.95vw, 2.95rem);
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  #card .meta { margin: 0.6em 0 0; color: var(--muted); font-size: clamp(0.75rem, 1vw, 1.02rem); }
+  #card .meta span + span { margin-left: 0.9em; }
+  #card .mean { margin: 0.5em 0 0; font-size: clamp(0.9rem, 1.4vw, 1.4rem); font-weight: 500; }
+  #card .ex { margin: 0.6em 0 0; font-size: clamp(0.75rem, 1.05vw, 1.05rem); line-height: 1.5; color: #d9def9; font-style: italic; }
+  #card .col { margin: 0.8em 0 0; display: flex; flex-wrap: wrap; gap: 0.45em; }
+  #card .col span { font-size: clamp(0.68rem, 0.85vw, 0.88rem); padding: 0.2em 0.65em; border-radius: 999px;
+    border: 1px solid rgba(255, 197, 138, 0.45); color: #ffe2c2; background: rgba(255, 197, 138, 0.08); }
+  #card .col:empty { display: none; }
+  #card .nav { margin: 0.9em 0 0; color: var(--muted); font-size: clamp(0.62rem, 0.72vw, 0.75rem); }
+  #card .nav span + span { margin-left: 1.2em; }
+  #card .nav:empty { display: none; }
+  body.mode-vocab #card { box-shadow: 0 0 0 2px var(--tail); }
+  #card .ex:empty, #card .meta span:empty { display: none; }
+  body.mode-idle #card .nav { display: none; }
+
+  #hud {
+    position: fixed;
+    top: calc(16px + env(safe-area-inset-top, 0px));
+    right: 16px;
+    display: flex; gap: 10px; align-items: center;
+    z-index: 20;
+  }
+  #hint { color: var(--muted); font-size: clamp(0.82rem, 1vw, 1.02rem); transition: opacity 1s ease; }
+  #hint kbd { font-family: inherit; padding: 0.1em 0.45em; border: 1px solid var(--panel-edge); border-radius: 6px; margin-right: 0.3em; }
+  #hint span + span { margin-left: 1em; }
+  #hud { transition: opacity 1s ease; }
+  #hud.quiet { opacity: 0; pointer-events: none; }
+  button.pill {
+    font: inherit;
+    color: var(--text);
+    background: var(--panel);
+    border: 1px solid var(--panel-edge);
+    border-radius: 999px;
+    padding: 0.55em 1.1em;
+    cursor: pointer;
+  }
+  button.pill:hover { border-color: rgba(220, 225, 255, 0.5); }
+  button.pill:focus-visible, textarea:focus-visible { outline: 3px solid var(--tail); outline-offset: 2px; }
+
+  #themeNote {
+    position: fixed; left: 50vw; top: 42%; transform: translate(-50%, -50%) scale(.96);
+    padding: 0.8em 1.6em; border-radius: 999px; z-index: 30; pointer-events: none;
+    background: var(--panel); border: 1px solid var(--panel-edge); color: var(--text);
+    font-family: "Bricolage Grotesque", "Segoe UI", Roboto, Arial, sans-serif; font-weight: 600;
+    font-size: clamp(1.1rem, 1.8vw, 1.9rem); opacity: 0; transition: opacity .3s ease, transform .3s ease;
+  }
+  #themeNote.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  /* Touch screens (iPad, phone): the buttons in the top corner always show; on a TV they hide by themselves */
+  @media (pointer: coarse) { #hud.quiet { opacity: 1; pointer-events: auto; } }
+  /* Word count, bottom right */
+  #wcount { position: fixed; right: calc(14px + env(safe-area-inset-right, 0px)); bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+    z-index: 9; font-size: clamp(0.7rem, 0.8vw, 0.9rem); color: var(--muted); opacity: .55; pointer-events: none; font-variant-numeric: tabular-nums; }
+  /* Word list: swipe a row left/right to reveal Delete */
+  /* The word list panel sits on the right while words keep flying beside it. Narrow screens (upright phone): it covers the screen */
+  :root { --wpw: min(360px, 30vw); }
+  #wpanel { position: fixed; top: 0; right: 0; bottom: 0; width: var(--wpw); z-index: 25; display: flex; flex-direction: column;
+    background: var(--rail); border-left: 1px solid var(--panel-edge); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    padding-top: env(safe-area-inset-top, 0px); transform: translateX(100%); visibility: hidden; transition: transform .3s ease, visibility .3s; }
+  body.wl-open #wpanel { transform: none; visibility: visible; }
+  body.wl-open #field { right: var(--wpw); }
+  body.wl-open #hud { right: calc(var(--wpw) + 16px); }
+  body.wl-open #hint { display: none; }
+  #hud button.pill { white-space: nowrap; }
+  body.wl-open #card { max-width: min(560px, calc(100vw - var(--wpw) - 48px)); }
+  .wp-head { display: flex; gap: 8px; align-items: center; padding: 12px 12px 8px; }
+  .wl-search, .wp-add input { flex: 1; min-width: 0; min-height: 40px; border-radius: 10px; border: 1px solid var(--panel-edge);
+    background: var(--card); color: var(--text); padding: 0 12px; font: inherit; font-size: 16px; }
+  .wp-head .pill, .wp-add .pill { padding: .45em .9em; flex: none; }
+  .wp-add { display: flex; gap: 8px; padding: 0 12px 8px; }
+  #wlInfo { margin: 0; padding: 0 14px 8px; color: var(--muted); font-size: .82rem; line-height: 1.45; }
+  #wlBody { flex: 1; min-height: 0; overflow-y: auto; border-top: 1px solid var(--panel-edge); -webkit-overflow-scrolling: touch;
+    padding-bottom: env(safe-area-inset-bottom, 0px); }
+  #wlBody .empty { padding: 18px 14px; color: var(--muted); }
+  @media (max-width: 760px) {
+    #wpanel { width: 100%; left: 0; z-index: 40; background: var(--space-deep); }
+    body.wl-open #field { right: 0; }
+    body.wl-open #hud { right: 16px; }
+  }
+  .wrow { position: relative; overflow: hidden; border-bottom: 1px solid var(--panel-edge); }
+  .wrow .del { position: absolute; inset: 0 0 0 auto; width: 120px; border: 0; background: #d9534f; color: #fff; font: inherit; font-weight: 600; cursor: pointer; }
+  .wrow.left .del { inset: 0 auto 0 0; }
+  .wrow .in { position: relative; display: flex; gap: 10px; align-items: baseline; padding: 11px 14px; background: #10143a; touch-action: pan-y;
+    transition: transform .2s ease; user-select: none; -webkit-user-select: none; cursor: pointer; }
+  .wrow.on .in { box-shadow: inset 3px 0 0 var(--tail); background: #1d2358; }
+  :root.day .wrow.on .in { background: #f1ead6; }
+  :root.day .wrow .in { background: #fbf8ef; }
+  .wrow.armed .in { transform: translateX(-120px); }
+  .wrow.armed.left .in { transform: translateX(120px); }
+  .wrow .w { font-weight: 700; }
+  .wrow .v { color: var(--muted); font-size: .92em; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .wrow .s { color: var(--tail); }
+  #wlUndo { display: none; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 14px; background: var(--card-hover); font-size: .9rem; }
+  #wlUndo.show { display: flex; }
+  #paused {
+    position: fixed; top: 50%; left: 50vw;
+    transform: translate(-50%, -50%);
+    font-family: "Bricolage Grotesque", "Segoe UI", Roboto, Arial, sans-serif;
+    font-size: clamp(1.4rem, 2.5vw, 2.4rem);
+    color: var(--muted);
+    display: none;
+    z-index: 15;
+  }
+  body.is-paused #paused { display: block; }
+
+  dialog {
+    width: min(760px, calc(100vw - 32px));
+    max-height: calc(100% - 48px);
+    color: var(--text);
+    background: #10143a;
+    border: 1px solid var(--panel-edge);
+    border-radius: 18px;
+    padding: 24px;
+  }
+  dialog::backdrop { background: rgba(3, 5, 20, 0.7); }
+  dialog h3 { margin: 0 0 6px; font-family: "Bricolage Grotesque", "Segoe UI", Roboto, Arial, sans-serif; font-size: 1.5rem; }
+  dialog p { margin: 0 0 14px; color: var(--muted); line-height: 1.5; }
+  dialog code { color: var(--tail); }
+  textarea {
+    width: 100%; min-height: 300px;
+    font: 0.95rem/1.55 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    color: var(--text);
+    background: #0a0d2a;
+    border: 1px solid var(--panel-edge);
+    border-radius: 10px;
+    padding: 12px;
+    resize: vertical;
+  }
+  .actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 14px; flex-wrap: wrap; }
+  .actions .primary { background: var(--tail); color: #1b1230; border-color: var(--tail); font-weight: 600; }
+  #err { color: #ffb4a8; margin: 10px 0 0; min-height: 1.2em; }
+
+  @media (max-width: 1100px) {
+    #hint { display: none; }
+  }
+  @media (max-width: 760px) {
+    #card { left: 12px; right: 12px; max-width: none; }
+    #brand { display: none; }
+    #hud { left: 12px; right: 12px; flex-wrap: wrap; justify-content: flex-end; }
+  }
+  #brand { position: fixed; left: clamp(16px, 3vw, 56px); top: calc(18px + env(safe-area-inset-top, 0px)); z-index: 9; pointer-events: none;
+    font-family: "Bricolage Grotesque", "Segoe UI", Roboto, Arial, sans-serif; font-weight: 800; font-size: clamp(1.1rem, 1.9vw, 2.1rem); letter-spacing: -0.01em; }
+  #brand small { display: block; font-family: inherit; font-weight: 400; font-size: 0.5em; color: var(--muted); letter-spacing: 0; margin-top: 0.2em; }
+  #card .exen { margin: 0.25em 0 0; font-size: clamp(0.72rem, 0.95vw, 0.98rem); color: var(--muted); }
+  #card .exen:empty { display: none; }
+
+  /* ================= Daytime (6:00–18:00): a bright, rustic garden =================
+     Night keeps the starry sky. The .day class is switched on by the script at the top of the page. */
+  :root.day {
+    --space-deep: #efe8d6;
+    --space-mid: #f8f4e8;
+    --nebula: rgba(255, 222, 150, 0.5);
+    --nebula-2: rgba(170, 204, 140, 0.45);
+    --head: #6f9a5c;
+    --glow: rgba(120, 170, 95, 0.45);
+    --tail: #9cbf84;
+    --text: #2c3a2b;
+    --muted: #66735e;
+    --panel: rgba(255, 253, 246, 0.9);
+    --panel-edge: rgba(60, 80, 50, 0.16);
+    --rail: rgba(250, 246, 235, 0.86);
+    --card: rgba(60, 80, 50, 0.05);
+    --card-hover: rgba(60, 80, 50, 0.1);
+    --c-hot: #c46a1c;
+    --c-work: #2f6a9a;
+    --c-life: #2f8158;
+    --c-heart: #c0466a;
+    --dust: #b9a26a;
+    color-scheme: light;
+  }
+  :root.day #sky {
+    background:
+      radial-gradient(ellipse 50% 45% at 80% 12%, var(--nebula), transparent 70%),
+      radial-gradient(ellipse 45% 40% at 40% 100%, var(--nebula-2), transparent 70%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 260'%3E%3Cpath d='M320 6C250 30 190 70 140 130S70 230 40 258' fill='none' stroke='%23889e72' stroke-width='3' stroke-linecap='round'/%3E%3Cg fill='%2399b783'%3E%3Cellipse cx='282' cy='40' rx='30' ry='11' transform='rotate(-28 282 40)'/%3E%3Cellipse cx='250' cy='20' rx='24' ry='9' transform='rotate(-62 250 20)'/%3E%3Cellipse cx='222' cy='80' rx='32' ry='12' transform='rotate(-10 222 80)'/%3E%3Cellipse cx='190' cy='58' rx='26' ry='10' transform='rotate(-58 190 58)'/%3E%3Cellipse cx='166' cy='130' rx='30' ry='11' transform='rotate(8 166 130)'/%3E%3Cellipse cx='132' cy='104' rx='24' ry='9' transform='rotate(-50 132 104)'/%3E%3Cellipse cx='104' cy='186' rx='26' ry='10' transform='rotate(20 104 186)'/%3E%3C/g%3E%3C/svg%3E") right -1vw top -1vw / 24vw auto no-repeat,
+      linear-gradient(170deg, var(--space-mid), var(--space-deep) 70%);
+  }
+  :root.day #stars { opacity: 0.5; }
+  /* Meteors become drifting leaves */
+  :root.day .meteor .head { border-radius: 0 60% 0 60%; box-shadow: 0 0 0.6em 0.1em var(--glow); }
+  :root.day .meteor .tail { background: linear-gradient(90deg, var(--tail), rgba(156, 191, 132, 0.3) 30%, transparent); }
+  :root.day .meteor .w { text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7); color: var(--text); }
+  :root.day .meteor.lit .w { color: #1f2d1e; text-shadow: 0 0 18px rgba(255, 236, 190, 0.95), 0 1px 0 #fff; }
+  :root.day #card .ex { color: #3d4a3a; }
+  :root.day #card .col span { border-color: rgba(200, 116, 42, 0.45); color: #8a4a12; background: rgba(200, 116, 42, 0.08); }
+  :root.day .actions .primary { color: #fff; }
+  :root.day dialog { background: #fbf8ef; }
+  :root.day dialog::backdrop { background: rgba(60, 70, 40, 0.35); }
+  :root.day textarea { background: #fff; }
+  :root.day #err { color: #b03a2a; }
+</style>
+</head>
+<body>
+<div id="sky"></div>
+<canvas id="stars" aria-hidden="true"></canvas>
+
+
+<div id="field" aria-hidden="true"></div>
+
+<div id="brand"></div>
+
+<div id="hud">
+  <div id="hint">
+    <span><kbd>OK</kbd>words one by one</span>
+    <span><kbd>▲</kbd>videos</span>
+    <span><kbd>▼</kbd>language</span>
+    <span><kbd>◀</kbd>light/dark</span>
+  </div>
+  <button class="pill" id="homeBtn" type="button" aria-label="Start page">⌂</button>
+  <button class="pill" id="langBtn" type="button"></button>
+  <button class="pill" id="videoBtn" type="button">▶ Videos</button>
+  <button class="pill" id="themeBtn" type="button"></button>
+  <button class="pill" id="listBtn" type="button">Word list</button>
+  <button class="pill" id="editBtn" type="button">Edit words</button>
+</div>
+<div id="wcount" aria-live="polite"></div>
+<div id="themeNote" aria-live="polite"></div>
+
+<div id="paused">Paused</div>
+
+<section id="card" aria-live="polite">
+  <h2 id="cWord"></h2>
+  <p class="meta"><span id="cIpa"></span><span id="cPos"></span></p>
+  <p class="mean" id="cVi"></p>
+  <p class="ex" id="cEx"></p>
+  <p class="exen" id="cExEn"></p>
+  <p class="col" id="cCol"></p>
+  <p class="nav" id="cNav"></p>
+</section>
+
+<aside id="wpanel" aria-label="Word list">
+  <div class="wp-head">
+    <input class="wl-search" id="wlSearch" type="search" placeholder="Search…" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search">
+    <button class="pill" type="button" id="wlClose" aria-label="Close the list">✕</button>
+  </div>
+  <form class="wp-add" id="wlAdd"><input id="wlAddIn" placeholder="Add:  word | meaning" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="done"><button class="pill" type="submit">Add</button></form>
+  <p id="wlInfo"></p>
+  <div id="wlUndo"><span id="wlUndoTxt"></span><button class="pill" id="wlUndoBtn" type="button">Undo</button></div>
+  <div id="wlBody"></div>
+</aside>
+<dialog id="editor">
+  <h3>Word list</h3>
+  <p>One word per line, parts separated by <code>|</code>:<br>
+  <code>word | pronunciation | type | meaning | example | example in English</code><br>
+  Just <code>word | meaning</code> works too.</p>
+  <textarea id="txt" spellcheck="false"></textarea>
+  <p id="err"></p>
+  <div class="actions">
+    <button class="pill" type="button" id="resetBtn">Use the latest list</button>
+    <button class="pill" type="button" id="cancelBtn">Cancel</button>
+    <button class="pill primary" type="button" id="saveBtn">Save the list</button>
+  </div>
+</dialog>
+
+
+<script>
+(() => {
+  const LC = window.LearnCore, LANG = LC ? LC.LANG : "zh", LI = LC ? LC.langInfo : { name: "Chinese", native: "中文", hello: "你好" };
+  /* A few built-in words per language, used only when data/<lang>/words.json cannot be loaded (offline copy inside the TV app). */
+  const BUILT_IN = {
+    zh: [
+      { w: "你好", pron: "nǐ hǎo", pos: "phrase", en: "hello", ex: "你好，我叫小明。", ex_en: "Hello, my name is Xiao Ming." },
+      { w: "谢谢", pron: "xièxie", pos: "phrase", en: "thank you", ex: "谢谢你的帮助。", ex_en: "Thank you for your help." },
+      { w: "朋友", pron: "péngyou", pos: "noun", en: "friend", ex: "他是我的好朋友。", ex_en: "He is my good friend." },
+      { w: "喜欢", pron: "xǐhuan", pos: "verb", en: "to like", ex: "我喜欢吃苹果。", ex_en: "I like eating apples." },
+      { w: "学校", pron: "xuéxiào", pos: "noun", en: "school", ex: "我们的学校很大。", ex_en: "Our school is big." },
+      { w: "今天", pron: "jīntiān", pos: "noun", en: "today", ex: "今天天气很好。", ex_en: "The weather is nice today." },
+      { w: "好吃", pron: "hǎochī", pos: "adj", en: "tasty, delicious", ex: "妈妈做的饺子很好吃。", ex_en: "Mum's dumplings are delicious." },
+      { w: "加油", pron: "jiāyóu", pos: "phrase", en: "go for it! keep it up!", ex: "明天考试，加油！", ex_en: "The exam is tomorrow, go for it!" }
+    ],
+    vi: [
+      { w: "xin chào", pron: "sin chow", pos: "phrase", en: "hello", ex: "Xin chào, tôi là Aaron.", ex_en: "Hello, I am Aaron." },
+      { w: "cảm ơn", pron: "gahm uhn", pos: "phrase", en: "thank you", ex: "Cảm ơn bạn rất nhiều.", ex_en: "Thank you very much." },
+      { w: "ngon", pron: "ngawn", pos: "adj", en: "delicious", ex: "Phở này ngon quá!", ex_en: "This pho is so good!" },
+      { w: "bao nhiêu", pron: "bow nyew", pos: "phrase", en: "how much / how many", ex: "Cái này bao nhiêu tiền?", ex_en: "How much is this?" },
+      { w: "cà phê", pron: "kah feh", pos: "noun", en: "coffee", ex: "Cho tôi một ly cà phê sữa đá.", ex_en: "One iced milk coffee, please." },
+      { w: "bạn", pron: "bahn", pos: "noun", en: "friend; you", ex: "Bạn khỏe không?", ex_en: "How are you?" },
+      { w: "đi", pron: "dee", pos: "verb", en: "to go", ex: "Chúng ta đi ăn nhé.", ex_en: "Let's go eat." },
+      { w: "một, hai, ba, dô!", pron: "moht, hai, bah, yo", pos: "phrase", en: "one, two, three, cheers!", ex: "Một, hai, ba, dô!", ex_en: "One, two, three, cheers!" }
+    ]
+  };
+  const DEFAULT_WORDS = BUILT_IN[LANG] || [];
+  const SHOW_PRON = !!LI.pronOnCards;
+  const STORE_KEY = "meteor-words-" + LANG;
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const $ = (id) => document.getElementById(id);
+  const escH = t => String(t).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+
+  /* =================== VOCABULARY METEORS =================== */
+  const field = $("field");
+  const hud = $("hud");
+  const card = $("card");
+
+  /* Words saved on the video pages (★). Same site, so the TV shares localStorage with them */
+  const SAVED_KEY = "meteor-saved-" + LANG;
+  function savedWords() {
+    try {
+      const lst = JSON.parse(localStorage.getItem(SAVED_KEY) || "[]");
+      return Array.isArray(lst) ? lst.filter(o => o && o.w) : [];
+    } catch (e) { return []; }
+  }
+  const hiddenW = w => !!(window.LearnCore && LearnCore.Sync.isHidden(w));
+  function shuffle(a) {
+    for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+    return a;
+  }
+  /* Saved words + the base list, minus deleted words (hidden on every device), in RANDOM order (also for ← →) */
+  function withSaved(base) {
+    const saved = savedWords();
+    const have = new Set(saved.map(o => o.w.toLowerCase()));
+    return shuffle(saved.concat(base.filter(o => o && o.w && !have.has(String(o.w).toLowerCase())))
+      .filter(o => !hiddenW(o.w)));
+  }
+  function loadWords() {
+    try {
+      const raw = localStorage.getItem(STORE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length) return withSaved(parsed);
+      }
+    } catch (e) {}
+    return withSaved(DEFAULT_WORDS.slice());
+  }
+  let hasCustomWords = false;
+  try { hasCustomWords = !!localStorage.getItem(STORE_KEY); } catch (e) {}
+  let remoteWords = null;
+  let words = loadWords();
+  async function refreshWords() {
+    try {
+      const r = await fetch(LC ? LC.dataUrl("words.json") : "data/zh/words.json", { cache: "no-store" });
+      if (!r.ok) return;
+      const list = await r.json();
+      if (!Array.isArray(list) || !list.length) return;
+      remoteWords = list.filter(o => o && o.w);
+      if (!hasCustomWords) { words = withSaved(remoteWords); bag = []; }
+      paintCount();
+      if (panelOpen()) renderWordList();
+    } catch (e) { /* offline or not hosted: keep current list */ }
+  }
+  /* Words saved on the TV / iPad / phone sync through learn-core.js: reload the list when something changes */
+  if (window.LearnCore) {
+    LearnCore.Sync.on(what => {
+      if (what !== "data") return;
+      words = (!hasCustomWords && remoteWords) ? withSaved(remoteWords) : loadWords();
+      bag = [];
+      paintCount();
+      if (panelOpen()) renderWordList();
+    });
+    LearnCore.Sync.start();
+  }
+  let bag = [];
+  function nextWord() {
+    if (!bag.length) {
+      const cutoff = Date.now() - 3 * 86400000;           // words added in the last 3 days
+      const recent = words.filter(o => o.saved || (o.added && Date.parse(o.added) >= cutoff));
+      bag = words.concat(recent);                          // ...and words saved from videos appear twice as often
+      for (let i = bag.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [bag[i], bag[j]] = [bag[j], bag[i]];
+      }
+    }
+    return bag.pop();
+  }
+
+  const canvas = $("stars");
+  const ctx = canvas.getContext("2d");
+  let W = 0, H = 0, FW = 0, FH = 0, stars = [];
+  function resize() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = window.innerWidth; H = window.innerHeight;
+    FW = field.clientWidth; FH = field.clientHeight;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const count = Math.round((W * H) / 2600);
+    stars = Array.from({ length: count }, () => ({
+      x: Math.random() * W, y: Math.random() * H,
+      r: Math.random() < 0.08 ? 1.4 + Math.random() : 0.4 + Math.random() * 0.8,
+      a: 0.3 + Math.random() * 0.7,
+      tw: Math.random() * Math.PI * 2,
+      sp: 0.4 + Math.random() * 1.6
+    }));
+  }
+  function drawStars(t) {
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = document.documentElement.classList.contains("day") ? "#b9a26a" : "#fff";
+    for (const s of stars) {
+      ctx.globalAlpha = reduceMotion ? s.a : s.a * (0.65 + 0.35 * Math.sin(t * 0.001 * s.sp + s.tw));
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  const DRIFT = 0.32;
+  const TAIL_ANGLE = (Math.atan2(1, DRIFT) * 180 / Math.PI) + 180;
+  const MAX_METEORS = 11;
+  let meteors = [];
+  let speed = reduceMotion ? 0.4 : 1;
+  let paused = false, spawnClock = 0, lit = null, cardTimer = null;
+
+  let lastX = -9999;
+  function pickX() {
+    let x = 0;
+    for (let i = 0; i < 6; i++) {
+      x = 0.02 * FW + Math.random() * 0.68 * FW;
+      if (Math.abs(x - lastX) > FW * 0.18) break;
+    }
+    lastX = x;
+    return x;
+  }
+  function spawn(forced, startY) {
+    if (!forced && (meteors.length >= MAX_METEORS || !words.length)) return null;
+    const item = forced || nextWord();
+    const z = 0.55 + Math.random() * 0.45;
+    const el = document.createElement("div");
+    el.className = "meteor";
+    el.style.setProperty("--s", z.toFixed(3));
+    el.style.setProperty("--tail-angle", TAIL_ANGLE + "deg");
+    el.innerHTML = '<i class="tail"></i><i class="head"></i><span class="label"><b class="w"></b><span class="vi"></span></span>';
+    el.querySelector(".w").textContent = item.w;
+    el.querySelector(".vi").textContent = (SHOW_PRON && item.pron ? item.pron + " · " : "") + (item.en || "");
+    const m = {
+      el, item, z,
+      x: pickX(),
+      y: startY != null ? startY : -80 - Math.random() * 60,
+      v: (55 + Math.random() * 30) * z * Math.max(0.6, FH / 900)
+    };
+    el.addEventListener("click", () => { spotlight(m); say(m.item); });
+    field.appendChild(el);
+    meteors.push(m);
+    return m;
+  }
+
+  const say = item => { if (LC && item) LC.speak(item.w); };
+  let mode = "idle", vIdx = 0;
+  function setMode(m) {
+    mode = m;
+    document.body.classList.toggle("mode-idle", m === "idle");
+    document.body.classList.toggle("mode-vocab", m === "vocab");
+  }
+
+  function lightMeteor(m) {
+    if (lit) lit.el.classList.remove("lit");
+    lit = m || null;
+    if (lit) lit.el.classList.add("lit");
+    meteors.forEach(x => x.el.classList.toggle("dim", !!lit && x !== lit));
+  }
+
+  function showCard(item) {
+    $("cWord").textContent = item.w;
+    $("cIpa").textContent = item.pron || "";
+    $("cPos").textContent = item.pos || "";
+    $("cVi").textContent = item.en || "";
+    $("cEx").textContent = item.ex || "";
+    $("cExEn").textContent = item.ex ? (item.ex_en || "") : "";
+    const col = $("cCol");
+    col.innerHTML = "";
+    (Array.isArray(item.col) ? item.col : []).slice(0, 4).forEach(c => {
+      const span = document.createElement("span");
+      span.textContent = c;
+      col.appendChild(span);
+    });
+    $("cNav").innerHTML = mode === "vocab"
+      ? `<span>${vIdx + 1}/${words.length}</span><span>◀ ▶ next word</span><span>OK: say it</span><span>▲ ▼ speed</span><span>Back: meteor shower</span>`
+      : "";
+    card.classList.add("show");
+    clearTimeout(cardTimer);
+    if (mode !== "vocab") cardTimer = setTimeout(clearSpotlight, 9000);
+  }
+
+  function spotlight(m) {
+    if (!m) {
+      const c = meteors.filter(x => x.y > FH * 0.1 && x.y < FH * 0.55 && x !== lit);
+      if (!c.length) return;
+      c.sort((a, b) => b.z - a.z);
+      m = c[0];
+    }
+    const i = words.findIndex(w => w.w === m.item.w);
+    if (i >= 0) vIdx = i;
+    lightMeteor(m);
+    showCard(m.item);
+  }
+
+  function clearSpotlight() {
+    card.classList.remove("show");
+    lightMeteor(null);
+  }
+
+  // Show word number i: light its meteor, or send one across the sky for it.
+  function showWordAt(i) {
+    if (!words.length) return;
+    vIdx = (i + words.length) % words.length;
+    const item = words[vIdx];
+    let m = meteors.find(x => x.item.w === item.w && x.y < FH * 0.7);
+    if (!m) m = spawn(item, FH * (0.12 + Math.random() * 0.15));
+    lightMeteor(m);
+    showCard(item);
+  }
+
+  function enterVocab() {
+    setMode("vocab");
+    if (lit) {
+      const i = words.findIndex(w => w.w === lit.item.w);
+      showWordAt(i >= 0 ? i : vIdx);
+    } else {
+      showWordAt(vIdx);
+    }
+  }
+
+  function exitVocab() {
+    setMode("idle");
+    clearSpotlight();
+  }
+
+  let autoClock = 0, last = performance.now();
+  function frame(t) {
+    const dt = Math.min((t - last) / 1000, 0.1);
+    last = t;
+    drawStars(t);
+    if (!paused) {
+      spawnClock += dt * 1000 * speed;
+      if (spawnClock > 1900) { spawnClock = 0; spawn(); }
+      autoClock += dt * 1000;
+      if (autoClock > 15000) { autoClock = 0; if (!lit && mode === "idle") spotlight(); }
+      for (let i = meteors.length - 1; i >= 0; i--) {
+        const m = meteors[i];
+        const step = m.v * speed * (m === lit ? 0.25 : 1) * dt;
+        m.y += step;
+        m.x += step * DRIFT;
+        m.el.style.transform = `translate3d(${m.x.toFixed(1)}px, ${m.y.toFixed(1)}px, 0)`;
+        if (m.y > FH + 120 || m.x > FW + 400) {
+          if (m === lit) { if (mode === "vocab") lightMeteor(null); else clearSpotlight(); }
+          m.el.remove();
+          meteors.splice(i, 1);
+        }
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+
+  /* =================== CONTROLS (keyboard + TV remote) =================== */
+  const editor = $("editor");
+  function setPaused(p) { paused = p; document.body.classList.toggle("is-paused", p); }
+
+  // Meteor shower (idle): OK or ▶ shows words one by one, ▲ opens the videos, ▼ twice switches language, ◀ light/dark.
+  // Words one by one: ◀ ▶ previous/next word, OK says it, ▲ ▼ meteor speed, Back returns to the shower.
+  let langArm = 0;
+  function switchLang() {
+    if (!LC || LC.LANG_KEYS.length < 2) return;
+    const next = LC.nextLang(), info = LC.LANGS[next];
+    if (Date.now() < langArm) { LC.setLang(next); return; }
+    langArm = Date.now() + 3500;
+    note(`Press ▼ again for ${info.name} · ${info.native}`, 3200);
+  }
+  window.addEventListener("keydown", (e) => {
+    if (editor.open) return;
+    if (e.target && /^(INPUT|TEXTAREA)$/.test(e.target.tagName)) return;   // typing in the search / add box
+    const k = e.key;
+    if (k === " " || k === "MediaPlayPause") { e.preventDefault(); setPaused(!paused); return; }
+    if (mode === "idle") {
+      if (k === "ArrowRight" || k === "Enter") { e.preventDefault(); enterVocab(); }
+      else if (k === "ArrowLeft") { e.preventDefault(); cycleTheme(); }
+      else if (k === "ArrowUp") { e.preventDefault(); location.href = "video.html"; }
+      else if (k === "ArrowDown") { e.preventDefault(); switchLang(); }
+      else if (k === "Escape" || k === "Backspace") { clearSpotlight(); }
+    } else {
+      if (k === "ArrowRight") { e.preventDefault(); showWordAt(vIdx + 1); }
+      else if (k === "ArrowLeft") { e.preventDefault(); showWordAt(vIdx - 1); }
+      else if (k === "ArrowUp") { e.preventDefault(); speed = Math.min(speed + 0.2, 3); }
+      else if (k === "ArrowDown") { e.preventDefault(); speed = Math.max(speed - 0.2, 0.2); }
+      else if (k === "Enter") { e.preventDefault(); say(words[vIdx]); }
+      else if (k === "Escape" || k === "Backspace") { e.preventDefault(); exitVocab(); }
+    }
+  });
+
+  // Called by the Android TV app when the remote's Back button is pressed (hold Back to quit).
+  window.tvBack = function () {
+    if (editor.open) { editor.close(); return; }
+    if (panelOpen()) { setPanel(false); return; }
+    if (mode === "vocab") exitVocab();
+    else clearSpotlight();
+  };
+  let hudTimer = setTimeout(() => hud.classList.add("quiet"), 8000);
+  function wakeHud() {
+    hud.classList.remove("quiet");
+    clearTimeout(hudTimer);
+    hudTimer = setTimeout(() => hud.classList.add("quiet"), 6000);
+  }
+  window.addEventListener("pointermove", wakeHud);
+  window.addEventListener("pointerdown", wakeHud);
+  window.addEventListener("keydown", (e) => { if (e.key === "ContextMenu" || e.key === "m" || e.key === "M") wakeHud(); });
+
+  /* =================== LIGHT / DARK, LANGUAGE, LINKS =================== */
+  const THEMES = ["auto", "day", "night"];
+  const THEME_LABEL = { auto: "◐ Auto (light by day, dark at night)", day: "☀ Always light", night: "☾ Always dark" };
+  const THEME_BTN = { auto: "◐ Auto", day: "☀ Light", night: "☾ Dark" };
+  const themeBtn = $("themeBtn"), themeNote = $("themeNote");
+  let themeNoteT;
+  function note(text, ms = 1800) {
+    themeNote.textContent = text;
+    themeNote.classList.add("show");
+    clearTimeout(themeNoteT);
+    themeNoteT = setTimeout(() => themeNote.classList.remove("show"), ms);
+    wakeHud();
+  }
+  function paintThemeBtn() { themeBtn.textContent = THEME_BTN[themePref()]; }
+  function cycleTheme() {
+    const next = THEMES[(THEMES.indexOf(themePref()) + 1) % THEMES.length];
+    if (new URLSearchParams(location.search).has("theme")) history.replaceState(null, "", location.pathname);
+    setThemePref(next);
+    paintThemeBtn();
+    note(THEME_LABEL[next]);
+  }
+  themeBtn.addEventListener("click", cycleTheme);
+  paintThemeBtn();
+  $("brand").innerHTML = `${escH(LI.hello || LI.native)}<small>Learning ${escH(LI.name)} · ${escH(LI.native)}</small>`;
+  $("langBtn").textContent = "🌏 " + LI.native;
+  if (!LC || LC.LANG_KEYS.length < 2) $("langBtn").style.display = "none";
+  $("langBtn").addEventListener("click", () => { if (LC) LC.setLang(LC.nextLang()); });
+  $("videoBtn").addEventListener("click", () => { location.href = "video.html"; });
+  $("homeBtn").addEventListener("click", () => { location.href = "./"; });
+
+  /* =================== WORD COUNT + WORD LIST =================== */
+  const panelOpen = () => document.body.classList.contains("wl-open");
+  function setPanel(open) {
+    document.body.classList.toggle("wl-open", open);
+    try { localStorage.setItem("dash.wpanel", open ? "1" : "0"); } catch (e) {}
+    if (open) { $("wlSearch").value = ""; renderWordList(); }
+    setTimeout(resize, 320);                                    // the meteor field got narrower / wider
+  }
+  function paintCount() {
+    const saved = window.LearnCore ? LearnCore.Sync.words().length : savedWords().length;
+    $("wcount").textContent = `${words.length} words${saved ? ` · ★ ${saved} saved` : ""}`;
+  }
+  paintCount(); setInterval(paintCount, 5000);
+
+  let undoT = null, lastDel = null;
+  function renderWordList() {
+    const q = $("wlSearch").value.trim().toLowerCase();
+    // Searching: only matches, words that start with the typed text first. Otherwise: saved words first, then A–Z
+    const rank = o => { const w = String(o.w).toLowerCase(); return w.startsWith(q) ? 0 : w.includes(q) ? 1 : 2; };
+    const list = (q
+      ? words.filter(o => String(o.w).toLowerCase().includes(q) || String(o.en || "").toLowerCase().includes(q) || String(o.pron || "").toLowerCase().includes(q))
+             .sort((a, b) => rank(a) - rank(b) || String(a.w).localeCompare(String(b.w)))
+      : words.slice().sort((a, b) => (b.saved ? 1 : 0) - (a.saved ? 1 : 0) || String(a.w).localeCompare(String(b.w))));
+    $("wlInfo").innerHTML = q ? `${list.length} result${list.length === 1 ? "" : "s"} for “${escH(q)}”` :
+      `${words.length} ${escH(LI.name)} words are flying. Tap a word to see and hear it; swipe it left/right and press <b>Delete</b> to remove it on every device.`;
+    if (!list.length) { $("wlBody").innerHTML = `<div class="empty">No word found. You can add one in the “Add” box above.</div>`; return; }
+    $("wlBody").innerHTML = list.map(o => `<div class="wrow" data-w="${encodeURIComponent(o.w)}">
+        <button class="del" type="button">Delete</button>
+        <div class="in"><span class="w">${o.saved ? '<span class="s">★ </span>' : ""}${escH(o.w)}</span><span class="v">${escH((SHOW_PRON && o.pron ? o.pron + " · " : "") + (o.en || ""))}</span></div></div>`).join("");
+  }
+  function disarm(except) { document.querySelectorAll("#wlBody .wrow.armed").forEach(r => { if (r !== except) r.classList.remove("armed", "left"); }); }
+  // Tap a word: show its card (and send it across the sky). Swipe left/right: reveal Delete.
+  function openWordCard(w) {
+    const i = words.findIndex(o => o.w === w); if (i < 0) return;
+    document.querySelectorAll("#wlBody .wrow.on").forEach(r => r.classList.remove("on"));
+    const row = [...document.querySelectorAll("#wlBody .wrow")].find(r => decodeURIComponent(r.dataset.w) === w);
+    if (row) row.classList.add("on");
+    if (matchMedia("(max-width: 760px)").matches) setPanel(false);   // upright phone: the list covers the screen, close it to see the card
+    showWordAt(i); say(words[i]);
+  }
+  let drag = null;
+  $("wlBody").addEventListener("pointerdown", e => {
+    const row = e.target.closest(".wrow"); if (!row || e.target.closest(".del")) return;
+    drag = { row, x: e.clientX, y: e.clientY, dx: 0, moved: false };
+  });
+  window.addEventListener("pointermove", e => {
+    if (!drag) return;
+    drag.dx = e.clientX - drag.x;
+    if (Math.abs(drag.dx) > 8 && Math.abs(drag.dx) > Math.abs(e.clientY - drag.y)) {
+      drag.moved = true;
+      const inner = drag.row.querySelector(".in");
+      inner.style.transition = "none";
+      inner.style.transform = `translateX(${Math.max(-140, Math.min(140, drag.dx))}px)`;
+      drag.row.classList.toggle("left", drag.dx > 0);
+    }
+  });
+  window.addEventListener("pointerup", () => {
+    if (!drag) return;
+    const { row, dx, moved } = drag; drag = null;
+    const inner = row.querySelector(".in"); inner.style.transition = ""; inner.style.transform = "";
+    if (moved && Math.abs(dx) > 60) { disarm(row); row.classList.add("armed"); row.classList.toggle("left", dx > 0); }
+    else if (moved) row.classList.remove("armed", "left");
+    else if (row.classList.contains("armed")) row.classList.remove("armed", "left");
+    else { disarm(); openWordCard(decodeURIComponent(row.dataset.w)); }
+  });
+  $("wlBody").addEventListener("click", e => {
+    const b = e.target.closest(".del"); if (!b || !window.LearnCore) return;
+    const w = decodeURIComponent(b.parentNode.dataset.w);
+    const item = words.find(o => o.w === w);
+    lastDel = { w, saved: item && item.saved ? item : null };
+    LearnCore.Sync.hideWord(w);
+    $("wlUndoTxt").textContent = `Deleted “${w}”`;
+    $("wlUndo").classList.add("show");
+    clearTimeout(undoT); undoT = setTimeout(() => $("wlUndo").classList.remove("show"), 6000);
+  });
+  $("wlUndoBtn").addEventListener("click", () => {
+    if (!lastDel || !window.LearnCore) { $("wlUndo").classList.remove("show"); return; }
+    LearnCore.Sync.unhideWord(lastDel.w, lastDel.saved);
+    $("wlUndo").classList.remove("show"); lastDel = null;
+  });
+  $("wlSearch").addEventListener("input", renderWordList);
+  $("listBtn").addEventListener("click", () => setPanel(!panelOpen()));
+  $("wlClose").addEventListener("click", () => setPanel(false));
+  $("wlSearch").addEventListener("focus", () => { $("wlBody").scrollTop = 0; });
+  /* Quick add: "word | meaning" (or "word - meaning", "word: meaning"). Added words go to the family store, every device sees them */
+  function addWord(w, en, extra = {}) {
+    if (!w) return false;
+    if (window.LearnCore) LearnCore.Sync.saveWord(Object.assign({ w, en: en || "", pos: extra.pos || "added by us" }, extra));
+    return true;
+  }
+  $("wlAdd").addEventListener("submit", e => {
+    e.preventDefault();
+    const raw = $("wlAddIn").value.trim(); if (!raw) return;
+    const m = raw.split(/\s*(?:\||\s-\s|:)\s*/);
+    if (addWord(m[0], m.slice(1).join(" - "))) {
+      $("wlAddIn").value = "";
+      $("wlUndoTxt").textContent = `Added “${m[0]}”`; lastDel = null;
+      $("wlUndo").classList.add("show"); clearTimeout(undoT); undoT = setTimeout(() => $("wlUndo").classList.remove("show"), 3000);
+    }
+  });
+  // iPad (wide touch screen): the list starts open on the right; each device remembers open/closed
+  (() => {
+    let pref = null; try { pref = localStorage.getItem("dash.wpanel"); } catch (e) {}
+    const wideTouch = matchMedia("(pointer: coarse) and (min-width: 900px)").matches;
+    if (pref === "1" || (pref === null && wideTouch)) setPanel(true);
+  })();
+
+  /* =================== WORD LIST EDITOR =================== */
+  const txt = $("txt"), err = $("err");
+  function toText(lst) {
+    return lst.map(o => [o.w, o.pron, o.pos, o.en, o.ex, o.ex_en].map(v => v || "").join(" | ").replace(/( \| )+$/, "")).join("\n");
+  }
+  function parse(text) {
+    const out = [];
+    for (const line of text.split("\n")) {
+      const p = line.split("|").map(s => s.trim());
+      if (!p[0]) continue;
+      if (p.length === 2) out.push({ w: p[0], en: p[1] });
+      else out.push({ w: p[0], pron: p[1] || "", pos: p[2] || "", en: p[3] || "", ex: p[4] || "", ex_en: p[5] || "" });
+    }
+    return out;
+  }
+  $("editBtn").addEventListener("click", () => { txt.value = toText(words); err.textContent = ""; setPaused(true); editor.showModal(); });
+  $("cancelBtn").addEventListener("click", () => editor.close());
+  editor.addEventListener("close", () => setPaused(false));
+  $("resetBtn").addEventListener("click", () => {
+    try { localStorage.removeItem(STORE_KEY); } catch (e) {}
+    hasCustomWords = false;
+    words = (remoteWords || DEFAULT_WORDS).slice();
+    bag = [];
+    editor.close();
+  });
+  $("saveBtn").addEventListener("click", () => {
+    const lst = parse(txt.value);
+    if (!lst.length) { err.textContent = "The list is empty. Add at least one line with a word."; return; }
+    if (window.LearnCore) {
+      const key = w => String(w).trim().toLowerCase();
+      const before = new Map(words.map(o => [key(o.w), o]));
+      const after = new Set(lst.map(o => key(o.w)));
+      lst.forEach(o => {
+        const old = before.get(key(o.w));
+        if (!old || (o.en || "") !== (old.en || "") || (o.pron || "") !== (old.pron || "") || (o.ex || "") !== (old.ex || "") || (o.ex_en || "") !== (old.ex_en || ""))
+          addWord(o.w, o.en, { pron: o.pron || "", ex: o.ex || "", ex_en: o.ex_en || "", pos: o.pos || "added by us" });
+      });
+      words.forEach(o => { if (!after.has(key(o.w))) LearnCore.Sync.hideWord(o.w); });
+      hasCustomWords = false;
+      try { localStorage.removeItem(STORE_KEY); } catch (e) {}
+    } else {
+      words = lst; bag = []; hasCustomWords = true;
+      try { localStorage.setItem(STORE_KEY, JSON.stringify(lst)); } catch (e) {}
+    }
+    editor.close();
+  });
+
+  window.addEventListener("resize", resize);
+  resize();
+  for (let i = 0; i < 4; i++) {
+    spawn();
+    const m = meteors[meteors.length - 1];
+    if (m) m.y = Math.random() * FH * 0.6;
+  }
+  setMode("idle");
+  refreshWords();
+  setInterval(refreshWords, 30 * 60 * 1000);
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

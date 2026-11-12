@@ -1,0 +1,5 @@
+{
+ "_note": "Hand-picked videos: paste YouTube video ids here (the part after v= in the address) and the next daily run prepares their phrases first. They join the catalog row named in 'row'.",
+ "row": "learn",
+ "videos": []
+}

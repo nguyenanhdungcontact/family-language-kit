@@ -1,0 +1,1381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Family channel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800&display=swap" rel="stylesheet">
+<script>
+/* 6:00–18:00 uses the bright garden look, evenings use the starry sky (Auto); Light or Dark can also be fixed. */
+/* Theme: 'auto' (by the clock), 'day' or 'night'. Shared by the dashboard and the video pages. */
+window.themePref = function(){
+  const q = new URLSearchParams(location.search).get('theme');
+  if (q === 'day' || q === 'night') return q;
+  try { const v = localStorage.getItem('tvv.theme'); if (v === 'day' || v === 'night') return v; } catch(e){}
+  return 'auto';
+};
+window.applyTheme = function(){
+  const pref = themePref(), h = new Date().getHours();
+  const day = pref === 'auto' ? (h >= 6 && h < 18) : pref === 'day';
+  document.documentElement.classList.toggle('day', day);
+  document.documentElement.classList.toggle('night', !day);
+};
+window.setThemePref = function(v){ try { localStorage.setItem('tvv.theme', v); } catch(e){} applyTheme(); };
+applyTheme(); setInterval(applyTheme, 60000);
+</script>
+<style>
+:root{
+  --bg0:#060920; --bg1:#0e1340; --bg2:#231b5e;
+  --ink:#eef0ff; --ink2:#a6aee0; --ink3:#6e76ad;
+  --accent:#8fa2ff;
+  --ring:#ffffff; --glow:rgba(143,162,255,.6); --ringw:.22rem;
+  --warm:#ffd36e;
+  --cw:15.8rem; --gap:1.6rem;
+  --head:'Bricolage Grotesque','Be Vietnam Pro',system-ui,sans-serif;
+  --body:'Be Vietnam Pro',system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+/* 1 rem = 1/96 of the width: 1920px → 20px, 960px (TV WebView) → 10px */
+html{font-size:calc(100vw / 96)}
+html,body{height:100%;overflow:hidden;color:var(--ink);font-family:var(--body);-webkit-font-smoothing:antialiased}
+body{
+  background:
+    radial-gradient(ellipse 70% 55% at 78% -8%, #3b2f92 0%, transparent 62%),
+    radial-gradient(ellipse 60% 45% at -5% 108%, #18397a 0%, transparent 60%),
+    linear-gradient(180deg,var(--bg1),var(--bg0));
+}
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;opacity:.55;
+  background-image:
+    radial-gradient(1.5px 1.5px at 24px 34px,#fff,transparent),
+    radial-gradient(1px 1px at 150px 86px,#cfd6ff,transparent),
+    radial-gradient(1.5px 1.5px at 272px 170px,#fff,transparent),
+    radial-gradient(1px 1px at 96px 222px,#aab4ff,transparent),
+    radial-gradient(1px 1px at 338px 44px,#fff,transparent);
+  background-size:390px 270px;
+}
+button{font-family:inherit}
+.screen{position:fixed;inset:0;display:none}
+.screen.active{display:block}
+#keytrap{position:fixed;left:-20px;top:0;width:1px;height:1px;opacity:0;border:0}
+
+/* ---------- Profile picker ---------- */
+#profile.active{display:flex;flex-direction:column;align-items:center;justify-content:center}
+#profile h1{font-family:var(--head);font-weight:800;font-size:4.4rem;letter-spacing:-.03em}
+#profile .sub{color:var(--ink2);font-size:1.3rem;margin:.6rem 0 4rem}
+.profiles{display:flex;gap:6rem}
+.pcard{display:flex;flex-direction:column;align-items:center;cursor:pointer;width:20rem}
+.pav{width:15rem;height:15rem;border-radius:50%;display:grid;place-items:center;font-family:var(--head);font-weight:800;font-size:5.4rem;color:#fff;letter-spacing:-.04em;transition:transform .2s ease,box-shadow .2s ease;box-shadow:0 1rem 3rem rgba(0,0,0,.45)}
+.me{background:linear-gradient(140deg,#6a7bff,#9a5cff)}
+.par{background:linear-gradient(140deg,#ffb86e,#ff7a9c)}
+.pname{font-family:var(--head);font-weight:700;font-size:2.3rem;margin-top:1.6rem;opacity:.8;transition:opacity .2s}
+.pdesc{font-size:1.05rem;color:var(--ink2);text-align:center;line-height:1.45;margin-top:.5rem}
+.pcard.focused .pav{transform:scale(1.08);box-shadow:0 0 0 .4rem #fff,0 0 0 1.1rem rgba(143,162,255,.45),0 1.4rem 3rem rgba(0,0,0,.5)}
+.pcard.focused .pname{opacity:1}
+#profile .foot{position:absolute;bottom:3rem;color:var(--ink3);font-size:1.05rem}
+
+/* ---------- Home ---------- */
+#home header{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:2.2rem 4rem 0;z-index:5}
+.brand{font-family:var(--head);font-weight:800;font-size:2rem;letter-spacing:-.03em;display:flex;align-items:center;gap:.8rem}
+.moon{width:1.3rem;height:1.3rem;border-radius:50%;background:var(--warm);box-shadow:0 0 1.4rem rgba(255,211,110,.7);position:relative;overflow:hidden}
+.moon::after{content:"";position:absolute;width:1.1rem;height:1.1rem;border-radius:50%;background:var(--bg1);left:.45rem;top:-.2rem}
+.hright{display:flex;align-items:center;gap:2.2rem}
+.clock{font-family:var(--head);font-weight:700;font-size:1.9rem;text-align:right;line-height:1.05}
+.clock small{display:block;font-family:var(--body);font-weight:500;font-size:.9rem;color:var(--ink2)}
+.chip{display:flex;align-items:center;gap:.8rem;padding:.45rem 1.3rem .45rem .45rem;border-radius:99rem;background:rgba(255,255,255,.07);border:.12rem solid rgba(255,255,255,.12);color:var(--ink);font-size:1.05rem;font-weight:600;cursor:pointer;transition:background .15s,box-shadow .15s}
+.chip .av{width:2.5rem;height:2.5rem;border-radius:50%;display:grid;place-items:center;font-family:var(--head);font-weight:800;font-size:1.05rem;color:#fff}
+.chip em{font-style:normal;font-weight:500;color:var(--ink2);margin-left:.4rem}
+.chip.focused{background:#fff;color:#141846;box-shadow:0 0 0 .4rem var(--glow)}
+.chip.focused em{color:#4b5190}
+
+#rows{position:absolute;top:8.4rem;left:0;right:0;bottom:0;overflow:hidden;-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 1.4rem);mask-image:linear-gradient(to bottom,transparent 0,#000 1.4rem)}
+#rowsInner{position:relative;transition:transform .32s ease;padding:1rem 0 7rem}
+.row{margin-bottom:1.8rem}
+.row h2{font-family:var(--head);font-weight:700;font-size:1.75rem;letter-spacing:-.015em;padding:0 4rem;display:flex;align-items:baseline;gap:1rem}
+.row h2 span{font-family:var(--body);font-weight:500;font-size:.95rem;color:var(--ink3)}
+.track-wrap{padding:1.1rem 4rem 1.2rem}
+.track{position:relative;display:flex;gap:var(--gap);transition:transform .28s ease;will-change:transform}
+.card{flex:0 0 var(--cw);width:var(--cw);cursor:pointer;transition:transform .18s ease;transform-origin:center 35%}
+.thumb{position:relative;padding-top:56.25%;border-radius:.9rem;overflow:hidden;background:linear-gradient(135deg,#2c3285,#151a48);box-shadow:0 .4rem 1.2rem rgba(0,0,0,.35);transition:box-shadow .18s ease}
+.thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.thumb.noimg::before{content:"▶";position:absolute;inset:0;display:grid;place-items:center;font-size:3rem;color:rgba(255,255,255,.22)}
+.dur{position:absolute;right:.5rem;bottom:.5rem;background:rgba(5,6,22,.86);color:#fff;font-size:.85rem;font-weight:600;padding:.15rem .5rem;border-radius:.35rem}
+.meta{padding:.85rem .15rem 0}
+.t{font-weight:600;font-size:1.05rem;line-height:1.35;color:#d9ddff;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.c{font-size:.88rem;color:var(--ink2);margin-top:.3rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card.focused{transform:scale(1.07);position:relative;z-index:2}
+.card.focused .thumb{box-shadow:0 0 0 var(--ringw) var(--ring),0 0 0 calc(var(--ringw) + .5rem) var(--glow),0 1.2rem 2.6rem rgba(0,0,0,.6)}
+.card.focused .t{color:#fff}
+.card.blocked .thumb::after{content:"Cannot play on the TV";position:absolute;inset:0;display:grid;place-items:center;background:rgba(8,10,30,.75);font-size:.95rem;font-weight:600;color:var(--ink2)}
+
+.hint{position:absolute;left:0;right:0;bottom:0;z-index:4;padding:2.4rem 4rem 1.4rem;background:linear-gradient(transparent,rgba(6,9,32,.96) 55%);display:flex;gap:2.6rem;font-size:1rem;color:var(--ink2)}
+.k{display:inline-block;min-width:1.9rem;padding:.12rem .55rem;margin-right:.45rem;border-radius:.4rem;background:rgba(255,255,255,.13);color:#fff;font-weight:700;text-align:center}
+
+/* ---------- "simple" profiles: bigger text, gold outline (set simple:true on a profile) ---------- */
+body.simple{--cw:20.6rem;--ring:var(--warm);--glow:rgba(255,211,110,.5);--ringw:.34rem}
+body.simple .row h2{font-size:2.6rem}
+body.simple .row h2 span{display:none}
+body.simple .t{font-size:1.5rem;line-height:1.3}
+body.simple .c{font-size:1.2rem}
+body.simple .dur{font-size:1.2rem;padding:.2rem .6rem}
+body.simple .hint{font-size:1.45rem}
+body.simple .chip{font-size:1.35rem}
+
+/* ---------- Player ---------- */
+#player{background:#000}
+#ytWrap,#ytWrap iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+#osd{position:absolute;top:2.4rem;left:50%;transform:translate(-50%,-.6rem);min-width:26rem;max-width:72rem;padding:1.1rem 2rem 1.2rem;border-radius:1.2rem;background:rgba(12,15,50,.9);box-shadow:0 1rem 3rem rgba(0,0,0,.5);opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;z-index:5;text-align:center}
+#osd.show{opacity:1;transform:translate(-50%,0)}
+#osd .l1{font-family:var(--head);font-weight:700;font-size:1.7rem;letter-spacing:-.01em}
+#osd .l2{font-size:1rem;color:var(--ink2);margin-top:.3rem}
+#osd .bar{height:.35rem;border-radius:1rem;background:rgba(255,255,255,.15);margin-top:.85rem;overflow:hidden}
+#osd .bar i{display:block;height:100%;width:0;background:var(--accent)}
+#osd.nobar .bar{display:none}
+body.simple #osd .l1{font-size:2.5rem}
+body.simple #osd .l2{font-size:1.4rem}
+body.simple #osd .bar i{background:var(--warm)}
+#pBack{position:absolute;top:1.6rem;left:1.6rem;z-index:6;width:3.4rem;height:3.4rem;border-radius:50%;border:0;background:rgba(12,15,50,.7);color:#fff;font-size:1.6rem;cursor:pointer;opacity:.45;transition:opacity .2s}
+#pBack:hover{opacity:1}
+
+#endcard{position:absolute;inset:0;z-index:7;display:none;align-items:center;justify-content:center;background:rgba(6,9,32,.95)}
+#endcard.show{display:flex}
+.endbox{display:flex;gap:3.4rem;align-items:center;max-width:82rem;padding:0 4rem}
+.endthumb{flex:0 0 36rem}
+.endthumb .thumb{box-shadow:0 0 0 .3rem var(--ring),0 1.4rem 3rem rgba(0,0,0,.6)}
+.endinfo .lbl{color:var(--ink2);font-size:1.25rem}
+.endinfo h3{font-family:var(--head);font-weight:800;font-size:2.8rem;line-height:1.12;letter-spacing:-.02em;margin:.6rem 0 .5rem}
+.endinfo .ch{color:var(--ink2);font-size:1.25rem}
+.endinfo .cnt{margin-top:1.6rem;font-size:1.3rem;color:var(--ink2)}
+.endinfo .cnt b{color:var(--warm);font-size:1.7rem}
+.btns{display:flex;gap:1rem;margin-top:2rem}
+.btn{padding:.9rem 1.8rem;border-radius:99rem;border:0;font-size:1.2rem;font-weight:600;background:rgba(255,255,255,.12);color:#fff;cursor:pointer}
+.btn.primary{background:#fff;color:#141846}
+body.simple .endinfo h3{font-size:3.3rem}
+body.simple .btn,body.simple .endinfo .cnt{font-size:1.6rem}
+
+/* ---------- Study mode: small video on the left, phrase card below it, phrase list on the right ---------- */
+/* --vw: width of the video while studying. A smaller video lets YouTube pick a lower quality, so seeking is faster */
+#player{--vw:58rem;--pad:2rem;--vh:calc(var(--vw) * 9 / 16)}
+#ytWrap{transition:left .3s ease,top .3s ease,width .3s ease,height .3s ease,border-radius .3s}
+#player.panel{background:transparent}
+#player.panel #ytWrap{left:var(--pad);top:var(--pad);width:var(--vw);height:var(--vh);border-radius:1rem;overflow:hidden;box-shadow:0 1rem 3rem rgba(0,0,0,.5);background:#000}
+#player.panel #osd{left:calc(var(--pad) + var(--vw) / 2);top:calc(var(--pad) + 1.2rem);min-width:20rem;max-width:calc(var(--vw) - 4rem)}
+#player.panel #pBack{display:none}
+#panel{position:absolute;top:0;right:0;bottom:0;width:calc(100% - var(--vw) - var(--pad) * 2);z-index:6;display:flex;flex-direction:column;
+  transform:translateX(100%);opacity:0;transition:transform .3s ease,opacity .3s}
+#player.panel #panel{transform:none;opacity:1}
+.ph-head{padding:var(--pad) 1.6rem .8rem .4rem}
+.ph-head h3{font-family:var(--head);font-weight:800;font-size:1.7rem;letter-spacing:-.02em;display:flex;align-items:baseline;gap:.7rem}
+.ph-head h3 span{font-family:var(--body);font-weight:600;font-size:.9rem;color:var(--warm);padding:.1rem .5rem;border:.1rem solid rgba(255,211,110,.45);border-radius:.4rem}
+.ph-head h3 em{font-family:var(--body);font-style:normal;font-weight:500;font-size:.95rem;color:var(--ink3)}
+.ph-sum{margin-top:.5rem;font-size:.92rem;line-height:1.5;color:var(--ink2);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ph-list{flex:1;overflow:hidden;position:relative;-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 .8rem,#000 calc(100% - 2rem),transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,#000 .8rem,#000 calc(100% - 2rem),transparent 100%)}
+.ph-inner{position:relative;padding:.8rem 1.6rem 6rem .4rem;transition:transform .25s ease}
+.ph{padding:.75rem 1rem;border-radius:.8rem;margin-bottom:.45rem;background:rgba(255,255,255,.035);cursor:pointer;transition:background .15s,box-shadow .15s}
+.ph .row1{display:flex;align-items:baseline;justify-content:space-between;gap:1rem}
+.ph .p{font-family:var(--head);font-weight:700;font-size:1.2rem;letter-spacing:-.01em;line-height:1.25}
+.ph .tm{font-size:.82rem;color:var(--ink3);font-weight:600;flex:none}
+.ph .m{font-size:.92rem;color:var(--ink2);margin-top:.15rem;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ph.sel{background:rgba(255,255,255,.12);box-shadow:0 0 0 var(--ringw) var(--ring)}
+.ph.now .tm{color:var(--warm)}
+.ph.now .tm::before{content:"● ";}
+.ph-empty{padding:1rem .4rem;color:var(--ink2);font-size:1.1rem;line-height:1.55}
+.ph-foot{padding:.9rem 1.6rem 1.3rem .4rem;font-size:.88rem;color:var(--ink3);display:flex;flex-wrap:wrap;gap:.4rem 1.2rem}
+.ph-foot .k{font-size:.82rem}
+.ph-foot .okl{color:#fff}
+
+#learn{position:absolute;left:var(--pad);width:var(--vw);top:calc(var(--pad) + var(--vh) + 1.2rem);bottom:var(--pad);z-index:6;overflow:hidden;
+  padding:1.3rem 1.8rem;border-radius:1rem;background:rgba(255,255,255,.05);border:.1rem solid rgba(255,255,255,.08);
+  opacity:0;transform:translateY(1rem);transition:opacity .3s,transform .3s;pointer-events:none}
+#player.panel #learn{opacity:1;transform:none}
+.lw-top{display:flex;justify-content:space-between;font-size:.9rem;color:var(--ink3);font-weight:600}
+.lw-top .st{color:var(--warm)}
+.lw-p{font-family:var(--head);font-weight:800;font-size:2.3rem;letter-spacing:-.02em;line-height:1.15;margin-top:.3rem}
+.lw-p .ipa{font-family:var(--body);font-weight:500;font-size:1.15rem;color:var(--accent);letter-spacing:0;margin-left:.6rem}
+.lw-m{font-size:1.25rem;color:#fff;margin-top:.2rem}
+.lw-q{margin-top:.7rem;font-style:italic;font-size:1.12rem;line-height:1.45;color:#dfe3ff}
+.lw-q mark{background:none;color:var(--warm);font-weight:600}
+.lw-u{margin-top:.5rem;font-size:1rem;line-height:1.45;color:var(--ink2)}
+.lw-ex{margin-top:.5rem;font-size:1.05rem;line-height:1.45;color:#fff}
+.lw-ex small{display:block;color:var(--ink2);font-size:.95rem}
+.lw-empty{font-size:1.15rem;line-height:1.6;color:var(--ink2)}
+
+body.simple .ph .p{font-size:1.5rem}
+body.simple .ph .m{font-size:1.15rem}
+body.simple .lw-p{font-size:2.5rem}
+body.simple .lw-m,body.simple .lw-q,body.simple .lw-ex{font-size:1.2rem}
+body.simple .lw-u{display:none}
+
+/* Study mode: stretch the YouTube frame taller, then crop top/bottom → hides its title, buttons and timeline.
+   The picture still fills the box because YouTube keeps 16:9 centred. Full screen keeps the normal YouTube look. */
+#player.panel #ytWrap iframe{top:-40%;bottom:auto;height:180%;pointer-events:none}
+
+/* Our own subtitle line (from the captions file), independent of YouTube's subtitles */
+#cap{position:absolute;z-index:6;left:50%;bottom:9%;transform:translateX(-50%);max-width:80%;text-align:center;pointer-events:none;
+  font-size:1.7rem;line-height:1.35;font-weight:500;color:#fff;padding:.25rem .9rem;border-radius:.5rem;background:rgba(0,0,0,.62);
+  transition:opacity .2s}
+#cap:empty{opacity:0;padding:0}
+#cap mark{background:none;color:#ffd36e;font-weight:700}
+#player.panel #cap{left:calc(var(--pad) + var(--vw) / 2);bottom:auto;top:calc(var(--pad) + var(--vh) - .6rem);transform:translate(-50%,-100%);
+  max-width:calc(var(--vw) - 3rem);font-size:1.25rem}
+body.simple #cap{font-size:2.1rem}
+body.simple #player.panel #cap{font-size:1.5rem}
+
+/* Saved words */
+.ph .p .star,.lw-p .star{color:#ffd36e;margin-left:.4rem;font-size:.85em}
+:root.day .ph .p .star,:root.day .lw-p .star{color:#c8742a}
+
+/* Video marks: watched (dimmed, end of the row), new; the card that opens Study history */
+.card.watched .thumb img{opacity:.42;filter:saturate(.6)}
+.wlabel{position:absolute;left:.5rem;bottom:.5rem;background:rgba(10,14,40,.85);color:#fff;font-size:.82rem;font-weight:700;padding:.15rem .55rem;border-radius:.35rem}
+.newb{position:absolute;right:.5rem;top:.5rem;background:#ff7a59;color:#fff;font-size:.78rem;font-weight:800;letter-spacing:.04em;padding:.12rem .5rem;border-radius:.35rem}
+.card.stub .thumb{display:grid;place-items:center;background:linear-gradient(135deg,rgba(143,162,255,.22),rgba(143,162,255,.06));border:.12rem dashed rgba(255,255,255,.25)}
+.card.stub .thumb b{font-size:3rem;line-height:1}
+.card.stub .thumb span{display:block;margin-top:.5rem;font-size:1rem;font-weight:600;color:var(--ink2)}
+.row.history h2{color:var(--ink2)}
+:root.day .wlabel{background:rgba(40,52,32,.85)}
+:root.day .card.stub .thumb{background:linear-gradient(135deg,rgba(79,125,69,.16),rgba(79,125,69,.05));border-color:rgba(60,80,50,.25)}
+
+/* The "mark this video?" box when leaving / at the end, and the sync screen */
+#ask{position:absolute;inset:0;z-index:9;display:none;align-items:center;justify-content:center;background:rgba(6,9,32,.78)}
+#ask.show{display:flex}
+.askbox{max-width:64rem;padding:2.4rem 2.8rem;border-radius:1.4rem;background:var(--bg1);box-shadow:0 1.4rem 4rem rgba(0,0,0,.5);text-align:center}
+.askbox .lbl{color:var(--ink2);font-size:1.15rem}
+.askbox h3{font-family:var(--head);font-weight:800;font-size:2.2rem;line-height:1.15;margin:.5rem 0 1.6rem}
+.opts{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
+.opt{padding:1rem 1.8rem;border-radius:99rem;border:0;font-size:1.25rem;font-weight:600;background:rgba(255,255,255,.1);color:var(--ink);cursor:pointer}
+.opt.sel{background:#fff;color:#141846;box-shadow:0 0 0 .3rem var(--glow)}
+.askbox .foot{margin-top:1.4rem;color:var(--ink3);font-size:1rem}
+.endopts{margin-top:1.6rem}
+.endopts .opts{justify-content:flex-start}
+:root.day #ask{background:rgba(240,234,218,.85)}
+:root.day .askbox{background:var(--bg1)}
+:root.day .opt{background:rgba(60,80,50,.1)}
+:root.day .opt.sel{background:var(--accent);color:#fff}
+body.simple .opt{font-size:1.6rem}
+
+/* Saved words screen: list on the left, detail card on the right */
+#wordsbox{position:fixed;inset:0;z-index:40;display:none;align-items:center;justify-content:center;background:rgba(6,9,32,.9)}
+#wordsbox.show{display:flex}
+.wbox{display:flex;gap:2.4rem;width:min(88rem,92vw);height:78vh;padding:2.2rem 2.4rem;border-radius:1.6rem;background:var(--bg1);box-shadow:0 1.4rem 4rem rgba(0,0,0,.5)}
+.wcol{flex:0 0 30rem;display:flex;flex-direction:column;min-height:0}
+.wcol h3{font-family:var(--head);font-weight:800;font-size:2rem;letter-spacing:-.02em}
+.wcol h3 span{font-family:var(--body);font-weight:500;font-size:1rem;color:var(--ink3);margin-left:.6rem}
+.wlist{flex:1;min-height:0;overflow:hidden;margin-top:1rem;position:relative}
+.wlist-in{transition:transform .2s ease}
+.wi{padding:.7rem 1rem;border-radius:.7rem;margin-bottom:.3rem;font-size:1.2rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wi small{display:block;font-size:.9rem;font-weight:400;color:var(--ink2);overflow:hidden;text-overflow:ellipsis}
+.wi.sel{background:#fff;color:#141846}
+.wi.sel small{color:#4b5190}
+.wdet{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center}
+.wdet .w{font-family:var(--head);font-weight:800;font-size:3rem;letter-spacing:-.02em;line-height:1.1}
+.wdet .ipa{color:var(--accent);font-size:1.35rem;margin-top:.4rem}
+.wdet .vi{font-size:1.6rem;margin-top:.8rem}
+.wdet .ex{font-size:1.25rem;margin-top:1rem;line-height:1.5;color:var(--ink2);font-style:italic}
+.wdet .src{font-size:1.05rem;margin-top:1.2rem;color:var(--ink3)}
+.wdet .keys{margin-top:2rem;font-size:1.05rem;color:var(--ink2);display:flex;flex-wrap:wrap;gap:.5rem 1.6rem}
+.wdet .warn{color:#ffb4a8}
+.wempty{font-size:1.3rem;line-height:1.6;color:var(--ink2);margin:auto}
+:root.day #wordsbox{background:rgba(240,234,218,.92)}
+:root.day .wi.sel{background:var(--accent);color:#fff}
+:root.day .wi.sel small{color:#e4f0da}
+body.simple .wi{font-size:1.5rem}
+#syncbox{position:fixed;inset:0;z-index:40;display:none;align-items:center;justify-content:center;background:rgba(6,9,32,.86)}
+#syncbox.show{display:flex}
+.sbox{display:flex;gap:3rem;align-items:center;max-width:80rem;padding:2.6rem 3rem;border-radius:1.6rem;background:var(--bg1);box-shadow:0 1.4rem 4rem rgba(0,0,0,.5)}
+.sbox .qr{flex:none;width:17rem;height:17rem;padding:1rem;border-radius:1rem;background:#fff;display:grid;place-items:center}
+.sbox .qr img,.sbox .qr canvas{width:100%!important;height:auto!important}
+.sbox h3{font-family:var(--head);font-weight:800;font-size:2.2rem;letter-spacing:-.02em}
+.sbox ol{margin:1rem 0 0 1.3rem;font-size:1.15rem;line-height:1.6;color:var(--ink2)}
+.sbox .code{margin-top:1.1rem;font-family:ui-monospace,Menlo,monospace;font-size:1.05rem;color:var(--ink);word-break:break-all}
+.sbox .st{margin-top:.7rem;font-size:1rem;color:var(--ink3)}
+.sbox .st b{color:#7fe0b8}
+.sbox .st b.off{color:#ffb4a8}
+:root.day #syncbox{background:rgba(240,234,218,.9)}
+
+/* "Has phrases" badge on a video card */
+.badge{position:absolute;left:.5rem;top:.5rem;background:rgba(255,211,110,.95);color:#2a1e00;font-size:.8rem;font-weight:700;padding:.12rem .5rem;border-radius:.35rem}
+body.simple .badge{font-size:1.05rem}
+
+/* ---------- Menu nhanh (▼) ---------- */
+#qmenu{position:absolute;left:50%;bottom:3rem;transform:translate(-50%,.6rem);z-index:7;display:flex;gap:1rem;padding:1rem;border-radius:1.4rem;background:rgba(12,15,50,.93);box-shadow:0 1rem 3rem rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
+#qmenu.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.qi{padding:.8rem 1.5rem;border-radius:99rem;background:rgba(255,255,255,.08);font-size:1.2rem;font-weight:600;color:#fff;cursor:pointer;white-space:nowrap}
+.qi small{display:block;font-size:.8rem;font-weight:500;color:var(--ink2)}
+.qi.info{cursor:default}
+.qi.sel{background:#fff;color:#141846}
+.qi.sel small{color:#4b5190}
+body.simple .qi{font-size:1.6rem}
+
+#toast{position:fixed;left:50%;bottom:3rem;transform:translate(-50%,1rem);z-index:50;max-width:70rem;padding:1rem 1.8rem;border-radius:1rem;background:rgba(22,26,74,.96);border:.1rem solid rgba(255,255,255,.16);font-size:1.2rem;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+body.simple #toast{font-size:1.6rem}
+
+/* ================= Daytime (6:00–18:00): a bright, rustic garden =================
+   Night keeps the starry sky above. The .day class is switched on by the script at the top of the page. */
+:root.day{
+  --bg0:#efe8d6; --bg1:#f7f2e4; --bg2:#e3ecd6;
+  --ink:#2c3a2b; --ink2:#5a6852; --ink3:#8a927c;
+  --accent:#4f7d45;
+  --ring:#3f6b37; --glow:rgba(111,160,92,.35);
+  --warm:#c8742a;
+  --head:'Fraunces','Be Vietnam Pro',Georgia,serif;
+}
+:root.day body{
+  background:
+    radial-gradient(ellipse 60% 50% at 85% -5%, rgba(255,226,160,.55) 0%, transparent 60%),
+    radial-gradient(ellipse 55% 45% at -5% 105%, rgba(176,206,150,.5) 0%, transparent 62%),
+    linear-gradient(180deg,#f8f4e8,#efe8d6);
+}
+/* Leafy branches in two corners instead of stars */
+:root.day body::before{
+  opacity:.9;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 260'%3E%3Cpath d='M320 6C250 30 190 70 140 130S70 230 40 258' fill='none' stroke='%23889e72' stroke-width='3' stroke-linecap='round'/%3E%3Cg fill='%2399b783'%3E%3Cellipse cx='282' cy='40' rx='30' ry='11' transform='rotate(-28 282 40)'/%3E%3Cellipse cx='250' cy='20' rx='24' ry='9' transform='rotate(-62 250 20)'/%3E%3Cellipse cx='222' cy='80' rx='32' ry='12' transform='rotate(-10 222 80)'/%3E%3Cellipse cx='190' cy='58' rx='26' ry='10' transform='rotate(-58 190 58)'/%3E%3Cellipse cx='166' cy='130' rx='30' ry='11' transform='rotate(8 166 130)'/%3E%3Cellipse cx='132' cy='104' rx='24' ry='9' transform='rotate(-50 132 104)'/%3E%3Cellipse cx='104' cy='186' rx='26' ry='10' transform='rotate(20 104 186)'/%3E%3C/g%3E%3Cg fill='%23b9cfa3'%3E%3Cellipse cx='300' cy='70' rx='18' ry='7' transform='rotate(20 300 70)'/%3E%3Cellipse cx='72' cy='214' rx='20' ry='8' transform='rotate(-40 72 214)'/%3E%3C/g%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 260 220'%3E%3Cpath d='M0 214C60 196 110 160 150 110S210 30 230 4' fill='none' stroke='%23889e72' stroke-width='3' stroke-linecap='round'/%3E%3Cg fill='%2399b783'%3E%3Cellipse cx='40' cy='196' rx='26' ry='10' transform='rotate(-18 40 196)'/%3E%3Cellipse cx='76' cy='166' rx='24' ry='9' transform='rotate(-62 76 166)'/%3E%3Cellipse cx='110' cy='170' rx='28' ry='11' transform='rotate(-2 110 170)'/%3E%3Cellipse cx='150' cy='96' rx='26' ry='10' transform='rotate(-70 150 96)'/%3E%3Cellipse cx='184' cy='92' rx='24' ry='9' transform='rotate(-20 184 92)'/%3E%3C/g%3E%3Cg fill='%23e7b97a'%3E%3Ccircle cx='208' cy='40' r='6'/%3E%3Ccircle cx='222' cy='54' r='4'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-size:26rem auto, 20rem auto;
+  background-position:right -1rem top -1rem, left -1rem bottom -1rem;
+}
+:root.day body[data-screen="player"]::before{opacity:.2}
+:root.day .moon{background:#f2b84b;box-shadow:0 0 1.4rem rgba(242,184,75,.6)}
+:root.day .moon::after{display:none}
+:root.day .me{background:linear-gradient(140deg,#7fa86b,#4f7d45)}
+:root.day .par{background:linear-gradient(140deg,#f0b46e,#d9805a)}
+:root.day .pcard.focused .pav{box-shadow:0 0 0 .4rem #fff,0 0 0 1.1rem rgba(111,160,92,.4),0 1.4rem 3rem rgba(60,70,40,.25)}
+:root.day .pav{box-shadow:0 1rem 2.4rem rgba(60,70,40,.2)}
+:root.day .chip{background:rgba(255,255,255,.65);border-color:rgba(60,80,50,.15)}
+:root.day .chip.focused{background:var(--accent);color:#fff;box-shadow:0 0 0 .4rem var(--glow)}
+:root.day .chip.focused em{color:#e4f0da}
+:root.day .thumb{background:linear-gradient(135deg,#d7e2c6,#c4d3b0);box-shadow:0 .4rem 1.1rem rgba(60,70,40,.18)}
+:root.day .card.focused .thumb{box-shadow:0 0 0 var(--ringw) var(--ring),0 0 0 calc(var(--ringw) + .5rem) var(--glow),0 1.2rem 2.4rem rgba(60,70,40,.28)}
+:root.day .t{color:var(--ink)}
+:root.day .card.focused .t{color:#1d2a1c}
+:root.day .card.blocked .thumb::after{background:rgba(247,242,228,.85)}
+:root.day .hint{background:linear-gradient(transparent,rgba(244,239,225,.97) 55%)}
+:root.day .k{background:rgba(60,80,50,.1);color:var(--ink)}
+:root.day #osd{background:rgba(255,252,243,.95);box-shadow:0 1rem 2.6rem rgba(60,70,40,.25)}
+:root.day #osd .bar{background:rgba(60,80,50,.15)}
+:root.day #pBack{background:rgba(255,252,243,.8);color:var(--ink)}
+:root.day #endcard{background:rgba(246,241,228,.97)}
+:root.day .endthumb .thumb{box-shadow:0 0 0 .3rem var(--ring),0 1.4rem 3rem rgba(60,70,40,.25)}
+:root.day .btn{background:rgba(60,80,50,.1);color:var(--ink)}
+:root.day .btn.primary{background:var(--accent);color:#fff}
+:root.day .ph{background:rgba(255,255,255,.55)}
+:root.day .ph.sel{background:#fff}
+:root.day .ph-foot .okl{color:var(--ink)}
+:root.day #learn{background:rgba(255,253,246,.8);border-color:rgba(60,80,50,.12);box-shadow:0 .6rem 2rem rgba(60,70,40,.12)}
+:root.day #player.panel #ytWrap{box-shadow:0 1rem 2.6rem rgba(60,70,40,.28)}
+:root.day .lw-p .ipa{color:#3f7a8c}
+:root.day .lw-m,:root.day .lw-ex{color:var(--ink)}
+:root.day .lw-q{color:#3d4a3a}
+:root.day .lw-q mark,:root.day .ph .q mark{color:var(--warm)}
+:root.day .ph-head h3 span{border-color:rgba(200,116,42,.45)}
+:root.day #qmenu{background:rgba(255,252,243,.96);box-shadow:0 1rem 2.6rem rgba(60,70,40,.25)}
+:root.day .qi{background:rgba(60,80,50,.08);color:var(--ink)}
+:root.day .qi.sel{background:var(--accent);color:#fff}
+:root.day .qi.sel small{color:#e4f0da}
+:root.day #toast{background:rgba(255,252,243,.97);border-color:rgba(60,80,50,.15);color:var(--ink);box-shadow:0 .8rem 2rem rgba(60,70,40,.2)}
+:root.day .badge{background:#4f7d45;color:#fff}
+:root.day body.simple{--ring:var(--warm);--glow:rgba(200,116,42,.35)}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<button id="keytrap" tabindex="-1" aria-hidden="true"></button>
+
+<section id="profile" class="screen">
+  <h1>Who's learning?</h1>
+  <p class="sub">Pick a language to see its videos</p>
+  <div class="profiles" id="profiles"></div>
+  <p class="foot">◀ ▶ to choose, OK to enter. Back returns to the word meteor shower.</p>
+</section>
+
+<section id="home" class="screen">
+  <header>
+    <div class="brand"><span class="moon"></span><span id="brandName">Family channel</span></div>
+    <div class="hright">
+      <div class="clock" id="clock"></div>
+      <button class="chip" id="wordsChip">★ Saved words</button>
+      <button class="chip" id="syncChip">⇅ Sync</button>
+      <button class="chip" id="chip"></button>
+    </div>
+  </header>
+  <div id="rows"><div id="rowsInner"></div></div>
+  <div class="hint">
+    <span><b class="k">◀▶▲▼</b>Choose a video</span>
+    <span><b class="k">OK</b>Watch</span>
+    <span><b class="k">Back</b>Go back</span>
+  </div>
+</section>
+
+<section id="player" class="screen">
+  <div id="ytWrap"></div>
+  <button id="pBack" title="Back to the list">←</button>
+  <div id="osd" class="nobar"><div class="l1"></div><div class="l2"></div><div class="bar"><i></i></div></div>
+  <aside id="panel"></aside>
+  <div id="learn"></div>
+  <div id="cap"></div>
+  <div id="qmenu"></div>
+  <div id="endcard"></div>
+  <div id="ask"></div>
+</section>
+<div id="syncbox"></div>
+<div id="wordsbox"></div>
+
+<div id="toast"></div>
+
+<script src="config.js"></script>
+<script src="learn-core.js"></script>
+<script>
+/* ===== Profiles: one per language in config.js. Picking a profile switches the whole site to that language. ===== */
+const LC = window.LearnCore, SYNC = LC.Sync, LI = LC.langInfo, markQuote = LC.markQuote;
+const PROFILES = {};
+LC.LANG_KEYS.forEach((k, i) => {
+  const li = LC.LANGS[k];
+  PROFILES[k] = { label: li.who || li.name, initial: li.badge || li.native.slice(0, 2), cls: i % 2 ? 'par' : 'me', simple: false, learn: true,
+                  desc: `Learn ${li.name} · ${li.native}`, rows: [] };
+});
+const PKEYS = LC.LANG_KEYS.slice();
+const isLearnProfile = () => !!(PROFILES[S.profile] && PROFILES[S.profile].learn);
+
+/* ===== Video catalog (scripts/video_daily.py adds to it every day) + synced marks ===== */
+let CATALOG = null, PHR_INDEX = {};
+const getJSON = url => fetch(url, { cache:'no-store' }).then(r => r.ok ? r.json() : null).catch(() => null);
+const catalogReady = Promise.race([
+  Promise.all([LC.getData('video/catalog.json'), LC.getData('video/phrases/index.json')]).then(([cat, idx]) => {
+    CATALOG = cat; PHR_INDEX = idx || {};
+  }),
+  new Promise(res => setTimeout(res, 3000)),
+]);
+/* Rows of a profile: New → the topics (unwatched first, watched last) → Study history */
+function buildMeRows(){
+  const b = LC.buildRows(CATALOG || { videos:[] });
+  const out = b.rows.map(r => ({ id:r.id, title:r.title, items:r.items, isNewRow:r.isNewRow }));
+  S.history = b.history;
+  if (b.history.length){
+    const stub = { stub:true, id:'__hist', title: S.histOpen ? 'Hide' : 'Open Study history', count: b.history.length };
+    out.push({ id:'history', title:'Study history', history:true, items: S.histOpen ? [stub, ...b.history] : [stub] });
+  }
+  if (!out.length) out.push({ id:'empty', title:`No ${LI.name} videos yet`, items:[{ stub:true, id:'__none', title:'Run the daily update once', count:0, none:true }] });
+  PROFILES[S.profile].rows = out;
+}
+const rowKey = row => row ? (row.id || row.title) : '';
+
+/* ===== Helpers ===== */
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const rem = () => parseFloat(getComputedStyle(document.documentElement).fontSize);
+const store = {
+  get(k){ try { return localStorage.getItem(k); } catch(e){ return null; } },
+  set(k,v){ try { localStorage.setItem(k,v); } catch(e){} }
+};
+const thumbUrl = id => `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
+const fmt = s => { s = Math.max(0, Math.floor(s||0)); const h=Math.floor(s/3600), m=Math.floor(s%3600/60), x=String(s%60).padStart(2,'0'); return h ? `${h}:${String(m).padStart(2,'0')}:${x}` : `${m}:${x}`; };
+
+let toastT;
+function toast(msg, ms=2600){
+  const el = $('#toast'); el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('show'), ms);
+}
+
+const S = { screen:'profile', pIdx:0, profile:null, row:0, cols:[], header:false, hIdx:1, play:null, end:false, endTimer:null, endNext:null, errors:0, history:[], histOpen:false, ask:null, sync:false };
+const rows = () => PROFILES[S.profile].rows;
+
+function show(id){
+  document.querySelectorAll('.screen').forEach(el => el.classList.toggle('active', el.id === id));
+  S.screen = id;
+  document.body.dataset.screen = id;
+}
+
+/* ===== Profile picker ===== */
+function renderProfiles(){
+  const last = S.profile || LC.LANG;
+  S.pIdx = Math.max(0, PKEYS.indexOf(last));
+  $('#profiles').innerHTML = PKEYS.map((k,i) => {
+    const p = PROFILES[k];
+    return `<div class="pcard" data-i="${i}"><div class="pav ${p.cls}">${p.initial}</div><div class="pname">${p.label}</div><div class="pdesc">${esc(p.desc)}</div></div>`;
+  }).join('');
+  focusProfile();
+}
+function focusProfile(){
+  document.querySelectorAll('.pcard').forEach((el,i) => el.classList.toggle('focused', i === S.pIdx));
+}
+function enterProfile(key){
+  if (key !== LC.LANG){ store.set('tvv.autoEnter', '1'); LC.setLang(key); return; }   // other language: reload the page in it, then enter
+  catalogReady.then(() => enterProfileNow(key));
+}
+function enterProfileNow(key){
+  S.profile = key; store.set('tvv.profile', key);
+  document.body.classList.toggle('simple', PROFILES[key].simple);
+  renderHome(); show('home');
+  requestAnimationFrame(() => updateFocus());
+}
+function goProfiles(){ renderProfiles(); show('profile'); }
+
+function profileKey(k){
+  if (k === 'left' || k === 'right'){ S.pIdx = (S.pIdx + 1) % PKEYS.length; focusProfile(); }
+  else if (k === 'ok') enterProfile(PKEYS[S.pIdx]);
+  else if (k === 'back') location.href = 'tv.html';   // back to the meteor dashboard
+}
+
+/* ===== Home ===== */
+function cardHTML(v, r, c){
+  if (v.stub) return `<div class="card stub" data-r="${r}" data-c="${c}" data-id="${v.id}">
+    <div class="thumb"><div><b>${S.histOpen ? '▴' : '🗂'}</b><span>${v.none ? 'See the setup guide' : S.histOpen ? 'Hide history' : `${v.count} archived`}</span></div></div>
+    <div class="meta"><div class="t">${esc(v.title)}</div><div class="c">${v.none ? '' : S.histOpen ? 'OK to hide' : 'OK to look again'}</div></div></div>`;
+  const n = v.n || (PHR_INDEX[v.id] && PHR_INDEX[v.id].n);
+  const flag = v.id ? SYNC.flag(v.id) : '';
+  return `<div class="card${v.blocked?' blocked':''}${flag === 'watched' ? ' watched' : ''}" data-r="${r}" data-c="${c}" data-id="${esc(v.id)}">
+    <div class="thumb"><img loading="lazy" src="${thumbUrl(v.id)}" alt="" onerror="this.parentNode.classList.add('noimg');this.remove()"><span class="dur">${esc(v.dur)}</span>${n ? `<span class="badge">Aa ${n}</span>` : ''}${v.isNew && !flag ? '<span class="newb">NEW</span>' : ''}${flag === 'watched' ? '<span class="wlabel">✓ Watched</span>' : flag === 'archived' ? '<span class="wlabel">🗂 History</span>' : ''}</div>
+    <div class="meta"><div class="t">${esc(v.title)}</div><div class="c">${esc(v.channel)}</div></div>
+  </div>`;
+}
+function renderHome(keep = false){
+  const p = PROFILES[S.profile];
+  // Remember the row + selected video so the focus stays put when the list re-sorts
+  const prev = keep ? rows().map((r, i) => ({ key: rowKey(r), id: (r.items[S.cols[i]] || {}).id, col: S.cols[i] || 0 })) : null;
+  const prevRow = keep ? rowKey(rows()[S.row]) : null;
+  if (isLearnProfile()) buildMeRows();
+  $('#chip').innerHTML = `<span class="av ${p.cls}">${p.initial}</span><span>${p.label}<em>Switch language</em></span>`;
+  $('#syncChip').style.display = isLearnProfile() ? '' : 'none';
+  $('#wordsChip').style.display = isLearnProfile() ? '' : 'none';
+  $('#brandName').textContent = `${LI.native} · ${LC.CFG.familyName || 'Family channel'}`;
+  const nw = SYNC.words().length;
+  $('#wordsChip').textContent = nw ? `★ Saved words (${nw})` : '★ Saved words';
+  $('#rowsInner').innerHTML = p.rows.map((row,r) =>
+    `<section class="row${row.history ? ' history' : ''}"><h2>${esc(row.title)}<span>${row.history ? `${S.history.length} videos` : row.id === 'empty' ? '' : `${row.items.length} videos`}</span></h2>
+     <div class="track-wrap"><div class="track">${row.items.map((v,c) => cardHTML(v,r,c)).join('')}</div></div></section>`
+  ).join('');
+  if (keep && prev){
+    S.cols = p.rows.map(row => {
+      const old = prev.find(x => x.key === rowKey(row)); if (!old) return 0;
+      const i = row.items.findIndex(v => v.id === old.id);
+      return i >= 0 ? i : Math.min(old.col, row.items.length - 1);
+    });
+    const ri = p.rows.findIndex(r => rowKey(r) === prevRow);
+    S.row = ri >= 0 ? ri : Math.min(S.row, p.rows.length - 1);
+  } else {
+    S.row = 0; S.cols = p.rows.map(() => 0); S.header = false;
+    $('#rowsInner').style.transform = 'translateY(0)';
+  }
+}
+function toggleHistory(){
+  S.histOpen = !S.histOpen;
+  renderHome(true);
+  const hi = rows().findIndex(r => r.history);
+  if (hi >= 0){ S.row = hi; S.cols[hi] = S.histOpen && rows()[hi].items.length > 1 ? 1 : 0; }
+  updateFocus();
+}
+function rowEls(){ return document.querySelectorAll('#rowsInner .row'); }
+
+function updateFocus(scroll = true){
+  document.querySelectorAll('#home .focused').forEach(e => e.classList.remove('focused'));
+  const inner = $('#rowsInner');
+  if (S.header){
+    const hb = isLearnProfile() ? ['#wordsChip','#syncChip','#chip'] : ['#chip'];
+    $(hb[Math.min(S.hIdx, hb.length - 1)]).classList.add('focused');
+    if (scroll) inner.style.transform = 'translateY(0)';
+    return;
+  }
+  const rowEl = rowEls()[S.row];
+  const track = rowEl.querySelector('.track');
+  const card = track.children[S.cols[S.row]];
+  card.classList.add('focused');
+  if (!scroll) return;
+
+  // Sideways: keep one card in front so you can tell there are more videos on the left
+  const R = rem();
+  const gap = parseFloat(getComputedStyle(track).columnGap) || 0;
+  const last = track.children[track.children.length - 1];
+  const contentW = last.offsetLeft + last.offsetWidth;
+  const visW = track.parentNode.clientWidth - R * 8;
+  const maxX = Math.max(0, contentW - visW);
+  const x = Math.min(Math.max(0, card.offsetLeft - (card.offsetWidth + gap)), maxX);
+  track.style.transform = `translateX(${-x}px)`;
+
+  // Up/down: bring the selected row near the top of the list area
+  const box = $('#rows');
+  const maxY = Math.max(0, inner.offsetHeight - box.clientHeight);
+  const y = S.row === 0 ? 0 : Math.min(Math.max(0, rowEl.offsetTop - R), maxY);
+  inner.style.transform = `translateY(${-y}px)`;
+}
+
+function homeKey(k){
+  const rs = rows();
+  if (S.header){
+    const n = isLearnProfile() ? 3 : 1;
+    S.hIdx = Math.min(S.hIdx, n - 1);
+    if (k === 'down') S.header = false;
+    else if (k === 'left') S.hIdx = Math.max(0, S.hIdx - 1);
+    else if (k === 'right') S.hIdx = Math.min(n - 1, S.hIdx + 1);
+    else if (k === 'ok' && n === 3 && S.hIdx === 0){ openWords(); return; }
+    else if (k === 'ok' && n === 3 && S.hIdx === 1){ openSync(); return; }
+    else if (k === 'ok' || k === 'back'){ goProfiles(); return; }
+    updateFocus(); return;
+  }
+  const c = S.cols[S.row];
+  if (k === 'up'){ if (S.row === 0){ S.header = true; S.hIdx = isLearnProfile() ? 2 : 0; } else S.row--; }
+  else if (k === 'down'){ if (S.row < rs.length - 1) S.row++; }
+  else if (k === 'left'){ if (c > 0) S.cols[S.row]--; }
+  else if (k === 'right'){ if (c < rs[S.row].items.length - 1) S.cols[S.row]++; }
+  else if (k === 'ok' || k === 'playpause'){ play(S.row, c); return; }
+  else if (k === 'back'){
+    // Back once: to the start of the list. Back twice: to the profile picker
+    if (S.row > 0 || c > 0){ S.row = 0; S.cols = S.cols.map(() => 0); }
+    else { goProfiles(); return; }
+  }
+  updateFocus();
+}
+
+/* ===== YouTube player ===== */
+let player = null, ytReady = false, pendingId = null;
+window.onYouTubeIframeAPIReady = () => {
+  ytReady = true;
+  if (pendingId && S.screen === 'player'){ const id = pendingId; pendingId = null; createOrLoad(id); }
+};
+(function loadYT(){
+  const s = document.createElement('script');
+  s.src = 'https://www.youtube.com/iframe_api';
+  s.onerror = () => toast('Could not load the YouTube player. Check the internet connection.');
+  document.head.appendChild(s);
+})();
+
+function cur(){ return S.play ? S.play.v : null; }
+function playRow(){ return S.play ? (rows().find(r => rowKey(r) === S.play.rowKey) || rows()[S.play.r]) : null; }
+/* Next video in the same row: skips broken, watched and archived videos */
+function nextVideo(){
+  const row = playRow(); if (!row) return null;
+  const items = row.items, i = items.findIndex(x => x.id === S.play.v.id);
+  for (let j = i + 1; j < items.length; j++){
+    const x = items[j];
+    if (!x.stub && !x.blocked && !SYNC.flag(x.id)) return x;
+  }
+  return null;
+}
+const isLearn = v => !!(v && v.row && isLearnProfile());   // a catalog video (has synced marks)
+
+function play(r, c){
+  const v = rows()[r].items[c];
+  if (v.none) return;
+  if (v.stub){ toggleHistory(); return; }
+  S.cols[r] = c;
+  playV(r, v);
+}
+function playV(r, v, at){
+  S.startAt = at || 0;
+  if (v.blocked){ toast('This video cannot play on the TV, please pick another one'); return; }
+  clearEnd(); closeAsk();
+  S.play = { r, v, rowKey: rowKey(rows()[r]) }; S.row = r; S.ccApplied = false;
+  S.phr = null; S.sel = 0; S.nowIdx = -1; S.cap = null; S.capIdx = -1; $('#cap').textContent = ''; closeMenu();
+  loadCaptions(v.id).then(c => { const now = cur(); if (now && now.id === v.id) S.cap = c; });
+  show('player');
+  osd(v.title, v.channel, 3500, false);
+  renderPanel();
+  loadPhrases(v.id).then(d => {
+    const now = cur(); if (!now || now.id !== v.id) return;
+    S.phr = d; renderPanel();
+    if (d && !S.panel && learnPref()) openPanel(false);
+    else if (d && !S.panel) osd(v.title, `Press ▲ to study the ${d.phrases.length} phrases in this video`, 4500, false);
+  });
+  if (!ytReady){ pendingId = v.id; return; }
+  createOrLoad(v.id);
+}
+
+function createOrLoad(id){
+  if (player && player.loadVideoById){ player.loadVideoById(id); return; }
+  $('#ytWrap').innerHTML = '<div id="yt"></div>';
+  // Subtitles in the language being learned are drawn by this page (#cap): YouTube's embedded player does not show them reliably.
+  // "English" mode asks YouTube for its English track / auto-translation instead. Change it in the ▼ menu.
+  const m = ccGet();
+  const vars = { autoplay:1, rel:0, playsinline:1, iv_load_policy:3, fs:0, hl:'en',
+                 cc_load_policy: m === 'en' ? 1 : 0, cc_lang_pref: 'en' };
+  if (location.protocol.startsWith('http')) vars.origin = location.origin;
+  player = new YT.Player('yt', {
+    width:'100%', height:'100%', videoId:id, playerVars:vars,
+    events:{
+      onReady: e => { e.target.playVideo(); refocus(); },
+      onStateChange: onState,
+      onApiChange: () => { if (S.ccWant) applyCC(S.ccWant, false); },   // the subtitle track list has just loaded
+      onError: onErr
+    }
+  });
+}
+
+function onState(e){
+  if (e.data === YT.PlayerState.PLAYING){
+    S.errors = 0;
+    if (S.startAt){ const t = S.startAt; S.startAt = 0; try { player.seekTo(Math.max(0, t - 0.3), true); } catch(e){} }
+    if (!S.ccApplied){
+      S.ccApplied = true;
+      const m = ccGet(); if (m === 'en') applyCC(m, false);
+      applySpeed(speedGet());
+    }
+  }
+  if (e.data === YT.PlayerState.ENDED) showEnd();
+}
+
+function onErr(e){
+  const v = cur(); if (!v) return;
+  const code = e.data;
+  v.blocked = true;
+  document.querySelectorAll(`.card[data-id="${v.id}"]`).forEach(card => card.classList.add('blocked'));
+  const msg = (code === 101 || code === 150) ? 'This channel does not allow playing on other sites. Moving to the next video.'
+            : code === 100 ? 'This video is no longer on YouTube. Moving to the next video.'
+            : 'This video cannot be played. Moving to the next video.';
+  toast(msg, 2400);
+  S.errors++;
+  setTimeout(() => {
+    if (S.screen !== 'player') return;
+    const n = nextVideo();
+    if (n && S.errors < 5) playV(S.play.r, n);
+    else { closePlayer(); toast('No more playable videos in this row'); }
+  }, 1800);
+}
+
+function closePlayer(){
+  clearEnd(); closeMenu(); closePanel(false); closeAsk();
+  if (player){ try { player.destroy(); } catch(e){} player = null; }   // frees memory on the TV
+  $('#ytWrap').innerHTML = '';
+  pendingId = null;
+  if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+  show('home');
+  renderHome(true);   // watched / archived marks just changed → re-sort the rows
+  requestAnimationFrame(() => updateFocus());
+}
+
+/* ===== Marking videos: watched / Study history (synced to every device) ===== */
+function setFlag(v, s, note = true){
+  if (!v || !v.id) return;
+  SYNC.setFlag(v.id, s);
+  if (note) toast(s === 'watched' ? '✓ Marked as watched. It moves to the end of its row.'
+               : s === 'archived' ? '🗂 Put away in Study history (bottom of the page).' : 'Mark removed.', 2600);
+}
+/* Back while watching: after a good part of the video without a mark, ask */
+function requestClose(){
+  const v = cur();
+  const { t, d } = progress();
+  if (isLearn(v) && !SYNC.flag(v.id) && (t >= 180 || (d && t / d >= 0.5))){
+    showAsk('Finished with this video?', v.title, [
+      { label:'✓ Yes, watched', act:() => { setFlag(v, 'watched'); closePlayer(); } },
+      { label:'🗂 Keep in Study history', act:() => { setFlag(v, 'archived'); closePlayer(); } },
+      { label:'Not yet, later', act:() => closePlayer() },
+    ], d && t / d >= 0.85 ? 0 : 2, () => closePlayer());
+    return;
+  }
+  closePlayer();
+}
+function showAsk(lbl, title, opts, sel, onBack){
+  S.ask = { opts, sel, onBack };
+  try { player.pauseVideo(); } catch(e){}
+  $('#ask').innerHTML = `<div class="askbox"><div class="lbl">${esc(lbl)}</div><h3>${esc(title)}</h3>
+    <div class="opts">${opts.map((o, i) => `<button class="opt${i === sel ? ' sel' : ''}" data-i="${i}">${esc(o.label)}</button>`).join('')}</div>
+    <div class="foot">◀ ▶ choose · OK confirm · Back: leave without marking</div></div>`;
+  $('#ask').classList.add('show');
+}
+function closeAsk(){ S.ask = null; const a = $('#ask'); if (a) a.classList.remove('show'); }
+function askKey(k){
+  const A = S.ask, n = A.opts.length;
+  if (k === 'left'){ A.sel = (A.sel + n - 1) % n; }
+  else if (k === 'right'){ A.sel = (A.sel + 1) % n; }
+  else if (k === 'ok'){ const o = A.opts[A.sel]; closeAsk(); o.act(); return; }
+  else if (k === 'back'){ const f = A.onBack; closeAsk(); f && f(); return; }
+  document.querySelectorAll('#ask .opt').forEach((b, i) => b.classList.toggle('sel', i === A.sel));
+}
+
+/* ===== Sync screen: a QR code that opens the phone/iPad page on the same family store ===== */
+function openSync(){
+  S.sync = true;
+  const link = LC.pageLink('iphone.html');
+  const age = SYNC.lastPull ? Math.round((Date.now() - SYNC.lastPull) / 60000) : null;
+  $('#syncbox').innerHTML = `<div class="sbox"><div class="qr" id="qr"></div><div>
+    <h3>TV · iPad · phone</h3>
+    <ol><li><b>Scan the code</b> with a phone or iPad camera to open the ${esc(LI.name)} videos and games there.</li>
+        <li>${SYNC.enabled ? 'Every device shares <b>one family store</b>: <b>watched</b> videos, <b>Study history</b> and <b>saved words</b>. Nothing to log in to.' : 'Sync is <b>off</b>: each device keeps its own list. Add a Firebase database in config.js to share (setup guide, step 5).'}</li>
+        <li>${SYNC.enabled ? 'Mark something on one device and the others catch up within about a minute.' : 'Everything else works the same without it.'}</li></ol>
+    ${SYNC.enabled ? `<div class="code">Family code: ${esc(SYNC.code)} · ${SYNC.words().length} saved words</div>
+    <div class="st">Status: ${SYNC.online ? '<b>connected</b>' : '<b class="off">not connected</b>'}${age !== null ? ` · updated ${age < 1 ? 'just now' : age + ' min ago'}` : ''}</div>` : ''}
+    <div class="st">Back or OK to close</div></div></div>`;
+  $('#syncbox').classList.add('show');
+  LC.qr($('#qr'), link, 300);
+  SYNC.pull();
+}
+function closeSync(){ S.sync = false; $('#syncbox').classList.remove('show'); }
+
+/* ===== Saved words screen (synced to every device). ▲▼ choose · OK replays the sentence in its video · ◀ twice: remove ===== */
+function openWords(){ S.words = { sel: 0, arm: null }; renderWords(); $('#wordsbox').classList.add('show'); }
+function closeWords(){ S.words = null; $('#wordsbox').classList.remove('show'); renderHome(true); updateFocus(false); }
+function renderWords(){
+  const W = S.words; if (!W) return;
+  const l = SYNC.words();
+  W.sel = Math.max(0, Math.min(W.sel, l.length - 1));
+  if (!l.length){
+    $('#wordsbox').innerHTML = `<div class="wbox"><div class="wempty">No saved words yet.<br>While watching, press ▲ to study, then ▶ to save a phrase.<br>Words saved on the iPad or a phone show up here too.<br><br>Back to close</div></div>`;
+    return;
+  }
+  const o = l[W.sel], src = o.src && o.src.id ? o.src : null;
+  $('#wordsbox').innerHTML = `<div class="wbox">
+    <div class="wcol"><h3>★ Saved words<span>${l.length}</span></h3>
+      <div class="wlist"><div class="wlist-in">${l.map((x, i) => `<div class="wi${i === W.sel ? ' sel' : ''}">${esc(x.w)}<small>${esc(x.en || '')}</small></div>`).join('')}</div></div></div>
+    <div class="wdet">
+      <div class="w">${esc(o.w)}</div>${o.pron ? `<div class="ipa">${esc(o.pron)}</div>` : ''}
+      <div class="vi">${esc(o.en || '')}</div>
+      ${o.ex ? `<div class="ex">${esc(o.ex)}${o.ex_en ? `<br><small>${esc(o.ex_en)}</small>` : ''}</div>` : ''}
+      ${src && src.title ? `<div class="src">From: ${esc(src.title)} · ${fmt(src.t)}</div>` : ''}
+      <div class="keys"><span><b class="k">▲▼</b>Choose</span>${src ? '<span><b class="k">OK</b>Watch that moment</span>' : ''}
+        <span class="${W.arm === o.w ? 'warn' : ''}"><b class="k">◀</b>${W.arm === o.w ? 'Press again to remove' : 'Remove'}</span><span><b class="k">Back</b>Close</span></div>
+    </div></div>`;
+  const list = $('#wordsbox .wlist'), sel = $('#wordsbox .wi.sel');
+  if (list && sel){
+    const y = Math.max(0, Math.min(sel.offsetTop - list.clientHeight * 0.35, list.firstElementChild.offsetHeight - list.clientHeight));
+    list.firstElementChild.style.transform = `translateY(${-y}px)`;
+  }
+}
+function wordsKey(k){
+  const W = S.words, l = SYNC.words(), o = l[W.sel];
+  if (k === 'back'){ closeWords(); return; }
+  if (k === 'up'){ W.sel--; W.arm = null; }
+  else if (k === 'down'){ W.sel++; W.arm = null; }
+  else if (k === 'left' && o){
+    if (W.arm === o.w){ SYNC.removeWord(o.w); W.arm = null; toast(`Removed “${o.w}”`); }
+    else W.arm = o.w;
+  }
+  else if (k === 'ok' && o && o.src && o.src.id){
+    const v = CATALOG && CATALOG.videos.find(x => x.id === o.src.id);
+    if (!v){ toast('The video for this word is no longer in the list'); return; }
+    const t = o.src.t || 0;
+    closeWords();
+    const r = Math.max(0, rows().findIndex(row => row.items.some(x => x.id === v.id)));
+    const item = rows()[r] ? rows()[r].items.find(x => x.id === v.id) || v : v;
+    playV(r, item, t);
+    return;
+  }
+  renderWords();
+}
+
+function progress(){
+  try { return { t: player.getCurrentTime() || 0, d: player.getDuration() || 0 }; }
+  catch(e){ return { t:0, d:0 }; }
+}
+
+let osdT;
+function osd(l1, l2, ms = 1800, bar = true){
+  const el = $('#osd');
+  el.querySelector('.l1').textContent = l1;
+  el.querySelector('.l2').textContent = l2 || '';
+  el.classList.toggle('nobar', !bar);
+  if (bar){ const { t, d } = progress(); el.querySelector('.bar i').style.width = d ? (t / d * 100) + '%' : '0'; }
+  el.classList.add('show');
+  clearTimeout(osdT);
+  if (ms > 0) osdT = setTimeout(() => el.classList.remove('show'), ms);
+}
+function qualityLabel(){
+  const map = { tiny:'144p', small:'240p', medium:'360p', large:'480p', hd720:'720p', hd1080:'1080p', hd1440:'1440p', hd2160:'4K', highres:'4K+' };
+  try { const q = player.getPlaybackQuality(); return map[q] || 'Auto'; } catch(e){ return 'Auto'; }
+}
+function timeLine(){ const { t, d } = progress(); return `${fmt(t)} / ${fmt(d)}`; }
+
+function togglePlay(){
+  if (!player || !player.getPlayerState) return;
+  if (player.getPlayerState() === YT.PlayerState.PLAYING){ player.pauseVideo(); osd('Paused', timeLine(), 0); }
+  else { player.playVideo(); osd('Playing', timeLine(), 1500); }
+}
+function seek(d){
+  if (!player || !player.getCurrentTime) return;
+  const { t, d: dur } = progress();
+  const to = Math.min(Math.max(0, t + d), Math.max(0, dur - 1));
+  player.seekTo(to, true);
+  setTimeout(() => osd(d > 0 ? 'Forward 10 seconds' : 'Back 10 seconds', `${fmt(to)} / ${fmt(dur)}`), 60);
+}
+/* ===== Subtitles: the language being learned (drawn by this page) → English (from YouTube) → off; remembered per profile ===== */
+const CC_MODES = ['own','en','off'];
+const CC_LABEL = { off:'Subtitles off', own:`${LI.name} subtitles`, en:'English subtitles (YouTube)' };
+function ccGet(){
+  const v = store.get('tvv.cc3.' + S.profile);
+  return CC_MODES.includes(v) ? v : 'own';
+}
+function ccTracks(){
+  try { return player.getOption('captions','tracklist') || []; } catch(e){ return []; }
+}
+/* YouTube loads its track list late and differently per device: retry a few times, and again when onApiChange fires */
+let ccTimer = null;
+function applyCC(mode, announce, tries = 0){
+  if (!player || !player.loadModule) return;
+  clearTimeout(ccTimer);
+  S.ccWant = mode === 'en' ? mode : null;
+  try {
+    if (mode !== 'en'){
+      player.unloadModule('captions'); player.unloadModule('cc');
+      if (announce) osd(CC_LABEL[mode], '', 1800, false);
+      return;
+    }
+    player.loadModule('captions');
+    const tracks = ccTracks();
+    if (!tracks.length){
+      if (tries < 8){ ccTimer = setTimeout(() => applyCC(mode, announce, tries + 1), 600); return; }
+      if (announce) osd('This video has no subtitles on YouTube', '', 2200, false);
+      return;
+    }
+    const english = tracks.find(t => (t.languageCode || '').startsWith('en') && !t.kind) || tracks.find(t => (t.languageCode || '').startsWith('en'));
+    if (english){
+      player.setOption('captions','track',{ languageCode: english.languageCode });
+    } else {
+      // No English track: ask YouTube to auto-translate the track in the language being learned (or the first one)
+      const base = tracks.find(t => (t.languageCode || '').startsWith(LC.LANG)) || tracks[0];
+      player.setOption('captions','track',{ languageCode: base.languageCode, translationLanguage:{ languageCode:'en', languageName:'English' } });
+    }
+    S.ccWant = null;   // chosen; no need to apply again
+    if (announce) osd(CC_LABEL.en, english ? '' : 'Auto-translated', 1800, false);
+  } catch(e){
+    if (announce) osd('Could not change the subtitles for this video', '', 2200, false);
+  }
+}
+/* Our own subtitles: data/<lang>/video/captions/<id>.json, each segment is [start, duration, text] */
+const capCache = {};
+async function loadCaptions(id){
+  if (id in capCache) return capCache[id];
+  let c = null;
+  try { const r = await fetch(LC.dataUrl(`video/captions/${id}.json`), { cache:'no-store' }); if (r.ok) c = (await r.json()).s || null; } catch(e){}
+  return capCache[id] = c;
+}
+function capAt(t){
+  const s = S.cap; if (!s || !s.length) return -1;
+  let lo = 0, hi = s.length - 1, k = -1;
+  while (lo <= hi){ const mid = (lo + hi) >> 1; if (s[mid][0] <= t){ k = mid; lo = mid + 1; } else hi = mid - 1; }
+  if (k < 0) return -1;
+  const end = s[k][0] + Math.max(s[k][1], 1.2);
+  return (t <= end + 0.4 || (s[k + 1] && t < s[k + 1][0])) ? k : -1;
+}
+function tickCaption(){
+  const el = $('#cap'); if (!el) return;
+  if (S.screen !== 'player' || ccGet() !== 'own' || !S.cap || !player || !player.getCurrentTime){
+    if (el.textContent) el.textContent = ''; S.capIdx = -1; return;
+  }
+  const k = capAt(player.getCurrentTime() || 0);
+  if (k === S.capIdx) return;
+  S.capIdx = k;
+  if (k < 0){ el.textContent = ''; return; }
+  const seg = S.cap[k];
+  // Highlight the phrase being studied when it is in this line
+  const ph = S.phr && S.phr.phrases.find(p => Math.abs(p.t - seg[0]) < 0.05);
+  el.innerHTML = ph ? markQuote(seg[2], ph.phrase) : esc(seg[2]);
+}
+setInterval(tickCaption, 200);
+
+function cycleCC(){
+  const next = CC_MODES[(CC_MODES.indexOf(ccGet()) + 1) % CC_MODES.length];
+  store.set('tvv.cc3.' + S.profile, next);
+  S.capIdx = -2;
+  if (next === 'en') applyCC('en', true);
+  else {
+    try { player.unloadModule('captions'); player.unloadModule('cc'); } catch(e){}
+    osd(CC_LABEL[next], next === 'own' && !S.cap ? 'No subtitle file for this video yet' : '', 1800, false);
+  }
+}
+
+function toggleFullscreen(){
+  const el = document.documentElement;
+  if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+  else if (el.requestFullscreen) el.requestFullscreen().catch(() => {});
+}
+
+/* End-of-video screen. Catalog videos: ask how to mark it ("Watched, play next" is picked after 15 seconds).
+   Other videos: the next one in the row starts by itself. */
+function showEnd(){
+  clearEnd(); closeMenu();
+  const v = cur(), row = playRow(), next = nextVideo();
+  const el = $('#endcard');
+  const nextBox = next ? `<div class="endthumb"><div class="thumb"><img src="${thumbUrl(next.id)}" alt=""><span class="dur">${esc(next.dur)}</span></div></div>` : '';
+  let s = isLearn(v) ? 15 : 10;
+  if (isLearn(v)){
+    const opts = [
+      { label: next ? '✓ Watched, play next' : '✓ Watched', act: () => { setFlag(v, 'watched'); next ? playV(S.play.r, next) : closePlayer(); } },
+      { label: next ? 'No mark, play next' : 'Later', act: () => { next ? playV(S.play.r, next) : closePlayer(); } },
+      { label: '🗂 Keep in Study history', act: () => { setFlag(v, 'archived'); closePlayer(); } },
+    ];
+    S.endOpts = opts; S.endSel = 0;
+    el.innerHTML = `<div class="endbox">${nextBox}
+      <div class="endinfo"><div class="lbl">Finished: ${esc(v.title)}</div>
+        <h3>${next ? esc(next.title) : 'You finished the row ' + esc(row ? row.title : '')}</h3>${next ? `<div class="ch">Up next · ${esc(next.channel)}</div>` : ''}
+        <div class="endopts"><div class="opts">${opts.map((o, i) => `<button class="opt${i === 0 ? ' sel' : ''}" data-i="${i}">${esc(o.label)}</button>`).join('')}</div></div>
+        <div class="cnt">“${esc(opts[0].label)}” in <b id="cd">${s}</b> seconds · ◀ ▶ choose · Back: to the list</div>
+      </div></div>`;
+    S.endTimer = setInterval(() => {
+      s--; const cd = $('#cd'); if (cd) cd.textContent = s;
+      if (s <= 0){ clearInterval(S.endTimer); opts[0].act(); }
+    }, 1000);
+  } else if (!next){
+    S.endOpts = null;
+    el.innerHTML = `<div class="endbox"><div class="endinfo"><div class="lbl">You finished the row</div><h3>${esc(row ? row.title : '')}</h3>
+      <div class="btns"><button class="btn primary" data-act="back">Back: to the list</button></div></div></div>`;
+  } else {
+    S.endOpts = null;
+    el.innerHTML = `<div class="endbox">${nextBox}
+      <div class="endinfo"><div class="lbl">Up next in ${esc(row.title)}</div><h3>${esc(next.title)}</h3><div class="ch">${esc(next.channel)}</div>
+        <div class="cnt">Starts in <b id="cd">${s}</b> seconds</div>
+        <div class="btns"><button class="btn primary" data-act="next">OK: Play now</button><button class="btn" data-act="back">Back: to the list</button></div>
+      </div></div>`;
+    S.endNext = next;
+    S.endTimer = setInterval(() => {
+      s--; const cd = $('#cd'); if (cd) cd.textContent = s;
+      if (s <= 0) playV(S.play.r, next);
+    }, 1000);
+  }
+  el.classList.add('show'); S.end = true;
+}
+function clearEnd(){
+  clearInterval(S.endTimer); S.endTimer = null; S.end = false; S.endNext = null; S.endOpts = null;
+  $('#endcard').classList.remove('show');
+}
+
+function playerKey(k){
+  if (S.ask){ askKey(k); return; }
+  if (S.end){
+    if (S.endOpts){
+      const n = S.endOpts.length;
+      if (k === 'left' || k === 'right'){
+        clearInterval(S.endTimer); const cd = $('#endcard .cnt'); if (cd) cd.textContent = '◀ ▶ choose · OK confirm · Back: to the list';
+        S.endSel = (S.endSel + (k === 'left' ? n - 1 : 1)) % n;
+        document.querySelectorAll('#endcard .opt').forEach((b, i) => b.classList.toggle('sel', i === S.endSel));
+      } else if (k === 'ok'){ const o = S.endOpts[S.endSel]; clearEnd(); o.act(); }
+      else if (k === 'back') closePlayer();
+      return;
+    }
+    if (k === 'ok' && S.endNext) playV(S.play.r, S.endNext);
+    else if (k === 'back' || k === 'ok') closePlayer();
+    return;
+  }
+  if (S.menu){ menuKey(k); return; }
+  if (S.panel){ panelKey(k); return; }
+  switch (k){
+    case 'back': requestClose(); break;
+    case 'ok': case 'playpause': togglePlay(); break;
+    case 'left': seek(-10); break;
+    case 'right': seek(10); break;
+    case 'up': openPanel(); break;
+    case 'down': openMenu(); break;
+    case 'fullscreen': toggleFullscreen(); break;
+  }
+}
+
+/* ===== Phrases: read the JSON files written by scripts/video_phrases.py ===== */
+const phraseCache = {};
+async function loadPhrases(id){
+  if (id in phraseCache) return phraseCache[id];
+  let d = null;
+  try {
+    const r = await fetch(LC.dataUrl(`video/phrases/${id}.json`), { cache:'no-store' });
+    if (r.ok){ const j = await r.json(); if (j.phrases && j.phrases.length) d = j; }
+  } catch(e){}
+  phraseCache[id] = d;
+  return d;
+}
+
+function renderPanel(){
+  const el = $('#panel');
+  const d = S.phr;
+  if (!d){
+    el.innerHTML = `<div class="ph-head"><h3>Useful phrases</h3></div>
+      <div class="ph-empty">No phrases for this video yet.<br><br>They are prepared by the daily update (scripts/run_local.sh).</div>
+      <div class="ph-foot"><span><b class="k">OK</b><span class="okl">Play / pause</span></span><span><b class="k">◀▶</b>10 seconds</span><span><b class="k">Back</b>Full screen</span></div>`;
+    renderLearn();
+    return;
+  }
+  el.innerHTML = `<div class="ph-head"><h3>Useful phrases ${d.level ? `<span>${esc(d.level)}</span>` : ''}<em>${d.phrases.length}</em></h3>
+      ${d.summary ? `<div class="ph-sum">${esc(d.summary)}</div>` : ''}</div>
+    <div class="ph-list"><div class="ph-inner">${d.phrases.map((p, i) => `
+      <div class="ph" data-i="${i}">
+        <div class="row1"><div class="p">${esc(p.phrase)}${isSaved(p.phrase) ? '<span class="star">★</span>' : ''}</div><div class="tm">${fmt(p.t)}</div></div>
+        <div class="m">${p.pron ? `<i>${esc(p.pron)}</i> · ` : ''}${esc(p.meaning)}</div>
+      </div>`).join('')}</div></div>
+    <div class="ph-foot"><span><b class="k">▲▼</b>Choose</span><span><b class="k">OK</b><span class="okl"></span></span><span><b class="k">◀</b>Hear it again</span><span><b class="k">▶</b><span class="savel">Save ★</span></span><span><b class="k">Back</b>Full screen</span></div>`;
+  selectPhrase(Math.min(S.sel, d.phrases.length - 1), false);
+  markNow(S.nowIdx);
+}
+
+/* Detail card of the selected phrase, under the video */
+function renderLearn(){
+  const el = $('#learn');
+  const d = S.phr;
+  if (!d){
+    const v = cur();
+    el.innerHTML = `<div class="lw-top"><span>${v ? esc(v.channel) : ''}</span><span class="st"></span></div>
+      <div class="lw-p" style="font-size:1.8rem">${v ? esc(v.title) : ''}</div>
+      <div class="lw-empty" style="margin-top:.8rem">No phrases for this video yet. You can still watch and listen in this small frame.</div>`;
+    updateLearnState();
+    return;
+  }
+  const p = d.phrases[S.sel]; if (!p) return;
+  el.innerHTML = `<div class="lw-top"><span>Phrase ${S.sel + 1}/${d.phrases.length} · ${fmt(p.t)}</span><span class="st"></span></div>
+    <div class="lw-p">${esc(p.phrase)}${isSaved(p.phrase) ? '<span class="star">★ saved</span>' : ''}${p.pron ? `<span class="ipa">${esc(p.pron)}</span>` : ''}</div>
+    <div class="lw-m">${esc(p.meaning)}</div>
+    <div class="lw-q">“${markQuote(p.quote, p.phrase)}”</div>
+    ${p.usage ? `<div class="lw-u">${esc(p.usage)}</div>` : ''}
+    ${p.example ? `<div class="lw-ex">${esc(p.example)}<small>${p.example_pron ? esc(p.example_pron) + ' · ' : ''}${esc(p.example_en || '')}</small></div>` : ''}`;
+  updateLearnState();
+}
+
+function isPlaying(){ try { return player.getPlayerState() === YT.PlayerState.PLAYING; } catch(e){ return false; } }
+
+/* OK in study mode:
+   - on the phrase being said → pause / resume
+   - on another phrase → jump to that sentence and play */
+function okAction(){
+  if (!S.phr) return isPlaying() ? 'pause' : 'resume';
+  if (S.sel === currentPhraseIdx()) return isPlaying() ? 'pause' : 'resume';
+  return 'jump';
+}
+const OK_LABEL = { pause:'Pause', resume:'Resume', jump:'Hear this one' };
+function updateLearnState(){
+  if (!S.panel) return;
+  const a = okAction();
+  const okl = $('#panel .okl'); if (okl && okl.textContent !== OK_LABEL[a]) okl.textContent = OK_LABEL[a];
+  const st = $('#learn .st');
+  if (st){
+    const txt = isPlaying() ? (S.sel === S.nowIdx ? '● Being said now' : '● Playing') : 'Ⅱ Paused';
+    if (st.textContent !== txt) st.textContent = txt;
+  }
+}
+
+function selectPhrase(i, animate = true){
+  if (!S.phr) return;
+  S.sel = Math.max(0, Math.min(i, S.phr.phrases.length - 1));
+  const items = document.querySelectorAll('#panel .ph');
+  items.forEach((el, j) => el.classList.toggle('sel', j === S.sel));
+  renderLearn();
+  const el = items[S.sel], inner = $('#panel .ph-inner'), list = $('#panel .ph-list');
+  if (!el || !inner) return;
+  if (!animate) inner.style.transition = 'none';
+  requestAnimationFrame(() => {
+    const max = Math.max(0, inner.offsetHeight - list.clientHeight);
+    const y = Math.min(Math.max(0, el.offsetTop - list.clientHeight * 0.3), max);
+    inner.style.transform = `translateY(${-y}px)`;
+    if (!animate) requestAnimationFrame(() => inner.style.transition = '');
+  });
+}
+
+function markNow(idx){
+  S.nowIdx = idx;
+  document.querySelectorAll('#panel .ph').forEach((el, j) => el.classList.toggle('now', j === idx));
+  updateLearnState();
+}
+
+function currentPhraseIdx(){
+  if (!S.phr) return -1;
+  const { t } = progress();
+  let idx = -1;
+  S.phr.phrases.forEach((p, i) => { if (p.t <= t + 0.5) idx = i; });
+  return idx;
+}
+
+/* Study mode is remembered per profile: the next video opens in study mode too */
+const learnPref = () => store.get('tvv.learn.' + S.profile) === '1';
+function openPanel(remember = true){
+  S.panel = true;
+  if (remember) store.set('tvv.learn.' + S.profile, '1');
+  $('#player').classList.add('panel');
+  $('#osd').classList.remove('show');
+  renderPanel();
+  const idx = currentPhraseIdx();
+  if (idx >= 0) selectPhrase(idx, false);
+  markNow(idx);
+  // The video keeps playing
+}
+function closePanel(remember = true){
+  if (!S.panel) return;
+  S.panel = false;
+  if (remember) store.set('tvv.learn.' + S.profile, '0');
+  $('#player').classList.remove('panel');
+}
+/* Save a phrase to the family store (synced to every device; the meteor dashboard reads the same store) */
+const isSaved = w => SYNC.isSaved(w);
+function toggleSave(i){
+  const p = S.phr && S.phr.phrases[i]; if (!p) return;
+  if (SYNC.isSaved(p.phrase)){
+    SYNC.removeWord(p.phrase);
+    toast(`Removed “${p.phrase}”`);
+  } else {
+    const v = cur();
+    SYNC.saveWord({ w: p.phrase, pron: p.pron || '', pos: 'from a video', en: p.meaning || '', ex: p.example || p.quote || '', ex_en: p.example ? (p.example_en || '') : '',
+                    col: p.quote ? [p.quote.length > 60 ? p.quote.slice(0, 57) + '…' : p.quote] : [],
+                    src: { id: v && v.id, t: p.t, title: v && v.title } });
+    toast(`★ Saved “${p.phrase}”. It will fly in the meteor shower.`, 3200);
+  }
+  const keep = S.sel; renderPanel(); selectPhrase(keep, false);
+}
+
+function playPhrase(i){
+  if (!S.phr || !player || !player.seekTo) return;
+  const p = S.phr.phrases[i];
+  player.seekTo(Math.max(0, p.t - 0.3), true);   // the start time comes straight from the YouTube subtitle
+  player.playVideo();
+  S.navHold = 0;
+  markNow(i);
+}
+function panelKey(k){
+  const n = S.phr ? S.phr.phrases.length : 0;
+  switch (k){
+    case 'back': closePanel(); break;
+    case 'up': if (n){ selectPhrase(S.sel - 1); S.navHold = Date.now() + 8000; } break;
+    case 'down': if (n){ selectPhrase(S.sel + 1); S.navHold = Date.now() + 8000; } break;
+    case 'ok': {
+      const a = okAction();
+      if (a === 'jump') playPhrase(S.sel);
+      else if (a === 'pause') player.pauseVideo();
+      else player.playVideo();
+      setTimeout(updateLearnState, 250);
+      break;
+    }
+    case 'playpause': togglePlay(); break;
+    case 'left': if (n) playPhrase(S.sel); else seek(-10); break;
+    case 'right': if (n) toggleSave(S.sel); else seek(10); break;
+  }
+}
+// While the video plays: mark the phrase that was just said and let the list follow
+setInterval(() => {
+  if (S.screen !== 'player' || !player || !player.getPlayerState) return;
+  updateLearnState();
+  if (!S.phr || !isPlaying()) return;
+  const idx = currentPhraseIdx();
+  if (idx !== S.nowIdx) markNow(idx);
+  if (S.panel && idx >= 0 && idx !== S.sel && Date.now() > (S.navHold || 0)) selectPhrase(idx);
+}, 500);
+
+/* ===== Playback speed ===== */
+const SPEEDS = [0.5, 0.75, 1, 1.25, 1.5];
+function speedGet(){ const v = parseFloat(store.get('tvv.speed.' + S.profile)); return SPEEDS.includes(v) ? v : 1; }
+function applySpeed(r){ try { player.setPlaybackRate(r); } catch(e){} }
+function nextSpeed(){
+  const r = SPEEDS[(SPEEDS.indexOf(speedGet()) + 1) % SPEEDS.length];
+  store.set('tvv.speed.' + S.profile, String(r));
+  applySpeed(r);
+}
+
+/* ===== Quick menu (▼): speed, subtitles, marks, quality ===== */
+let menuT;
+function menuItems(){
+  const v = cur(), f = isLearn(v) ? SYNC.flag(v.id) : null;
+  return [
+    { key:'speed', label:`Speed ${speedGet()}×`, sub:'OK to change' },
+    { key:'cc', label:CC_LABEL[ccGet()], sub:'OK to change' },
+    ...(f === null ? [] : [
+      { key:'watched', label: f === 'watched' ? '✓ Watched' : 'Mark as watched', sub: f === 'watched' ? 'OK to undo' : 'Moves to the end of the row' },
+      { key:'archive', label: f === 'archived' ? '🗂 In Study history' : '🗂 Keep in Study history', sub: f === 'archived' ? 'OK to undo' : 'Moves to the bottom of the page' },
+    ]),
+    { key:'quality', label:qualityLabel(), sub:'Quality (picked by YouTube)', info:true },
+  ];
+}
+function renderMenu(){
+  $('#qmenu').innerHTML = menuItems().map((m, i) =>
+    `<div class="qi${m.info ? ' info' : ''}${i === S.msel ? ' sel' : ''}" data-i="${i}">${esc(m.label)}<small>${esc(m.sub)}</small></div>`).join('');
+}
+function bumpMenuTimer(){ clearTimeout(menuT); menuT = setTimeout(closeMenu, 8000); }
+function openMenu(){ S.menu = true; S.msel = S.msel || 0; renderMenu(); $('#qmenu').classList.add('show'); bumpMenuTimer(); }
+function closeMenu(){ S.menu = false; clearTimeout(menuT); const m = $('#qmenu'); if (m) m.classList.remove('show'); }
+function menuAct(i){
+  const it = menuItems()[i];
+  if (it.key === 'speed') nextSpeed();
+  else if (it.key === 'cc'){ cycleCC(); setTimeout(() => S.menu && renderMenu(), 900); }
+  else if (it.key === 'watched'){ const v = cur(); setFlag(v, SYNC.flag(v.id) === 'watched' ? '' : 'watched'); }
+  else if (it.key === 'archive'){ const v = cur(); setFlag(v, SYNC.flag(v.id) === 'archived' ? '' : 'archived'); }
+  renderMenu(); bumpMenuTimer();
+}
+function menuKey(k){
+  const n = menuItems().length;
+  if (k === 'left'){ S.msel = (S.msel + n - 1) % n; renderMenu(); bumpMenuTimer(); }
+  else if (k === 'right'){ S.msel = (S.msel + 1) % n; renderMenu(); bumpMenuTimer(); }
+  else if (k === 'ok') menuAct(S.msel);
+  else if (k === 'playpause') togglePlay();
+  else closeMenu();   // ▲, ▼ or Back
+}
+
+/* ===== Keyboard, remote, mouse ===== */
+function keyName(e){
+  const k = e.key, c = e.keyCode;
+  if (k === 'ArrowUp' || c === 38) return 'up';
+  if (k === 'ArrowDown' || c === 40) return 'down';
+  if (k === 'ArrowLeft' || c === 37) return 'left';
+  if (k === 'ArrowRight' || c === 39) return 'right';
+  if (k === 'Enter' || k === 'Select' || c === 13 || c === 23) return 'ok';
+  if (k === 'Escape' || k === 'Backspace' || k === 'GoBack' || k === 'BrowserBack' || c === 27 || c === 8 || c === 4) return 'back';
+  if (k === 'MediaPlayPause' || k === ' ' || c === 179 || c === 85) return 'playpause';
+  if (k === 'f' || k === 'F') return 'fullscreen';
+  return null;
+}
+let lastBack = 0;
+function dispatch(k){
+  if (k === 'back'){ const now = Date.now(); if (now - lastBack < 300) return; lastBack = now; }
+  if (S.sync){ if (k === 'back' || k === 'ok') closeSync(); return; }
+  if (S.words){ wordsKey(k); return; }
+  if (S.screen === 'profile') profileKey(k);
+  else if (S.screen === 'home') homeKey(k);
+  else if (S.screen === 'player') playerKey(k);
+}
+document.addEventListener('keydown', e => { const k = keyName(e); if (!k) return; e.preventDefault(); dispatch(k); });
+window.tvBack = () => { dispatch('back'); return true; };   // called by the Android TV app on Back
+
+// After a mouse click on the player, pull keyboard focus back to the page so the arrow keys / Back keep working
+function refocus(){ setTimeout(() => { try { $('#keytrap').focus({ preventScroll:true }); } catch(e){} }, 0); }
+window.addEventListener('blur', () => { if (S.screen === 'player') refocus(); });
+
+$('#profiles').addEventListener('click', e => { const p = e.target.closest('.pcard'); if (p) enterProfile(PKEYS[+p.dataset.i]); });
+$('#profiles').addEventListener('mouseover', e => { const p = e.target.closest('.pcard'); if (p){ S.pIdx = +p.dataset.i; focusProfile(); } });
+$('#chip').addEventListener('click', goProfiles);
+$('#syncChip').addEventListener('click', openSync);
+$('#wordsChip').addEventListener('click', openWords);
+$('#wordsbox').addEventListener('click', e => {
+  const items = [...document.querySelectorAll('#wordsbox .wi')], i = items.indexOf(e.target.closest('.wi'));
+  if (i >= 0){ S.words.sel = i; renderWords(); } else if (!e.target.closest('.wbox')) closeWords();
+});
+$('#syncbox').addEventListener('click', closeSync);
+$('#ask').addEventListener('click', e => { const b = e.target.closest('.opt'); if (b && S.ask){ S.ask.sel = +b.dataset.i; askKey('ok'); } });
+$('#rowsInner').addEventListener('click', e => { const c = e.target.closest('.card'); if (c) play(+c.dataset.r, +c.dataset.c); });
+$('#rowsInner').addEventListener('mouseover', e => {
+  const c = e.target.closest('.card'); if (!c) return;
+  const r = +c.dataset.r, col = +c.dataset.c;
+  if (S.header || S.row !== r || S.cols[r] !== col){ S.header = false; S.row = r; S.cols[r] = col; updateFocus(false); }
+});
+let wheelT = 0;
+$('#home').addEventListener('wheel', e => {
+  e.preventDefault();
+  const now = Date.now(); if (now - wheelT < 180) return; wheelT = now;
+  if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) homeKey(e.deltaX > 0 ? 'right' : 'left');
+  else homeKey(e.deltaY > 0 ? 'down' : 'up');
+}, { passive:false });
+$('#pBack').addEventListener('click', requestClose);
+$('#panel').addEventListener('click', e => { const p = e.target.closest('.ph'); if (p){ selectPhrase(+p.dataset.i); playPhrase(+p.dataset.i); } });
+$('#qmenu').addEventListener('click', e => { const q = e.target.closest('.qi'); if (q){ S.msel = +q.dataset.i; menuAct(S.msel); } });
+$('#endcard').addEventListener('click', e => {
+  const o = e.target.closest('.opt');
+  if (o && S.endOpts){ const f = S.endOpts[+o.dataset.i]; clearEnd(); f.act(); return; }
+  const b = e.target.closest('[data-act]'); if (!b) return;
+  if (b.dataset.act === 'next' && S.endNext) playV(S.play.r, S.endNext); else closePlayer();
+});
+window.addEventListener('resize', () => { if (S.screen === 'home') updateFocus(); });
+
+/* ===== Clock ===== */
+function tick(){
+  const d = new Date();
+  const time = d.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+  const day = d.toLocaleDateString([], { weekday:'long', day:'numeric', month:'short' });
+  $('#clock').innerHTML = `${time}<small>${day.charAt(0).toUpperCase() + day.slice(1)}</small>`;
+}
+tick(); setInterval(tick, 15000);
+
+renderProfiles(); show('profile');
+/* Arriving here right after picking another language on the profile screen: go straight in */
+if (store.get('tvv.autoEnter') === '1'){ store.set('tvv.autoEnter', '0'); enterProfile(LC.LANG); }
+
+/* Sync: pull marks + saved words from the server every ~45 seconds; the list re-sorts when something changes */
+SYNC.consumeParam().then(ok => { if (ok) toast('Connected to the family store'); });
+SYNC.on(what => {
+  if (what === 'data' && S.words) renderWords();
+  if (what === 'data' && S.screen === 'home' && isLearnProfile() && !S.sync && !S.words){ renderHome(true); updateFocus(false); }
+});
+SYNC.start();
+</script>
+</body>
+</html>

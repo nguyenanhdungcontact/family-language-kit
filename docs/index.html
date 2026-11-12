@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Language Kit">
+<meta name="theme-color" content="#f6f1e4" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0b0f2a" media="(prefers-color-scheme: dark)">
+<title>Family Language Kit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800&display=swap" rel="stylesheet">
+<script>
+/* Light/dark, shared with every page of the kit: 'auto' follows the clock (light 6:00–18:00), 'day', 'night' */
+window.themePref = function(){
+  try { const v = localStorage.getItem('tvv.theme'); if (v === 'day' || v === 'night') return v; } catch(e){}
+  return 'auto';
+};
+window.applyTheme = function(){
+  const pref = themePref(), h = new Date().getHours();
+  const day = pref === 'auto' ? (h >= 6 && h < 18) : pref === 'day';
+  document.documentElement.classList.toggle('day', day);
+  document.documentElement.classList.toggle('night', !day);
+};
+window.setThemePref = function(v){ try { localStorage.setItem('tvv.theme', v); } catch(e){} applyTheme(); };
+applyTheme(); setInterval(applyTheme, 60000);
+</script>
+<style>
+/* Start page: pick who is learning, then pick a screen. One column on a phone, a two-column board on wide screens. */
+:root{
+  --bg:#f6f1e4; --surface:#fffdf7; --surface2:#f0eadb; --line:rgba(52,70,42,.14);
+  --ink:#26331f; --ink2:#5b6852; --ink3:#8b927e;
+  --accent:#4f7d45; --accent-ink:#fff; --accent-soft:rgba(79,125,69,.13);
+  --warm:#c06a1f; --warm-soft:rgba(192,106,31,.12);
+  --shadow:0 8px 24px rgba(52,62,36,.12);
+  --head:'Fraunces',Georgia,serif; --body:'Be Vietnam Pro',system-ui,-apple-system,'PingFang SC','Noto Sans SC','Microsoft YaHei',sans-serif;
+  color-scheme:light;
+}
+:root.night{
+  --bg:#0b0f2a; --surface:#151b44; --surface2:#1d2456; --line:rgba(200,208,255,.14);
+  --ink:#eef0ff; --ink2:#a9b0de; --ink3:#747cb2;
+  --accent:#8fa2ff; --accent-ink:#0b0f2a; --accent-soft:rgba(143,162,255,.17);
+  --warm:#ffd36e; --warm-soft:rgba(255,211,110,.14);
+  --shadow:0 8px 26px rgba(0,0,0,.4);
+  color-scheme:dark;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg);color:var(--ink);font-family:var(--body);-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%}
+body{min-height:100dvh;padding:calc(18px + env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) calc(28px + env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left))}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+.wrap{max-width:1040px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+header{display:flex;align-items:center;gap:12px}
+header .mark{flex:none;width:44px;height:44px;border-radius:14px;background:var(--accent);position:relative;overflow:hidden}
+header .mark::before{content:"";position:absolute;left:9px;top:9px;width:26px;height:2px;border-radius:2px;background:linear-gradient(90deg,transparent,var(--accent-ink));transform:rotate(38deg);transform-origin:100% 50%}
+header .mark::after{content:"";position:absolute;right:9px;bottom:10px;width:9px;height:9px;border-radius:50%;background:var(--accent-ink)}
+header h1{font-family:var(--head);font-weight:800;font-size:clamp(22px,3.4vw,30px);letter-spacing:-.01em;line-height:1.1}
+header p{color:var(--ink2);font-size:14px;margin-top:2px}
+header .sp{flex:1}
+.ib{flex:none;height:40px;padding:0 14px;border-radius:20px;background:var(--surface2);font-weight:600;font-size:14px}
+
+.who{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.lang{position:relative;text-align:left;padding:18px 18px 16px;border-radius:22px;background:var(--surface);border:1.5px solid var(--line);box-shadow:var(--shadow);display:flex;flex-direction:column;gap:2px;min-height:132px;transition:transform .15s}
+.lang:active{transform:scale(.985)}
+.lang .hello{font-family:var(--head);font-weight:800;font-size:clamp(30px,6vw,44px);line-height:1.05}
+.lang .name{font-weight:600;font-size:16px;margin-top:6px}
+.lang .for{color:var(--ink2);font-size:13.5px}
+.lang .pick{position:absolute;right:16px;top:16px;font-size:12.5px;font-weight:700;padding:4px 10px;border-radius:99px;background:var(--surface2);color:var(--ink2)}
+.lang.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent),var(--shadow)}
+.lang.on .pick{background:var(--accent);color:var(--accent-ink)}
+
+h2{font-family:var(--head);font-weight:700;font-size:20px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+h2 small{font-family:var(--body);font-weight:500;font-size:13.5px;color:var(--ink3)}
+.apps{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-top:12px}
+.app{display:flex;gap:14px;align-items:center;padding:14px 16px;border-radius:18px;background:var(--surface);border:.5px solid var(--line);min-height:86px}
+.app:active{background:var(--surface2)}
+.app .ic{flex:none;width:52px;height:52px;border-radius:15px;display:grid;place-items:center;font-size:26px;background:var(--accent-soft);color:var(--accent)}
+.app.game .ic{background:var(--warm-soft);color:var(--warm)}
+.app b{display:block;font-size:16.5px;font-weight:700}
+.app span{display:block;color:var(--ink2);font-size:13.5px;line-height:1.4;margin-top:2px}
+.app .go{margin-left:auto;color:var(--ink3);font-size:20px}
+
+.share{display:flex;gap:18px;align-items:center;flex-wrap:wrap;padding:18px;border-radius:22px;background:var(--surface);border:.5px solid var(--line)}
+.share .qr{flex:none;width:148px;height:148px;padding:8px;border-radius:14px;background:#fff;display:grid;place-items:center}
+.share .qr img,.share .qr canvas{width:100%!important;height:auto!important}
+.share .tx{flex:1;min-width:220px}
+.share .tx p{color:var(--ink2);font-size:14.5px;line-height:1.55;margin-top:6px}
+.share .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.share .row a,.share .row button{height:42px;padding:0 16px;border-radius:12px;background:var(--surface2);font-weight:600;font-size:14.5px;display:inline-flex;align-items:center}
+.share .row .primary{background:var(--accent);color:var(--accent-ink)}
+footer{color:var(--ink3);font-size:13px;line-height:1.6;text-align:center}
+footer a{text-decoration:underline}
+#toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom));transform:translate(-50%,16px);opacity:0;pointer-events:none;z-index:70;background:var(--ink);color:var(--bg);padding:11px 16px;border-radius:12px;font-size:14px;font-weight:500;max-width:calc(100vw - 32px);transition:opacity .25s,transform .25s}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+a:focus-visible,button:focus-visible{outline:3px solid var(--warm);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="mark" aria-hidden="true"></div>
+    <div><h1 id="family">Family Language Kit</h1><p>Words on the TV, videos with phrases, and two games.</p></div>
+    <div class="sp"></div>
+    <button class="ib" id="themeBtn" aria-label="Light / dark"></button>
+  </header>
+
+  <section>
+    <h2>Who is learning? <small>Tap a language. This device remembers it.</small></h2>
+    <div class="who" id="who" style="margin-top:12px"></div>
+  </section>
+
+  <section>
+    <h2 id="appsTitle">Open</h2>
+    <div class="apps">
+      <a class="app" href="iphone.html"><div class="ic">▶</div><div><b>Videos with phrases</b><span>Real videos, subtitles, tap a phrase to hear it. Phone and iPad.</span></div><div class="go">›</div></a>
+      <a class="app game" href="game.html"><div class="ic">☄</div><div><b>Word asteroids</b><span>Blast a word, see what it means. Two thumbs.</span></div><div class="go">›</div></a>
+      <a class="app game" href="bricks.html"><div class="ic">▦</div><div><b>Word bricks</b><span>Break bricks, catch meanings. One calm thumb.</span></div><div class="go">›</div></a>
+      <a class="app" href="tv.html"><div class="ic">✦</div><div><b>TV meteor shower</b><span>Words drift across the big screen all day.</span></div><div class="go">›</div></a>
+      <a class="app" href="video.html"><div class="ic">📺</div><div><b>TV channel</b><span>The video rows, driven by the TV remote.</span></div><div class="go">›</div></a>
+      <a class="app" href="guide.html"><div class="ic">🧭</div><div><b>Setup guide</b><span>Make your own copy for your family, step by step.</span></div><div class="go">›</div></a>
+    </div>
+  </section>
+
+  <section class="share">
+    <div class="qr" id="qr"></div>
+    <div class="tx">
+      <h2 id="shareTitle">Open it on a phone</h2>
+      <p>Point the phone camera at the code. On an iPhone or iPad, tap <b>Share → Add to Home Screen</b> and it behaves like an app.</p>
+      <div class="row"><button class="primary" id="shareBtn">Send the link</button><a href="share.html">All QR codes</a></div>
+    </div>
+  </section>
+
+  <footer>Made with love as a family gift. Free to copy: the <a href="guide.html">setup guide</a> shows how to run your own.</footer>
+</div>
+<div id="toast"></div>
+
+<script src="config.js"></script>
+<script src="learn-core.js"></script>
+<script>
+(() => {
+  const LC = window.LearnCore, $ = s => document.querySelector(s);
+  let toastT;
+  const toast = m => { const el = $('#toast'); el.textContent = m; el.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('show'), 2400); };
+  const esc = LC.esc;
+  if (LC.CFG.familyName && LC.CFG.familyName !== 'Our family') $('#family').textContent = LC.CFG.familyName;
+
+  /* Language cards. Tapping one stores the choice; every other page of the kit reads it. */
+  let lang = LC.LANG;
+  function paint() {
+    $('#who').innerHTML = LC.LANG_KEYS.map(k => { const li = LC.LANGS[k]; return `<button class="lang${k === lang ? ' on' : ''}" data-lang="${k}">
+      <span class="pick">${k === lang ? '✓ Chosen' : 'Choose'}</span>
+      <span class="hello">${esc(li.hello || li.native)}</span>
+      <span class="name">${esc(li.name)} · ${esc(li.native)}</span>
+      <span class="for">${li.who ? 'For: ' + esc(li.who) : ''}</span></button>`; }).join('');
+    const li = LC.LANGS[lang];
+    $('#appsTitle').innerHTML = `Open <small>${esc(li.name)} · ${esc(li.native)}</small>`;
+    $('#shareTitle').textContent = `Open ${li.name} on a phone`;
+    document.querySelectorAll('.apps a').forEach(a => { const page = a.getAttribute('href').split('?')[0]; a.href = page === 'guide.html' ? page : `${page}?lang=${lang}`; });
+    LC.qr($('#qr'), link(), 148);
+  }
+  const link = () => location.href.replace(/[?#].*$/, '').replace(/[^/]*$/, '') + '?lang=' + lang;
+  $('#who').addEventListener('click', e => {
+    const b = e.target.closest('[data-lang]'); if (!b) return;
+    lang = b.dataset.lang;
+    try { localStorage.setItem('learn.lang', lang); } catch (x) {}
+    paint(); toast(`${LC.LANGS[lang].hello || ''}  ${LC.LANGS[lang].name} it is.`);
+  });
+  $('#shareBtn').onclick = async () => {
+    const url = link();
+    try { if (navigator.share) { await navigator.share({ title: 'Family Language Kit', url }); return; } } catch (e) { return; }
+    try { await navigator.clipboard.writeText(url); toast('Link copied'); } catch (e) { toast(url); }
+  };
+  if (!navigator.share) $('#shareBtn').textContent = 'Copy the link';
+
+  const THEMES = ['auto', 'day', 'night'], LABEL = { auto: '◐ Auto', day: '☀ Light', night: '☾ Dark' };
+  const paintTheme = () => { $('#themeBtn').textContent = LABEL[themePref()]; };
+  $('#themeBtn').onclick = () => { setThemePref(THEMES[(THEMES.indexOf(themePref()) + 1) % 3]); paintTheme(); };
+  paintTheme(); paint();
+})();
+</script>
+</body>
+</html>

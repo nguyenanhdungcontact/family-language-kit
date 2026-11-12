@@ -1,0 +1,14 @@
+.gradle/
+build/
+app/build/
+local.properties
+.idea/
+*.iml
+app/src/main/assets/
+.DS_Store
+__pycache__/
+
+# Transcript cache, the Python environment and API keys stay on this computer (never in the public repo)
+.cache/
+.venv/
+.env.local

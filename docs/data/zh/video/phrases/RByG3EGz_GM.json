@@ -1,0 +1,131 @@
+{
+ "id": "RByG3EGz_GM",
+ "created": "2026-11-12",
+ "source": "youtube-manual",
+ "language": "zh-Hans",
+ "ai": "gemini-3.6-flash",
+ "summary": "This video follows a parent on a day off as they pick up their child from school and walk around the neighborhood. It highlights simple everyday happiness, sunny weather, and cooking a tasty meal for the family.",
+ "level": "HSK 3",
+ "phrases": [
+  {
+   "t": 0.0,
+   "d": 2.0,
+   "phrase": "今天",
+   "pron": "jīntiān",
+   "quote": "今天休假，接送儿子上下学",
+   "meaning": "today",
+   "usage": "Use this word whenever you want to talk about things happening today!",
+   "example": "今天天气很好。",
+   "example_pron": "Jīntiān tiānqì hěn hǎo.",
+   "example_en": "The weather is very nice today."
+  },
+  {
+   "t": 23.16,
+   "d": 2.0,
+   "phrase": "梦想",
+   "pron": "mèngxiǎng",
+   "quote": "寒窗苦读，终能实现梦想",
+   "meaning": "dream",
+   "usage": "Use this word to talk about your big dreams and hopes for the future.",
+   "example": "我的梦想是当医生。",
+   "example_pron": "Wǒ de mèngxiǎng shì dāng yīshēng.",
+   "example_en": "My dream is to become a doctor."
+  },
+  {
+   "t": 72.61,
+   "d": 3.38,
+   "phrase": "天气",
+   "pron": "tiānqì",
+   "quote": "今天天气依旧晴朗，我带大家看看我家附近",
+   "meaning": "weather",
+   "usage": "Use this word when talking about sunny, rainy, or chilly days outside.",
+   "example": "今天天气真热！",
+   "example_pron": "Jīntiān tiānqì zhēn rè!",
+   "example_en": "The weather is really hot today!"
+  },
+  {
+   "t": 197.15,
+   "d": 2.48,
+   "phrase": "汉堡",
+   "pron": "hànbǎo",
+   "quote": "看到一家麦当劳，可以买个汉堡",
+   "meaning": "hamburger",
+   "usage": "Use this fun word whenever you want to order or talk about burgers!",
+   "example": "我想吃汉堡。",
+   "example_pron": "Wǒ xiǎng chī hànbǎo.",
+   "example_en": "I want to eat a hamburger."
+  },
+  {
+   "t": 245.65,
+   "d": 2.3,
+   "phrase": "秋天",
+   "pron": "qiūtiān",
+   "quote": "哈哈，本来想拍点秋天的落叶",
+   "meaning": "autumn / fall",
+   "usage": "Use this to describe the cozy autumn season when leaves fall.",
+   "example": "秋天到了。",
+   "example_pron": "Qiūtiān dào le.",
+   "example_en": "Autumn has arrived."
+  },
+  {
+   "t": 292.6,
+   "d": 2.76,
+   "phrase": "放学",
+   "pron": "fàngxué",
+   "quote": "快到放学时间了，在校门口来接孩子",
+   "meaning": "finish school",
+   "usage": "Say this when the school day ends and it is time to go home!",
+   "example": "我们三点放学。",
+   "example_pron": "Wǒmen sān diǎn fàngxué.",
+   "example_en": "We finish school at three o'clock."
+  },
+  {
+   "t": 316.01,
+   "d": 2.0,
+   "phrase": "美味",
+   "pron": "měiwèi",
+   "quote": "美味的晚餐",
+   "meaning": "delicious",
+   "usage": "Use this to describe yummy food that tastes fantastic!",
+   "example": "这个蛋糕很美味！",
+   "example_pron": "Zhège dàngāo hěn měiwèi!",
+   "example_en": "This cake is delicious!"
+  },
+  {
+   "t": 415.85,
+   "d": 3.86,
+   "phrase": "健康",
+   "pron": "jiànkāng",
+   "quote": "可口的饭菜，健康的身体、 和家人在一起就是快乐和幸福",
+   "meaning": "healthy / health",
+   "usage": "Use this word to talk about staying strong, healthy, and happy.",
+   "example": "祝你身体健康！",
+   "example_pron": "Zhù nǐ shēntǐ jiànkāng!",
+   "example_en": "Wish you good health!"
+  },
+  {
+   "t": 441.81,
+   "d": 2.0,
+   "phrase": "开饭啦",
+   "pron": "kāifàn la",
+   "quote": "开饭啦",
+   "meaning": "mealtime! / dinner is served!",
+   "usage": "Shout this out at home when delicious food is ready on the table!",
+   "example": "快洗手，开饭啦！",
+   "example_pron": "Kuài xǐshǒu, kāifàn la!",
+   "example_en": "Quickly wash your hands, mealtime!"
+  },
+  {
+   "t": 467.45,
+   "d": 2.0,
+   "phrase": "谢谢观看",
+   "pron": "xièxie guānkàn",
+   "quote": "谢谢观看",
+   "meaning": "thanks for watching",
+   "usage": "Say or write this friendly line at the end of a video or show-and-tell.",
+   "example": "我的故事讲完了，谢谢观看！",
+   "example_pron": "Wǒ de gùshì jiǎng wán le, xièxie guānkàn!",
+   "example_en": "My story is finished, thanks for watching!"
+  }
+ ]
+}

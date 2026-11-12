@@ -1,0 +1,96 @@
+{
+ "_readme": "One entry per language being learned (same keys as docs/config.js). The scripts read this file to know which YouTube subtitles to look for and how to brief the AI teacher. Edit 'learner' to describe YOUR learners: it changes which phrases the AI picks and how it explains them.",
+ "zh": {
+  "name": "Mandarin Chinese",
+  "cjk": true,
+  "caption_codes": [
+   "zh-Hans",
+   "zh-CN",
+   "zh",
+   "zh-SG",
+   "zh-Hant",
+   "zh-TW",
+   "zh-HK"
+  ],
+  "convert_from": [
+   "zh-Hant",
+   "zh-TW",
+   "zh-HK"
+  ],
+  "convert_to": "zh-Hans",
+  "search_lang": "zh-Hans",
+  "audio_prefixes": [
+   "zh",
+   "cmn"
+  ],
+  "learner": "English-speaking children (about 6 to 14) growing up abroad, who hear a little Mandarin from family. Beginner to lower-intermediate.",
+  "phrase_rule": "A phrase is 1 to 6 Chinese characters. Write all Chinese in Simplified characters.",
+  "pron_rule": "Hanyu Pinyin with tone marks for the phrase (e.g. nǐ hǎo)",
+  "example_pron_rule": "Hanyu Pinyin with tone marks for the example sentence",
+  "level_rule": "the HSK level of the language in the video, written like 'HSK 2' (HSK 1 to HSK 6)",
+  "extra_rule": "Keep examples short (under 14 characters), with easy words a child would say.",
+  "words_brief": "common, concrete Mandarin words and short phrases a child can use every day (HSK 1 to HSK 3 level), in Simplified characters",
+  "word_topics": [
+   "family and people",
+   "food and drinks",
+   "animals",
+   "school and learning",
+   "feelings",
+   "colours and shapes",
+   "home and things in it",
+   "weather and seasons",
+   "body and health",
+   "play, sports and hobbies",
+   "time and days",
+   "places in town",
+   "polite everyday phrases",
+   "action verbs",
+   "festivals and traditions",
+   "nature",
+   "clothes",
+   "transport and travel",
+   "numbers and measure words",
+   "describing things"
+  ]
+ },
+ "vi": {
+  "name": "Vietnamese",
+  "cjk": false,
+  "caption_codes": [
+   "vi"
+  ],
+  "search_lang": "vi",
+  "audio_prefixes": [
+   "vi"
+  ],
+  "learner": "An English-speaking adult beginner who works with Vietnamese colleagues and wants to chat with them, order food and travel in Vietnam.",
+  "phrase_rule": "A phrase is 1 to 5 words, written with all Vietnamese accent marks.",
+  "pron_rule": "an easy English-style respelling a beginner can read aloud (e.g. 'sin chow' for 'xin chào'), following the accent heard in the video",
+  "example_pron_rule": "empty string",
+  "level_rule": "the level of the language in the video: A1, A2, B1 or B2",
+  "extra_rule": "Keep examples short and practical: things said at work, in a cafe, at a market or with friends.",
+  "words_brief": "common Vietnamese words and short phrases an adult beginner needs for greetings, food, coffee, the office, getting around and friendly small talk",
+  "word_topics": [
+   "greetings and politeness",
+   "food and street food",
+   "coffee and drinks",
+   "numbers and money",
+   "family words and how to address people",
+   "at the office",
+   "getting around and taxis",
+   "shopping and markets",
+   "feelings and reactions",
+   "time and days",
+   "weather",
+   "common verbs",
+   "common adjectives",
+   "question words",
+   "cheers and parties",
+   "health",
+   "places in the city",
+   "travel and hotels",
+   "compliments and small talk",
+   "useful connectors"
+  ]
+ }
+}

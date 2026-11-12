@@ -1,0 +1,77 @@
+{
+ "_guide": "Video sources for scripts/video_daily.py. Every 'row' is a topic (one row on the screen); earlier rows show first. channels: YouTube handles (the @name on the channel page, without @); the script looks up their newest uploads. queries: search phrases, a few are used each day in rotation (every search costs 100 of the 10,000 free YouTube units per day). weight: rows with a bigger number get more new videos per day. Videos are never removed from the catalog.",
+ "target_per_day": 6,
+ "max_transcript_tries": 30,
+ "max_searches_per_day": 6,
+ "backfill_per_run": 4,
+ "min_minutes": 3,
+ "max_minutes": 20,
+ "search_recent_days": 1500,
+ "uploads_per_channel": 10,
+ "rows": [
+  {
+   "id": "learn",
+   "title": "Learn Vietnamese step by step",
+   "weight": 3,
+   "channels": [
+    "LearnVietnameseWithAnnie",
+    "TiengVietOi",
+    "VietnamesePod101",
+    "SlowVietnamese"
+   ],
+   "queries": [
+    "learn Vietnamese for beginners conversation",
+    "Vietnamese listening practice slow with subtitles",
+    "comprehensible input Vietnamese beginner",
+    "Southern Vietnamese lesson for beginners",
+    "Vietnamese phrases for travel",
+    "học tiếng Việt cho người nước ngoài hội thoại"
+   ]
+  },
+  {
+   "id": "street",
+   "title": "Real conversations & street interviews",
+   "weight": 3,
+   "channels": [
+    "EasyVietnamese"
+   ],
+   "queries": [
+    "Easy Vietnamese street interview",
+    "phỏng vấn đường phố Sài Gòn",
+    "hỏi người Việt Nam phỏng vấn",
+    "Vietnamese natural conversation with subtitles",
+    "vlog tiếng Việt chậm phụ đề"
+   ]
+  },
+  {
+   "id": "food",
+   "title": "Food, coffee & travel in Vietnam",
+   "weight": 2,
+   "max_minutes": 25,
+   "channels": [
+    "KhoaiLangThang"
+   ],
+   "queries": [
+    "ẩm thực đường phố Sài Gòn",
+    "du lịch Việt Nam vlog",
+    "cà phê Việt Nam cách pha",
+    "món ngon Hà Nội",
+    "nấu món Việt đơn giản",
+    "khám phá Đà Nẵng Hội An"
+   ]
+  },
+  {
+   "id": "life",
+   "title": "Culture & everyday life",
+   "weight": 1,
+   "channels": [],
+   "queries": [
+    "cuộc sống ở Việt Nam vlog",
+    "Tết Việt Nam truyền thống",
+    "văn hóa Việt Nam giới thiệu",
+    "một ngày ở Sài Gòn vlog",
+    "văn hóa công sở Việt Nam"
+   ]
+  }
+ ]
+}

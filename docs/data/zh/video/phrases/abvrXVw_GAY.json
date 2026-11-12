@@ -1,0 +1,131 @@
+{
+ "id": "abvrXVw_GAY",
+ "created": "2026-11-12",
+ "source": "youtube-manual",
+ "language": "zh-CN",
+ "ai": "gemini-3.7-flash",
+ "summary": "A cross-cultural couple shares stories about meeting parents, getting married, and living with their in-laws. They talk about cultural differences, family communication, and learning to support each other.",
+ "level": "HSK 4",
+ "phrases": [
+  {
+   "t": 36.57,
+   "d": 1.23,
+   "phrase": "首先",
+   "pron": "shǒuxiān",
+   "quote": "首先我跟他们说",
+   "meaning": "first of all",
+   "usage": "Use this at the beginning of a sentence when you want to list your first point or reason.",
+   "example": "首先，我们要洗手。",
+   "example_pron": "Shǒuxiān, wǒmen yào xǐshǒu.",
+   "example_en": "First of all, we need to wash our hands."
+  },
+  {
+   "t": 109.07,
+   "d": 1.13,
+   "phrase": "放心",
+   "pron": "fàngxīn",
+   "quote": "他们就放心了",
+   "meaning": "to stop worrying / to feel at ease",
+   "usage": "Say this to reassure someone and let them know everything is okay.",
+   "example": "别怕，你放心吧！",
+   "example_pron": "Bié pà, nǐ fàngxīn ba!",
+   "example_en": "Don't be afraid, rest assured!"
+  },
+  {
+   "t": 167.27,
+   "d": 1.93,
+   "phrase": "担心",
+   "pron": "dānxīn",
+   "quote": "你最最最担心的是什么？",
+   "meaning": "to worry",
+   "usage": "Use this when you feel nervous or concerned about something or someone.",
+   "example": "妈妈总是担心我。",
+   "example_pron": "Māma zǒngshì dānxīn wǒ.",
+   "example_en": "Mom always worries about me."
+  },
+  {
+   "t": 229.5,
+   "d": 0.87,
+   "phrase": "比如说",
+   "pron": "bǐrúshuō",
+   "quote": "比如说呢？",
+   "meaning": "for example",
+   "usage": "A handy connector phrase whenever you want to give a quick example.",
+   "example": "我爱吃水果，比如说苹果。",
+   "example_pron": "Wǒ ài chī shuǐguǒ, bǐrúshuō píngguǒ.",
+   "example_en": "I love fruit, for example, apples."
+  },
+  {
+   "t": 261.93,
+   "d": 3.0,
+   "phrase": "平时",
+   "pron": "píngshí",
+   "quote": "平时完全不联系的一个亲戚",
+   "meaning": "usually / normally",
+   "usage": "Use this to talk about your daily habits or things that happen on ordinary days.",
+   "example": "我平时喜欢画画。",
+   "example_pron": "Wǒ píngshí xǐhuan huàhuà.",
+   "example_en": "I usually like to draw."
+  },
+  {
+   "t": 285.2,
+   "d": 0.93,
+   "phrase": "说实话",
+   "pron": "shuō shíhuà",
+   "quote": "说实话啊",
+   "meaning": "to tell the truth / honestly",
+   "usage": "Say this before sharing your true thoughts or feelings with someone.",
+   "example": "说实话，我不喜欢吃青椒。",
+   "example_pron": "Shuō shíhuà, wǒ bù xǐhuan chī qīngjiāo.",
+   "example_en": "To tell the truth, I don't like green peppers."
+  },
+  {
+   "t": 304.4,
+   "d": 2.03,
+   "phrase": "准备好了",
+   "pron": "zhǔnbèi hǎo le",
+   "quote": "当时我是完全准备好了",
+   "meaning": "all ready / all set",
+   "usage": "Use this when you are completely ready to head out, eat, or start playing!",
+   "example": "我们都准备好了，出发吧！",
+   "example_pron": "Wǒmen dōu zhǔnbèi hǎo le, chūfā ba!",
+   "example_en": "We are all ready, let's go!"
+  },
+  {
+   "t": 327.6,
+   "d": 1.2,
+   "phrase": "总算",
+   "pron": "zǒngsuàn",
+   "quote": "总算等到这天了",
+   "meaning": "finally / at long last",
+   "usage": "Use this when something you have been waiting for patiently finally happens.",
+   "example": "做完了，作业总算写好了！",
+   "example_pron": "Zuò wán le, zuòyè zǒngsuàn xiě hǎo le!",
+   "example_en": "Done! My homework is finally finished!"
+  },
+  {
+   "t": 397.9,
+   "d": 3.97,
+   "phrase": "照顾",
+   "pron": "zhàogù",
+   "quote": "这几年因为我父母要来帮着照顾孩子",
+   "meaning": "to take care of / to look after",
+   "usage": "Use this when looking after a younger sibling, a pet, or helping family.",
+   "example": "我会照顾这只小狗。",
+   "example_pron": "Wǒ huì zhàogù zhè zhī xiǎogǒu.",
+   "example_en": "I can look after this puppy."
+  },
+  {
+   "t": 603.73,
+   "d": 1.17,
+   "phrase": "继续努力",
+   "pron": "jìxù nǔlì",
+   "quote": "那我们就继续努力",
+   "meaning": "keep working hard / keep trying",
+   "usage": "A great cheer to encourage yourself or your classmates to keep going.",
+   "example": "考得不错，继续努力！",
+   "example_pron": "Kǎo de bùcuò, jìxù nǔlì!",
+   "example_en": "You did well on the test, keep working hard!"
+  }
+ ]
+}

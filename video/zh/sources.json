@@ -1,0 +1,82 @@
+{
+ "_guide": "Video sources for scripts/video_daily.py. Every 'row' is a topic (one row on the screen); earlier rows show first. channels: YouTube handles (the @name on the channel page, without @); the script looks up their newest uploads. queries: search phrases, a few are used each day in rotation (every search costs 100 of the 10,000 free YouTube units per day). weight: rows with a bigger number get more new videos per day. Videos are never removed from the catalog.",
+ "target_per_day": 6,
+ "max_transcript_tries": 30,
+ "max_searches_per_day": 6,
+ "backfill_per_run": 4,
+ "min_minutes": 3,
+ "max_minutes": 20,
+ "search_recent_days": 1500,
+ "uploads_per_channel": 10,
+ "rows": [
+  {
+   "id": "kids",
+   "title": "Cartoons, songs & stories 动画·儿歌·故事",
+   "weight": 3,
+   "min_minutes": 2,
+   "channels": [
+    "LittleFoxChinese",
+    "LittleChineseLearners",
+    "MissPandaChinese"
+   ],
+   "queries": [
+    "小猪佩奇 中文版 全集",
+    "儿歌 童谣 中文 字幕",
+    "儿童故事 中文 动画 字幕",
+    "宝宝巴士 儿歌 中文",
+    "睡前故事 中文 动画",
+    "看动画学中文 儿童"
+   ]
+  },
+  {
+   "id": "learn",
+   "title": "Learn Chinese step by step 学中文",
+   "weight": 3,
+   "channels": [
+    "ComprehensibleChinese",
+    "MandarinCorner",
+    "EverydayChinese",
+    "GraceMandarinChinese",
+    "RitaChinese",
+    "ShuoshuoChinese"
+   ],
+   "queries": [
+    "learn Chinese for kids beginners",
+    "easy Chinese conversation with pinyin",
+    "comprehensible input Chinese beginner",
+    "Chinese listening practice HSK 1",
+    "slow Chinese story for beginners",
+    "daily Chinese conversation HSK 2"
+   ]
+  },
+  {
+   "id": "life",
+   "title": "Daily life, food & travel 生活·美食·旅行",
+   "weight": 2,
+   "max_minutes": 25,
+   "channels": [],
+   "queries": [
+    "中国美食 vlog 中文字幕",
+    "做饭 vlog 家常菜 中文字幕",
+    "中国 旅行 vlog 中文字幕",
+    "街头采访 中文字幕",
+    "中国 小学生 的一天",
+    "逛超市 vlog 中文字幕"
+   ]
+  },
+  {
+   "id": "culture",
+   "title": "Festivals, legends & culture 节日·文化",
+   "weight": 1,
+   "channels": [],
+   "queries": [
+    "春节的故事 动画",
+    "成语故事 动画 儿童",
+    "中国传统节日 介绍 中文字幕",
+    "十二生肖的故事 动画",
+    "中秋节的故事 动画",
+    "中国历史 故事 儿童 动画"
+   ]
+  }
+ ]
+}

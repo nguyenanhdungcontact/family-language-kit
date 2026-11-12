@@ -1,0 +1,131 @@
+{
+ "id": "Z4mj30T3xB8",
+ "created": "2026-11-12",
+ "source": "youtube-manual",
+ "language": "zh-CN",
+ "ai": "gemini-3.7-flash",
+ "summary": "In this video, Teacher Rita introduces the popular Chinese romance drama 'Early Spring and Sunny Day' and explains why so many viewers are hooked on it. She discusses the characters, the filming style, and what makes this modern love story so special.",
+ "level": "HSK 4",
+ "phrases": [
+  {
+   "t": 39.37,
+   "d": 6.0,
+   "phrase": "电视剧",
+   "pron": "diàn shì jù",
+   "quote": "这几天我正在看一个中国的电视剧",
+   "meaning": "TV show / TV series",
+   "usage": "Use this word when talking about your favorite shows or series to watch on TV or streaming apps.",
+   "example": "我喜欢看中文电视剧。",
+   "example_pron": "Wǒ xǐhuan kàn zhōngwén diànshìjù.",
+   "example_en": "I like watching Chinese TV shows."
+  },
+  {
+   "t": 79.23,
+   "d": 4.03,
+   "phrase": "一会",
+   "pron": "yí huì",
+   "quote": "我们一会说为什么",
+   "meaning": "in a little while / later",
+   "usage": "Say this when something is going to happen very soon, like in a few minutes.",
+   "example": "我们一会去公园玩吧。",
+   "example_pron": "Wǒmen yíhuì qù gōngyuán wán ba.",
+   "example_en": "Let's go play at the park in a bit."
+  },
+  {
+   "t": 175.97,
+   "d": 3.23,
+   "phrase": "越来越好",
+   "pron": "yuè lái yuè hǎo",
+   "quote": "做得越来越好",
+   "meaning": "better and better",
+   "usage": "A wonderful phrase to cheer someone on when their skills, grades, or mood keep improving!",
+   "example": "你的中文越来越好了！",
+   "example_pron": "Nǐ de zhōngwén yuè lái yuè hǎo le!",
+   "example_en": "Your Chinese is getting better and better!"
+  },
+  {
+   "t": 224.83,
+   "d": 4.1,
+   "phrase": "终于",
+   "pron": "zhōng yú",
+   "quote": "栾念终于有机会找到了尚之桃",
+   "meaning": "finally / at last",
+   "usage": "Use this when you have been waiting patiently for something good to happen.",
+   "example": "放学了，终于可以回家了！",
+   "example_pron": "Fàngxué le, zhōngyú kěyǐ huíjiā le!",
+   "example_en": "School is over, finally we can go home!"
+  },
+  {
+   "t": 248.97,
+   "d": 3.3,
+   "phrase": "停不了",
+   "pron": "tíng bù liǎo",
+   "quote": "停不了 想一直看完",
+   "meaning": "cannot stop",
+   "usage": "Use this when something is so fun or yummy that you just cannot quit doing it!",
+   "example": "这个薯片太好吃，停不了！",
+   "example_pron": "Zhège shǔpiàn tài hǎochī, tíng bù liǎo!",
+   "example_en": "These chips are so tasty, I can't stop!"
+  },
+  {
+   "t": 414.47,
+   "d": 2.83,
+   "phrase": "不好意思",
+   "pron": "bù hǎo yì si",
+   "quote": "她就不好意思地去看别的地方",
+   "meaning": "shy / embarrassed / excuse me",
+   "usage": "Use this when someone compliments you and you blush, or to say a polite 'excuse me'.",
+   "example": "听到表扬，他不好意思了。",
+   "example_pron": "Tīng dào biǎoyáng, tā bù hǎoyìsi le.",
+   "example_en": "Hearing the praise, he felt shy."
+  },
+  {
+   "t": 548.37,
+   "d": 0.53,
+   "phrase": "总之",
+   "pron": "zǒng zhī",
+   "quote": "总之",
+   "meaning": "in short / anyway",
+   "usage": "Use this when you want to wrap up a story and give the big picture.",
+   "example": "总之，今天玩得特别开心。",
+   "example_pron": "Zǒngzhī, jīntiān wán de tèbié kāixīn.",
+   "example_en": "In short, we had so much fun today."
+  },
+  {
+   "t": 670.33,
+   "d": 1.73,
+   "phrase": "从来没有",
+   "pron": "cóng lái méi yǒu",
+   "quote": "从来没有放弃过",
+   "meaning": "never",
+   "usage": "Say this to talk about things you have never done before in your life.",
+   "example": "我从来没有见过大熊猫。",
+   "example_pron": "Wǒ cónglái méiyǒu jiànguò dàxióngmāo.",
+   "example_en": "I have never seen a giant panda."
+  },
+  {
+   "t": 801.37,
+   "d": 1.93,
+   "phrase": "诚实",
+   "pron": "chéng shí",
+   "quote": "但是身体却很诚实",
+   "meaning": "honest",
+   "usage": "A lovely word to praise someone who always tells the truth.",
+   "example": "做一个诚实的好孩子。",
+   "example_pron": "Zuò yí gè chéngshí de hǎo háizi.",
+   "example_en": "Be an honest, good child."
+  },
+  {
+   "t": 1074.9,
+   "d": 1.8,
+   "phrase": "记得",
+   "pron": "jì de",
+   "quote": "务必记得在评论里告诉我",
+   "meaning": "to remember / remember to",
+   "usage": "Use this to remind your friends or family not to forget something important.",
+   "example": "出门要记得戴帽子。",
+   "example_pron": "Chūmén yào jìde dài màozi.",
+   "example_en": "Remember to wear a hat when going out."
+  }
+ ]
+}

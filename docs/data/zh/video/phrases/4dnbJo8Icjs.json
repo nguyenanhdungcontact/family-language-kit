@@ -1,0 +1,119 @@
+{
+ "id": "4dnbJo8Icjs",
+ "created": "2026-11-12",
+ "source": "youtube-manual",
+ "language": "zh",
+ "ai": "gemini-3.6-flash",
+ "summary": "This video vlog follows a Chinese student sharing daily moments from her school life, including going to classes, eating meals, and hanging out with friends. She chats warmly with her viewers about her busy week and school routines.",
+ "level": "HSK 2",
+ "phrases": [
+  {
+   "t": 11.95,
+   "d": 0.93,
+   "phrase": "大家好呀",
+   "pron": "dà jiā hǎo ya",
+   "quote": "大家好呀",
+   "meaning": "Hello everyone!",
+   "usage": "A cheerful, friendly greeting to use when speaking to a group of friends or family.",
+   "example": "大家好呀，我是小明。",
+   "example_pron": "dà jiā hǎo ya, wǒ shì xiǎo míng.",
+   "example_en": "Hello everyone, I am Xiaoming."
+  },
+  {
+   "t": 19.26,
+   "d": 2.28,
+   "phrase": "明天见",
+   "pron": "míng tiān jiàn",
+   "quote": "那我们明天见",
+   "meaning": "See you tomorrow!",
+   "usage": "Say this to your friends or teacher when school ends for the day.",
+   "example": "老师，明天见！",
+   "example_pron": "lǎo shī, míng tiān jiàn!",
+   "example_en": "Teacher, see you tomorrow!"
+  },
+  {
+   "t": 36.92,
+   "d": 2.34,
+   "phrase": "早上好呀",
+   "pron": "zǎo shang hǎo ya",
+   "quote": "早上好呀",
+   "meaning": "Good morning!",
+   "usage": "A warm and cute way to greet someone when you wake up in the morning.",
+   "example": "妈妈，早上好呀！",
+   "example_pron": "mā ma, zǎo shang hǎo ya!",
+   "example_en": "Mom, good morning!"
+  },
+  {
+   "t": 57.96,
+   "d": 2.97,
+   "phrase": "开心",
+   "pron": "kāi xīn",
+   "quote": "开心开心开心可以吃饭了",
+   "meaning": "happy",
+   "usage": "Use this word whenever you feel joyful or satisfied about something.",
+   "example": "今天我很开心。",
+   "example_pron": "jīn tiān wǒ hěn kāi xīn.",
+   "example_en": "I am very happy today."
+  },
+  {
+   "t": 184.32,
+   "d": 1.88,
+   "phrase": "放学啦",
+   "pron": "fàng xué la",
+   "quote": "放学啦",
+   "meaning": "School's out!",
+   "usage": "Shout this happily when classes finish at the end of the school day.",
+   "example": "放学啦，我们回家吧！",
+   "example_pron": "fàng xué la, wǒ men huí jiā ba!",
+   "example_en": "School is out, let's go home!"
+  },
+  {
+   "t": 201.77,
+   "d": 1.2,
+   "phrase": "天气很好",
+   "pron": "tiān qì hěn hǎo",
+   "quote": "虽然天气很好",
+   "meaning": "the weather is very nice",
+   "usage": "Use this phrase on a sunny or pleasant day outside.",
+   "example": "今天天气很好。",
+   "example_pron": "jīn tiān tiān qì hěn hǎo.",
+   "example_en": "The weather is very nice today."
+  },
+  {
+   "t": 380.38,
+   "d": 1.35,
+   "phrase": "非常好吃",
+   "pron": "fēi cháng hǎo chī",
+   "quote": "真的非常好吃",
+   "meaning": "super delicious",
+   "usage": "Say this when you taste something really yummy like ice cream or dumplings.",
+   "example": "这个苹果非常好吃！",
+   "example_pron": "zhè ge píng guǒ fēi cháng hǎo chī!",
+   "example_en": "This apple is super delicious!"
+  },
+  {
+   "t": 439.32,
+   "d": 2.4,
+   "phrase": "好困",
+   "pron": "hǎo kùn",
+   "quote": "啊好困",
+   "meaning": "so sleepy",
+   "usage": "Say this when you feel tired and ready to go to sleep.",
+   "example": "我好困，想睡觉。",
+   "example_pron": "wǒ hǎo kùn, xiǎng shuì jiào.",
+   "example_en": "I am so sleepy, I want to sleep."
+  },
+  {
+   "t": 465.11,
+   "d": 2.07,
+   "phrase": "体育课",
+   "pron": "tǐ yù kè",
+   "quote": "我们上体育课了",
+   "meaning": "PE class / Gym class",
+   "usage": "Use this term when talking about your physical education class at school.",
+   "example": "今天我们有体育课。",
+   "example_pron": "jīn tiān wǒ men yǒu tǐ yù kè.",
+   "example_en": "We have PE class today."
+  }
+ ]
+}

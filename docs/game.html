@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Asteroids">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#05061a">
+<title>Word asteroids</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@500;600;700;800&family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sat:env(safe-area-inset-top,0px); --sar:env(safe-area-inset-right,0px); --sab:env(safe-area-inset-bottom,0px); --sal:env(safe-area-inset-left,0px);
+  --ink:#eef0ff; --ink2:#a9b0de; --gold:#ffd36e; --violet:#c49bff; --cyan:#7fe7ff; --bad:#ff7a8a;
+  --body:'Be Vietnam Pro',system-ui,-apple-system,sans-serif; --head:'Bricolage Grotesque','Be Vietnam Pro',system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:#05061a;color:var(--ink);font-family:var(--body);overflow:hidden;overscroll-behavior:none;
+  touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-text-size-adjust:100%}
+canvas#c{position:fixed;inset:0;width:100%;height:100%;display:block}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+
+/* ---------- Top bar ---------- */
+.hud{position:fixed;left:0;right:0;top:0;z-index:5;display:flex;align-items:center;gap:10px;pointer-events:none;
+  padding:calc(var(--sat) + 8px) calc(var(--sar) + 12px) 0 calc(var(--sal) + 12px)}
+.score{font-family:var(--head);font-weight:800;font-size:22px;min-width:80px;text-shadow:0 2px 10px rgba(0,0,0,.6)}
+.score small{display:block;font-family:var(--body);font-weight:600;font-size:11px;color:var(--ink2);letter-spacing:.02em}
+.weapon{flex:1;display:flex;justify-content:center}
+.wchip{display:none;align-items:center;gap:8px;padding:5px 12px 5px 10px;border-radius:99px;background:rgba(10,14,46,.7);border:1px solid rgba(255,255,255,.15);font-weight:700;font-size:13px}
+.wchip.show{display:flex}
+.wchip i{display:block;width:60px;height:4px;border-radius:3px;background:rgba(255,255,255,.18);overflow:hidden}
+.wchip i b{display:block;height:100%;background:currentColor}
+.lives{font-size:17px;letter-spacing:2px;color:var(--bad);text-shadow:0 2px 8px rgba(0,0,0,.6)}
+.pbtn{pointer-events:auto;width:40px;height:40px;border-radius:50%;background:rgba(10,14,46,.6);border:1px solid rgba(255,255,255,.15);font-size:15px;font-weight:800}
+
+/* ---------- Steering ring (left) + fire button (right); body.swap swaps the sides ---------- */
+.ctrl{position:fixed;z-index:6;touch-action:none}
+#fire{right:calc(var(--sar) + 22px);bottom:calc(var(--sab) + 22px);width:112px;height:112px;border-radius:50%;
+  background:radial-gradient(circle at 50% 40%,rgba(255,122,138,.55),rgba(255,80,110,.25) 60%,rgba(255,80,110,.12));
+  border:2px solid rgba(255,160,175,.55);display:grid;place-items:center;font-family:var(--head);font-weight:800;font-size:18px;letter-spacing:.06em;color:#fff;
+  box-shadow:0 0 0 6px rgba(255,90,120,.08),0 8px 30px rgba(0,0,0,.4);transition:transform .06s}
+#fire.on{transform:scale(.93);background:radial-gradient(circle at 50% 40%,rgba(255,140,155,.85),rgba(255,80,110,.5) 60%,rgba(255,80,110,.25))}
+#stick{left:calc(var(--sal) + 22px);bottom:calc(var(--sab) + 22px);width:136px;height:136px;border-radius:50%;
+  background:radial-gradient(circle,rgba(127,231,255,.10),rgba(127,231,255,.04) 70%);border:2px solid rgba(127,231,255,.35);
+  box-shadow:0 8px 30px rgba(0,0,0,.35)}
+#stick::before{content:"";position:absolute;inset:26%;border-radius:50%;border:1px dashed rgba(127,231,255,.18)}
+#knob{position:absolute;left:50%;top:50%;width:58px;height:58px;margin:-29px 0 0 -29px;border-radius:50%;
+  background:radial-gradient(circle at 40% 35%,#c9f6ff,#5fd3f0 55%,#2a8fb3);box-shadow:0 4px 16px rgba(0,0,0,.45),0 0 18px rgba(127,231,255,.4)}
+body.swap #fire{right:auto;left:calc(var(--sal) + 22px)}
+body.swap #stick{left:auto;right:calc(var(--sar) + 22px)}
+body:not(.playing) .ctrl{opacity:.35}
+
+/* ---------- Start / pause / game-over cards ---------- */
+.ov{position:fixed;inset:0;z-index:10;display:none;align-items:center;justify-content:center;background:rgba(4,5,22,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  padding:calc(var(--sat) + 14px) calc(var(--sar) + 14px) calc(var(--sab) + 14px) calc(var(--sal) + 14px)}
+.ov.show{display:flex}
+.card{width:min(520px,100%);max-height:100%;overflow:auto;border-radius:22px;background:linear-gradient(180deg,#141a4a,#0b0f30);border:1px solid rgba(255,255,255,.12);
+  box-shadow:0 20px 60px rgba(0,0,0,.5);padding:22px 22px 18px;text-align:center;touch-action:pan-y;-webkit-overflow-scrolling:touch}
+.card h1{font-family:var(--head);font-weight:800;font-size:28px;line-height:1.1;letter-spacing:-.01em}
+.card h1 span{color:var(--gold)}
+.card p{color:var(--ink2);font-size:14px;line-height:1.5;margin-top:8px}
+.legend{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px;text-align:left;font-size:13px;color:var(--ink2)}
+.legend div{background:rgba(255,255,255,.05);border-radius:12px;padding:8px 10px}
+.legend b{color:var(--ink)}
+.big{display:block;width:100%;margin-top:16px;min-height:52px;border-radius:16px;background:linear-gradient(180deg,#ffd36e,#f0a93a);color:#2a1700;font-weight:800;font-size:18px;letter-spacing:.02em}
+.row2{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.row2 button,.row2 a{flex:1 1 30%;min-height:44px;border-radius:14px;background:rgba(255,255,255,.08);font-weight:700;font-size:14px;color:var(--ink);text-decoration:none;display:grid;place-items:center}
+.stats{display:flex;justify-content:center;gap:22px;margin-top:10px}
+.stats div{font-size:12px;color:var(--ink2)}
+.stats b{display:block;font-family:var(--head);font-size:26px;color:var(--ink)}
+.learned{margin-top:14px;text-align:left;border-top:1px solid rgba(255,255,255,.1)}
+.learned h3{font-size:13px;color:var(--ink2);font-weight:600;margin:12px 0 6px}
+.learned .hint{font-size:12px;color:var(--ink2);margin:-2px 0 6px;line-height:1.45}
+.lw{position:relative;overflow:hidden;border-bottom:1px solid rgba(255,255,255,.06)}
+.lw .del{position:absolute;left:0;top:0;bottom:0;width:96px;border-radius:0;background:#d9534f;color:#fff;font-weight:700;font-size:14px}
+.lw .in{position:relative;display:flex;align-items:center;gap:10px;padding:7px 2px;background:#111641;transition:transform .2s ease;touch-action:pan-y}
+.lw.armed .in{transform:translateX(96px)}
+.lw .t{flex:1;min-width:0}
+.lw .w{font-weight:700;font-size:15px}
+.lw .v{font-size:13px;color:var(--ink2)}
+.lw .star{flex:none;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.07);font-size:17px;color:var(--ink2)}
+.lw .star.on{color:var(--gold)}
+.lw.gone .in{justify-content:space-between;color:var(--ink2);font-size:13px;min-height:50px}
+.lw.gone .undo{flex:none;padding:6px 12px;border-radius:99px;background:rgba(255,255,255,.08);font-weight:700;font-size:13px;color:var(--ink)}
+.rot{display:none;margin-top:10px;font-size:13px;color:var(--cyan)}
+@media (orientation:portrait){ .rot{display:block} }
+/* Low landscape screens (phone held sideways): a more compact card */
+@media (orientation:landscape) and (max-height:500px){
+  .card{padding:16px 18px 14px;width:min(640px,100%)}
+  .card h1{font-size:24px}
+  .legend{grid-template-columns:repeat(5,1fr)}
+  .big{min-height:46px;margin-top:12px}
+  #fire{width:100px;height:100px}
+  #stick{width:124px;height:124px}
+}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<div class="hud">
+  <div class="score"><span id="score">0</span><small id="level">Level 1</small></div>
+  <div class="weapon"><div class="wchip" id="wchip"><span id="wname"></span><i><b id="wbar"></b></i></div></div>
+  <div class="lives" id="lives">♥♥♥</div>
+  <button class="pbtn" id="pauseBtn" aria-label="Pause">❚❚</button>
+</div>
+
+<div class="ctrl" id="fire" aria-label="Hold to fire">FIRE</div>
+<div class="ctrl" id="stick" aria-label="Drag to steer"><div id="knob"></div></div>
+
+<div class="ov show" id="startOv"><div class="card">
+  <h1>Word <span>asteroids</span></h1>
+  <p id="intro">Every asteroid carries a word. Blast it open to see what it means. Bigger rocks take more shots.</p>
+  <div class="legend">
+    <div><b id="lgL">Left thumb</b><br><span id="lgLt">drag the ring to fly</span></div>
+    <div><b id="lgR">Right thumb</b><br><span id="lgRt">hold FIRE</span></div>
+    <div><b style="color:var(--gold)">★ Gold</b><br>words you saved → laser beam</div>
+    <div><b style="color:var(--violet)">◆ Violet</b><br>tricky words → triple shot</div>
+    <div><b style="color:#ff8a6a">● Small dark rocks</b><br>cannot be broken, dodge them</div>
+  </div>
+  <p id="wordInfo">Loading words…</p>
+  <button class="big" id="startBtn">Start</button>
+  <div class="row2"><button id="handBtn">⇄ Swap hands</button><button id="muteBtn">🔊 Sound: on</button><button id="langBtn">🌏</button><a href="bricks.html">▦ Brick game</a><a href="iphone.html">▶ Videos</a><a href="./">⌂ Start</a></div>
+  <div class="rot">Tip: turn the phone sideways for more room to fly.</div>
+</div></div>
+
+<div class="ov" id="pauseOv"><div class="card">
+  <h1>Paused</h1>
+  <button class="big" id="resumeBtn">Keep playing</button>
+  <div class="row2"><button id="handBtn2">⇄ Swap hands</button><button id="muteBtn2">🔊 Sound</button><button id="quitBtn">End this round</button></div>
+</div></div>
+
+<div class="ov" id="overOv"><div class="card">
+  <h1 id="overTitle">Game over!</h1>
+  <div class="stats"><div><b id="oScore">0</b>points</div><div><b id="oWords">0</b>words cracked</div><div><b id="oBest">0</b>best</div></div>
+  <button class="big" id="againBtn">Play again</button>
+  <div class="learned" id="learned"></div>
+</div></div>
+
+<script src="config.js"></script>
+<script src="learn-core.js"></script>
+<script>
+(() => {
+'use strict';
+/* =====================================================================
+   Word asteroids: shoot asteroids that carry a word in the language being learned; they break open to show the meaning.
+   Words come from data/<lang>/words.json + the saved ★ words (the synced store in learn-core.js), minus deleted words.
+   Held sideways: asteroids fly in from the right, the ship shoots to the right.
+   Held upright:  asteroids fall from the top, the ship shoots up.
+   ===================================================================== */
+const $ = s => document.querySelector(s);
+const cv = $('#c'), ctx = cv.getContext('2d');
+const FONT = "'Be Vietnam Pro', system-ui, -apple-system, 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', sans-serif";
+const rand = (a, b) => a + Math.random() * (b - a);
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
+const LC = window.LearnCore || null, SYNC = LC ? LC.Sync : null, LI = LC ? LC.langInfo : { name: 'Chinese', native: '中文' };
+const SHOW_PRON = !!LI.pronOnCards, BEST_KEY = 'game.best.' + (LC ? LC.LANG : 'zh');
+const meaningOf = o => (SHOW_PRON && o.pron ? o.pron + ' · ' : '') + (o.en || '');
+
+/* ---------- Screen ---------- */
+let W = 0, H = 0, DPR = 1, U = 1, land = true;
+const safe = { t: 0, r: 0, b: 0, l: 0 };
+function readSafe() {
+  const cs = getComputedStyle(document.documentElement);
+  safe.t = parseFloat(cs.getPropertyValue('--sat')) || 0; safe.r = parseFloat(cs.getPropertyValue('--sar')) || 0;
+  safe.b = parseFloat(cs.getPropertyValue('--sab')) || 0; safe.l = parseFloat(cs.getPropertyValue('--sal')) || 0;
+}
+let stars = [];
+function resize() {
+  const wasLand = land;
+  W = innerWidth; H = innerHeight; DPR = Math.min(devicePixelRatio || 1, 2.5);
+  cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  U = clamp(Math.min(W, H) / 400, 0.8, 1.8);
+  land = W > H;
+  readSafe();
+  stars = Array.from({ length: Math.round(W * H / 2600) }, () => ({ x: Math.random() * W, y: Math.random() * H, z: Math.random(), tw: Math.random() * 6 }));
+  if (G && wasLand !== land) { G.rocks = []; G.darks = []; G.bullets = []; placeShip(); }   // phone turned mid-round: clear the field, keep playing
+  if (G) clampShip();
+}
+addEventListener('resize', resize);
+addEventListener('orientationchange', () => setTimeout(resize, 250));
+// Stop scrolling / pinch-zoom on iOS
+document.addEventListener('touchmove', e => { if (!e.target.closest('.card')) e.preventDefault(); }, { passive: false });
+document.addEventListener('gesturestart', e => e.preventDefault());
+document.addEventListener('dblclick', e => e.preventDefault());
+
+/* ---------- Words ---------- */
+const FALLBACK = (LC && LC.LANG === 'vi')
+  ? [{ w: 'xin chào', en: 'hello' }, { w: 'cảm ơn', en: 'thank you' }, { w: 'ngon', en: 'delicious' }, { w: 'cà phê', en: 'coffee' }, { w: 'bao nhiêu', en: 'how much' }, { w: 'tạm biệt', en: 'goodbye' }]
+  : [{ w: '你好', pron: 'nǐ hǎo', en: 'hello' }, { w: '谢谢', pron: 'xièxie', en: 'thank you' }, { w: '朋友', pron: 'péngyou', en: 'friend' }, { w: '喜欢', pron: 'xǐhuan', en: 'to like' }, { w: '好吃', pron: 'hǎochī', en: 'tasty' }, { w: '再见', pron: 'zàijiàn', en: 'goodbye' }];
+let WORDS = [], bag = [];
+/* "Tricky" words (violet rocks): idioms, 4+ character Chinese words, long phrases */
+const isHard = o => !!o.hard || /idiom/i.test(o.pos || '') || (/[\u3400-\u9fff]/.test(o.w) ? [...o.w].length >= 4 : o.w.length >= 14);
+async function loadWords() {
+  let base = [];
+  try { const r = await fetch(LC ? LC.dataUrl('words.json') : 'data/zh/words.json', { cache: 'no-store' }); if (r.ok) base = (await r.json()).filter(o => o && o.w && o.en); } catch (e) {}
+  if (!base.length) base = FALLBACK.slice();
+  const saved = SYNC ? SYNC.words().filter(o => o.w) : [];
+  const seen = new Set(), out = [];
+  saved.forEach(o => { const k = o.w.toLowerCase(); if (!seen.has(k)) { seen.add(k); out.push(Object.assign({}, o, { kind: 'saved' })); } });
+  base.forEach(o => {
+    const k = o.w.toLowerCase();
+    if (seen.has(k) || (SYNC && SYNC.isHidden(o.w))) return;
+    seen.add(k); out.push(Object.assign({}, o, { kind: isHard(o) ? 'hard' : 'normal' }));
+  });
+  WORDS = out; bag = [];
+  const nSaved = out.filter(o => o.kind === 'saved').length, nHard = out.filter(o => o.kind === 'hard').length;
+  $('#wordInfo').textContent = `${LI.native}: ${out.length} words · ★ ${nSaved} saved · ◆ ${nHard} tricky`;
+}
+function nextWord() {
+  if (!bag.length) {
+    bag = WORDS.slice();
+    for (let i = bag.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [bag[i], bag[j]] = [bag[j], bag[i]]; }
+  }
+  return bag.pop();
+}
+
+/* ---------- Sound (made with Web Audio, no files needed) ---------- */
+let AC = null, muted = store.get('game.mute') === '1';
+function audio() {
+  if (muted) return null;
+  if (!AC) { try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return null; } }
+  if (AC.state === 'suspended') AC.resume();
+  return AC;
+}
+function tone(f, dur, type = 'square', vol = 0.035, f2 = 0) {
+  const a = audio(); if (!a) return;
+  const o = a.createOscillator(), g = a.createGain(), t = a.currentTime;
+  o.type = type; o.frequency.setValueAtTime(f, t); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + dur);
+  g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g).connect(a.destination); o.start(t); o.stop(t + dur);
+}
+function noise(dur, vol = 0.12) {
+  const a = audio(); if (!a) return;
+  const n = Math.floor(a.sampleRate * dur), buf = a.createBuffer(1, n, a.sampleRate), d = buf.getChannelData(0);
+  for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, 2);
+  const s = a.createBufferSource(), g = a.createGain(), f = a.createBiquadFilter();
+  f.type = 'lowpass'; f.frequency.value = 900; s.buffer = buf; g.gain.value = vol;
+  s.connect(f).connect(g).connect(a.destination); s.start();
+}
+const sfx = {
+  shot: () => tone(880, 0.06, 'square', 0.018, 440),
+  laser: () => tone(1500, 0.05, 'sawtooth', 0.014, 900),
+  hit: () => tone(220, 0.05, 'triangle', 0.05, 160),
+  boom: big => { noise(big ? 0.55 : 0.32, big ? 0.2 : 0.13); tone(110, 0.25, 'sine', 0.06, 50); },
+  power: () => { tone(520, 0.12, 'triangle', 0.05, 1040); setTimeout(() => tone(780, 0.16, 'triangle', 0.05, 1560), 90); },
+  hurt: () => { noise(0.4, 0.16); tone(160, 0.35, 'sawtooth', 0.04, 60); },
+};
+function paintMute() { ['#muteBtn', '#muteBtn2'].forEach(s => $(s).textContent = muted ? '🔇 Sound: off' : '🔊 Sound: on'); }
+function toggleMute() { muted = !muted; store.set('game.mute', muted ? '1' : '0'); paintMute(); }
+$('#muteBtn').onclick = toggleMute; $('#muteBtn2').onclick = toggleMute; paintMute();
+
+/* Swap hands: by default the left thumb steers and the right thumb fires; "⇄ Swap hands" flips it (remembered on this device) */
+function paintHands() {
+  const swap = store.get('game.swap') === '1';
+  document.body.classList.toggle('swap', swap);
+  $('#lgLt').textContent = swap ? 'hold FIRE' : 'drag the ring to fly';
+  $('#lgRt').textContent = swap ? 'drag the ring to fly' : 'hold FIRE';
+}
+function toggleHands() { store.set('game.swap', store.get('game.swap') === '1' ? '0' : '1'); paintHands(); }
+$('#handBtn').onclick = toggleHands; $('#handBtn2').onclick = toggleHands; paintHands();
+
+/* ---------- Controls: hold FIRE, drag the ring; both thumbs work at the same time ---------- */
+const input = { fire: false, jx: 0, jy: 0, firePid: null, stickPid: null };
+const fireEl = $('#fire'), stickEl = $('#stick'), knob = $('#knob');
+fireEl.addEventListener('pointerdown', e => { e.preventDefault(); input.firePid = e.pointerId; input.fire = true; fireEl.classList.add('on'); try { fireEl.setPointerCapture(e.pointerId); } catch (x) {} audio(); });
+const fireUp = e => { if (e.pointerId !== input.firePid) return; input.fire = false; input.firePid = null; fireEl.classList.remove('on'); };
+fireEl.addEventListener('pointerup', fireUp); fireEl.addEventListener('pointercancel', fireUp); fireEl.addEventListener('lostpointercapture', fireUp);
+function stickMove(e) {
+  const r = stickEl.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2, R = r.width / 2 - 8;
+  let dx = e.clientX - cx, dy = e.clientY - cy;
+  const d = Math.hypot(dx, dy); if (d > R) { dx *= R / d; dy *= R / d; }
+  knob.style.transform = `translate(${dx}px, ${dy}px)`;
+  const m = Math.hypot(dx, dy) / R, dead = 0.08, k = m < dead ? 0 : (m - dead) / (1 - dead);
+  input.jx = m ? dx / (m * R) * k : 0; input.jy = m ? dy / (m * R) * k : 0;
+}
+stickEl.addEventListener('pointerdown', e => { e.preventDefault(); input.stickPid = e.pointerId; try { stickEl.setPointerCapture(e.pointerId); } catch (x) {} stickMove(e); audio(); });
+stickEl.addEventListener('pointermove', e => { if (e.pointerId === input.stickPid) stickMove(e); });
+const stickUp = e => { if (e.pointerId !== input.stickPid) return; input.stickPid = null; input.jx = input.jy = 0; knob.style.transform = ''; };
+stickEl.addEventListener('pointerup', stickUp); stickEl.addEventListener('pointercancel', stickUp); stickEl.addEventListener('lostpointercapture', stickUp);
+// Keyboard (for trying it on a computer): arrows / WASD to fly, Space to fire, P / Esc to pause
+const keys = new Set();
+addEventListener('keydown', e => {
+  keys.add(e.key.toLowerCase());
+  if (e.key === ' ') { input.fire = true; e.preventDefault(); }
+  if ((e.key === 'p' || e.key === 'Escape') && G && G.state === 'play') pause();
+});
+addEventListener('keyup', e => { keys.delete(e.key.toLowerCase()); if (e.key === ' ' && input.firePid === null) input.fire = false; });
+function keyAxis() {
+  const k = n => keys.has(n);
+  return { x: (k('arrowright') || k('d') ? 1 : 0) - (k('arrowleft') || k('a') ? 1 : 0), y: (k('arrowdown') || k('s') ? 1 : 0) - (k('arrowup') || k('w') ? 1 : 0) };
+}
+
+/* ---------- Round state ---------- */
+let G = null;
+const WEAPONS = {
+  blaster: { name: 'Blaster', color: '#ffe9a8', rate: 0.18 },
+  spread:  { name: '◆ Triple shot', color: '#c49bff', rate: 0.17, time: 12 },
+  laser:   { name: '★ Piercing laser', color: '#7fe7ff', rate: 0.075, time: 12 },
+  twin:    { name: '⚡ Rapid twin shot', color: '#9dffb0', rate: 0.07, time: 10 },
+};
+function newGame() {
+  G = { state: 'play', t: 0, score: 0, lives: 3, level: 1, rocks: [], darks: [], darkT: 3, bullets: [], frags: [], sparks: [], pops: [], banners: [],
+        weapon: 'blaster', wTime: 0, cool: 0, spawnT: 0.6, inv: 0, learned: [], nextId: 1, shotN: 0 };
+  G.ship = { x: 0, y: 0, vx: 0, vy: 0, r: 16 * U, tilt: 0 };
+  placeShip(); paintHud();
+}
+const fwd = () => land ? { x: 1, y: 0 } : { x: 0, y: -1 };
+function shipBounds() {
+  return land
+    ? { x0: safe.l + 26 * U, x1: W * 0.6, y0: safe.t + 54, y1: H - safe.b - 22 * U }
+    : { x0: safe.l + 22 * U, x1: W - safe.r - 22 * U, y0: H * 0.34, y1: H - safe.b - 176 };
+}
+function placeShip() { const b = shipBounds(), s = G.ship; s.x = land ? b.x0 + 50 * U : W / 2; s.y = land ? H / 2 : b.y1 - 30 * U; s.vx = s.vy = 0; }
+function clampShip() { const b = shipBounds(), s = G.ship; s.x = clamp(s.x, b.x0, b.x1); s.y = clamp(s.y, b.y0, b.y1); }
+
+/* ---------- Asteroids ---------- */
+function labelLines(text, r) {
+  const size = clamp(r * 0.42, 12 * U, 19 * U);
+  ctx.font = `700 ${size}px ${FONT}`;
+  if (ctx.measureText(text).width <= r * 1.75 || !/\s/.test(text)) return { size, lines: [text] };
+  const words = text.split(' '); let best = null;
+  for (let i = 1; i < words.length; i++) {
+    const a = words.slice(0, i).join(' '), b = words.slice(i).join(' ');
+    const w = Math.max(ctx.measureText(a).width, ctx.measureText(b).width);
+    if (!best || w < best.w) best = { w, lines: [a, b] };
+  }
+  return { size, lines: best.lines };
+}
+/* Dark rocks: small, almost black with a faint red warning rim; they drift diagonally so you have to dodge */
+function spawnDark() {
+  const r = rand(9, 16) * U, sp = rand(55, 85) * U * (1 + (G.level - 1) * 0.07);
+  const ang = rand(-0.35, 0.35);
+  let x, y, vx, vy;
+  if (land) { x = W + r + 6; y = rand(safe.t + 50, H - safe.b - r); vx = -Math.cos(ang) * sp; vy = Math.sin(ang) * sp; }
+  else { x = rand(safe.l + r, W - safe.r - r); y = -r - 6; vx = Math.sin(ang) * sp; vy = Math.cos(ang) * sp; }
+  const n = 7 + Math.floor(Math.random() * 3), shape = [];
+  for (let i = 0; i < n; i++) shape.push({ a: i / n * Math.PI * 2 + rand(-0.15, 0.15), k: rand(0.75, 1.08) });
+  G.darks.push({ x, y, vx, vy, r, rot: rand(0, 6.3), vr: rand(-2, 2), shape, pulse: rand(0, 6), flash: 0 });
+}
+function drawDark(o) {
+  ctx.save(); ctx.translate(o.x, o.y);
+  ctx.shadowColor = `rgba(255,70,50,${0.45 + 0.25 * Math.sin(o.pulse)})`; ctx.shadowBlur = 12 * U;
+  ctx.beginPath();
+  o.shape.forEach((p, i) => { const px = Math.cos(p.a + o.rot) * o.r * p.k, py = Math.sin(p.a + o.rot) * o.r * p.k; i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); });
+  ctx.closePath();
+  const g = ctx.createRadialGradient(-o.r * 0.3, -o.r * 0.3, o.r * 0.1, 0, 0, o.r);
+  g.addColorStop(0, '#3a3440'); g.addColorStop(1, '#0a080e');
+  ctx.fillStyle = g; ctx.fill();
+  ctx.shadowBlur = 0;
+  ctx.lineWidth = 1.4 * U; ctx.strokeStyle = `rgba(255,110,80,${0.55 + 0.25 * Math.sin(o.pulse)})`; ctx.stroke();
+  if (o.flash > 0) { o.flash -= 1 / 60; ctx.fillStyle = `rgba(255,160,120,${o.flash * 3})`; ctx.fill(); }
+  ctx.restore();
+}
+function spawnRock() {
+  if (!WORDS.length) return;
+  let it = nextWord();
+  // Special asteroids: saved words (gold), tricky words (violet), now and then a turquoise one for the twin shot
+  const pick = Math.random();
+  if (pick < 0.12) { const s = WORDS.filter(o => o.kind === 'saved'); if (s.length) it = s[Math.floor(Math.random() * s.length)]; }
+  else if (pick < 0.24) { const h = WORDS.filter(o => o.kind === 'hard'); if (h.length) it = h[Math.floor(Math.random() * h.length)]; }
+  let special = it.kind === 'saved' ? 'gold' : it.kind === 'hard' && Math.random() < 0.55 ? 'violet' : Math.random() < 0.05 ? 'cyan' : null;
+  // Asteroid size: room for the text, plus a random extra (small / medium / large)
+  ctx.font = `700 ${16 * U}px ${FONT}`;
+  const tw = Math.min(ctx.measureText(it.w).width, ctx.measureText(it.w).width * (/\s/.test(it.w) ? 0.62 : 1));
+  const sizeRoll = Math.random();
+  const r = clamp(tw / 2 + 14 * U, 26 * U, 66 * U) * (sizeRoll < 0.45 ? 1 : sizeRoll < 0.8 ? 1.22 : 1.45);
+  const hp = r < 36 * U ? 3 : r < 50 * U ? 5 : r < 64 * U ? 8 : r < 78 * U ? 11 : 14;   // several shots needed: time to read the word
+  const L = labelLines(it.w, r);
+  const speed = (20 + Math.random() * 14) * U * (1 + (G.level - 1) * 0.06) * (r < 40 * U ? 1.15 : 1);
+  let x, y;
+  for (let tries = 0; tries < 6; tries++) {
+    if (land) { x = W + r + 8; y = rand(safe.t + 50 + r * 0.6, H - safe.b - r * 0.6); }
+    else { x = rand(safe.l + r * 0.7, W - safe.r - r * 0.7); y = -r - 8; }
+    if (!G.rocks.some(o => Math.hypot(o.x - x, o.y - y) < o.r + r + 12)) break;
+  }
+  const n = 11 + Math.floor(Math.random() * 6), shape = [];
+  for (let i = 0; i < n; i++) shape.push({ a: i / n * Math.PI * 2 + rand(-0.12, 0.12), k: rand(0.8, 1.07) });
+  const craters = Array.from({ length: 2 + Math.floor(Math.random() * 3) }, () => ({ a: rand(0, 6.3), d: rand(0.2, 0.62), s: rand(0.1, 0.22) }));
+  G.rocks.push({
+    id: G.nextId++, item: it, special, r, hp, maxHp: hp, x, y,
+    vx: land ? -speed : rand(-10, 10) * U, vy: land ? rand(-10, 10) * U : speed,
+    rot: rand(0, 6.3), vr: rand(-0.6, 0.6), shape, craters, flash: 0, L,
+    hue: special === 'gold' ? 42 : special === 'violet' ? 268 : special === 'cyan' ? 188 : rand(18, 32),
+  });
+}
+function rockPath(o, scale = 1) {
+  ctx.beginPath();
+  o.shape.forEach((p, i) => {
+    const px = Math.cos(p.a + o.rot) * o.r * p.k * scale, py = Math.sin(p.a + o.rot) * o.r * p.k * scale;
+    i ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
+  });
+  ctx.closePath();
+}
+function drawRock(o) {
+  ctx.save(); ctx.translate(o.x, o.y);
+  const sp = o.special;
+  if (sp) { ctx.shadowColor = sp === 'gold' ? 'rgba(255,211,110,.85)' : sp === 'violet' ? 'rgba(196,155,255,.85)' : 'rgba(127,231,255,.85)'; ctx.shadowBlur = 22 * U; }
+  const g = ctx.createRadialGradient(-o.r * 0.35, -o.r * 0.4, o.r * 0.1, 0, 0, o.r * 1.1);
+  if (sp === 'gold') { g.addColorStop(0, '#fff1c4'); g.addColorStop(0.45, '#c99a3c'); g.addColorStop(1, '#5a3c12'); }
+  else if (sp === 'violet') { g.addColorStop(0, '#eadcff'); g.addColorStop(0.45, '#8a62c9'); g.addColorStop(1, '#2e1a52'); }
+  else if (sp === 'cyan') { g.addColorStop(0, '#dcfbff'); g.addColorStop(0.45, '#3fa7bf'); g.addColorStop(1, '#0f3a48'); }
+  else { g.addColorStop(0, `hsl(${o.hue},18%,62%)`); g.addColorStop(0.5, `hsl(${o.hue},16%,36%)`); g.addColorStop(1, `hsl(${o.hue},20%,14%)`); }
+  rockPath(o); ctx.fillStyle = g; ctx.fill();
+  ctx.shadowBlur = 0;
+  ctx.lineWidth = 1.5 * U; ctx.strokeStyle = 'rgba(0,0,0,.35)'; ctx.stroke();
+  // Craters
+  o.craters.forEach(c => {
+    const cx = Math.cos(c.a + o.rot) * o.r * c.d, cy = Math.sin(c.a + o.rot) * o.r * c.d, cr = o.r * c.s;
+    ctx.beginPath(); ctx.arc(cx, cy, cr, 0, 6.3); ctx.fillStyle = 'rgba(0,0,0,.22)'; ctx.fill();
+    ctx.beginPath(); ctx.arc(cx - cr * 0.25, cy - cr * 0.25, cr * 0.7, 0, 6.3); ctx.fillStyle = 'rgba(255,255,255,.06)'; ctx.fill();
+  });
+  // Cracks grow with every hit
+  const dmg = 1 - o.hp / o.maxHp;
+  if (dmg > 0) {
+    ctx.strokeStyle = 'rgba(20,10,0,.55)'; ctx.lineWidth = 1.6 * U;
+    const n = Math.ceil(dmg * 5);
+    for (let i = 0; i < n; i++) {
+      const a = o.shape[(i * 3) % o.shape.length].a + o.rot;
+      ctx.beginPath(); ctx.moveTo(0, 0);
+      ctx.lineTo(Math.cos(a) * o.r * 0.45, Math.sin(a) * o.r * 0.45);
+      ctx.lineTo(Math.cos(a + 0.3) * o.r * 0.8, Math.sin(a + 0.3) * o.r * 0.8);
+      ctx.stroke();
+    }
+  }
+  if (o.flash > 0) { rockPath(o); ctx.fillStyle = `rgba(255,255,255,${o.flash * 5})`; ctx.fill(); }
+  // The word: always upright
+  ctx.font = `700 ${o.L.size}px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  const lh = o.L.size * 1.08, y0 = -(o.L.lines.length - 1) * lh / 2;
+  o.L.lines.forEach((ln, i) => {
+    ctx.lineWidth = 3.4 * U; ctx.strokeStyle = 'rgba(8,8,20,.85)'; ctx.strokeText(ln, 0, y0 + i * lh);
+    ctx.fillStyle = sp === 'gold' ? '#fff3c8' : sp === 'violet' ? '#f1e6ff' : '#ffffff'; ctx.fillText(ln, 0, y0 + i * lh);
+  });
+  if (sp) { ctx.font = `800 ${11 * U}px ${FONT}`; ctx.fillStyle = sp === 'gold' ? '#ffd36e' : sp === 'violet' ? '#d9c2ff' : '#9df0ff';
+    ctx.fillText(sp === 'gold' ? '★' : sp === 'violet' ? '◆' : '⚡', 0, -o.r * 0.68); }
+  // Thin health ring for big asteroids
+  if (o.maxHp > 1 && o.hp < o.maxHp) {
+    ctx.beginPath(); ctx.arc(0, 0, o.r + 5 * U, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * o.hp / o.maxHp);
+    ctx.strokeStyle = 'rgba(255,255,255,.35)'; ctx.lineWidth = 2 * U; ctx.stroke();
+  }
+  ctx.restore();
+}
+
+/* ---------- Shooting ---------- */
+function shoot() {
+  const w = WEAPONS[G.weapon], f = fwd(), p = { x: -f.y, y: f.x }, s = G.ship;
+  const nx = s.x + f.x * s.r * 1.2, ny = s.y + f.y * s.r * 1.2;
+  const mk = (ang, off, o = {}) => {
+    const c = Math.cos(ang), sn = Math.sin(ang), dx = f.x * c - f.y * sn, dy = f.x * sn + f.y * c;
+    const sp = (o.speed || 760) * U;
+    G.bullets.push(Object.assign({ x: nx + p.x * off, y: ny + p.y * off, vx: dx * sp, vy: dy * sp, dmg: 1, pierce: false, color: w.color, len: 12 * U, w: 3.2 * U, hit: new Set() }, o));
+  };
+  if (G.weapon === 'spread') { mk(-0.2, 0); mk(0, 0); mk(0.2, 0); }
+  else if (G.weapon === 'twin') { mk(0, -7 * U); mk(0, 7 * U); }
+  else if (G.weapon === 'laser') mk(0, 0, { speed: 1300, dmg: 1, pierce: true, len: 34 * U, w: 2.6 * U });
+  else mk(0, 0);
+  G.shotN++;
+  if (G.shotN % 2 === 0) (G.weapon === 'laser' ? sfx.laser : sfx.shot)();
+}
+
+/* ---------- Effects ---------- */
+function burst(x, y, n, color, speed = 160, life = 0.6) {
+  for (let i = 0; i < n && G.sparks.length < 500; i++) {
+    const a = rand(0, 6.3), v = rand(0.3, 1) * speed * U;
+    G.sparks.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, t: 0, life: rand(life * 0.5, life), color, s: rand(1.2, 2.8) * U });
+  }
+}
+function shatter(o) {
+  const n = Math.round(clamp(o.r / (9 * U), 5, 12));
+  for (let i = 0; i < n; i++) {
+    const a = rand(0, 6.3), v = rand(40, 170) * U, k = rand(0.18, 0.34);
+    const pts = Array.from({ length: 5 }, (_, j) => ({ a: j / 5 * 6.3 + rand(-0.3, 0.3), k: rand(0.6, 1) }));
+    G.frags.push({ x: o.x, y: o.y, vx: Math.cos(a) * v + o.vx * 0.5, vy: Math.sin(a) * v + o.vy * 0.5, r: o.r * k, rot: rand(0, 6.3), vr: rand(-5, 5),
+      t: 0, life: rand(0.7, 1.2), pts, hue: o.hue, special: o.special });
+  }
+  burst(o.x, o.y, 26, o.special === 'gold' ? '#ffd36e' : o.special === 'violet' ? '#c49bff' : '#ffb27a', 220, 0.7);
+}
+/* The meaning "bursts out" near the asteroid, floats up slowly and fades.
+   Each meaning looks for free space: not on top of another one, not under the FIRE button / steering ring. */
+const RISE = 14, WORD_PX = 24, MEAN_PX = 13.5;
+const HEAD = "'Bricolage Grotesque', 'Be Vietnam Pro', system-ui, sans-serif";
+function popMeaning(o) {
+  ctx.font = `800 ${WORD_PX * U}px ${HEAD}`;
+  const ww = ctx.measureText(o.item.w).width;
+  ctx.font = `600 ${MEAN_PX * U}px ${FONT}`;
+  const lines = wrapText(meaningOf(o.item), Math.max(ww, Math.min(W * 0.4, 210 * U))).slice(0, 2);
+  const bw = Math.max(ww, ...lines.map(l => ctx.measureText(l).width), 60 * U) + 16 * U;
+  const bh = (WORD_PX + 6 + lines.length * (MEAN_PX + 4)) * U + 8 * U;
+  const blocks = ['#fire', '#stick'].map(sel => { const r = $(sel).getBoundingClientRect(); return { x0: r.left - 8, x1: r.right + 8, y0: r.top - 8, y1: r.bottom + 8 }; });
+  const hits = (cx, cy) => {
+    const b = { x0: cx - bw / 2, x1: cx + bw / 2, y0: cy - bh / 2, y1: cy + bh / 2 };
+    const over = q => b.x0 < q.x1 && b.x1 > q.x0 && b.y0 < q.y1 && b.y1 > q.y0;
+    if (blocks.some(over)) return true;
+    return G.pops.some(p => { const py = p.y - p.t * RISE * U; return over({ x0: p.x - p.bw / 2, x1: p.x + p.bw / 2, y0: py - p.bh / 2, y1: py + p.bh / 2 }); });
+  };
+  // Try every cell on the screen (grid sized to the meaning box), take the free one nearest the asteroid
+  const x0 = bw / 2 + safe.l + 8, x1 = W - safe.r - bw / 2 - 8, y0 = safe.t + (land ? 60 : 64 + 52 * U) + bh / 2, y1 = H - safe.b - bh / 2 - (land ? 54 * U : 6);
+  const cands = [];
+  for (let y = y0; y <= y1 + 0.1; y += Math.max(bh * 0.55, 20)) for (let x = x0; x <= x1 + 0.1; x += Math.max(bw * 0.34, 30)) cands.push({ x, y });
+  cands.push({ x: clamp(o.x, x0, x1), y: clamp(o.y, y0, y1) });
+  cands.sort((a, b) => Math.hypot(a.x - o.x, a.y - o.y) - Math.hypot(b.x - o.x, b.y - o.y));
+  let best = cands.find(c => !hits(c.x, c.y));
+  if (!best) { G.pops.shift(); best = cands.find(c => !hits(c.x, c.y)) || cands[0]; }   // screen is full: drop the oldest meaning
+  G.pops.push({ x: best.x, y: best.y, w: o.item.w, lines, bw, bh, t: 0, life: 3.4, special: o.special });
+  if (G.pops.length > 6) G.pops.shift();
+}
+function banner(text, color) {
+  const same = G.banners.find(b => b.text === text);
+  if (same) { same.t = Math.min(same.t, 0.2); return; }          // same message: extend it instead of repeating the line
+  G.banners.push({ text, color, t: 0, life: 2.2 });
+  if (G.banners.length > 2) G.banners.shift();
+}
+function wrapText(text, maxW) {
+  const words = String(text).split(' '), lines = []; let cur = '';
+  words.forEach(w => { const t = cur ? cur + ' ' + w : w; if (ctx.measureText(t).width > maxW && cur) { lines.push(cur); cur = w; } else cur = t; });
+  if (cur) lines.push(cur);
+  return lines.slice(0, 3);
+}
+
+/* ---------- Game loop ---------- */
+function damage(o, dmg) {
+  o.hp -= dmg; o.flash = 0.08;
+  if (o.hp > 0) { sfx.hit(); burst(o.x, o.y, 4, '#ffd9b0', 120, 0.3); return; }
+  // Broken: show the meaning and say the word aloud (when sound is on)
+  G.rocks.splice(G.rocks.indexOf(o), 1);
+  shatter(o); popMeaning(o); sfx.boom(o.r > 50 * U);
+  if (!muted && LC) LC.speak(o.item.w, 1);
+  G.score += o.maxHp * 10 * (o.special ? 2 : 1);
+  if (!G.learned.some(x => x.w === o.item.w)) G.learned.push(o.item);
+  if (o.special) {
+    const wpn = o.special === 'gold' ? 'laser' : o.special === 'violet' ? 'spread' : 'twin';
+    G.weapon = wpn; G.wTime = WEAPONS[wpn].time; sfx.power();
+    banner(WEAPONS[wpn].name + ` · ${WEAPONS[wpn].time}s`, WEAPONS[wpn].color);
+  }
+}
+function update(dt) {
+  G.t += dt;
+  const lvl = 1 + Math.floor(G.t / 30);
+  if (lvl !== G.level) { G.level = lvl; banner(`Level ${lvl}: faster asteroids`, '#ffd36e'); }
+  // Ship: steering ring → target velocity, smooth acceleration
+  const s = G.ship, ka = keyAxis();
+  const jx = clamp(input.jx + ka.x, -1, 1), jy = clamp(input.jy + ka.y, -1, 1);
+  const maxV = 330 * U, ease = Math.min(1, dt * 9);
+  s.vx += (jx * maxV - s.vx) * ease; s.vy += (jy * maxV - s.vy) * ease;
+  s.x += s.vx * dt; s.y += s.vy * dt; clampShip();
+  s.tilt += ((land ? s.vy : s.vx) / maxV * 0.35 - s.tilt) * Math.min(1, dt * 8);
+  if (G.inv > 0) G.inv -= dt;
+  // Fire
+  G.cool -= dt;
+  if (input.fire && G.cool <= 0) { shoot(); G.cool = WEAPONS[G.weapon].rate; }
+  if (G.weapon !== 'blaster') { G.wTime -= dt; if (G.wTime <= 0) { G.weapon = 'blaster'; banner('Special weapon used up', '#a9b0de'); } }
+  // Spawn asteroids
+  G.spawnT -= dt;
+  const maxRocks = Math.min(3 + G.level, 7), every = Math.max(1.5, 3 - G.level * 0.15);
+  if (G.spawnT <= 0) { if (G.rocks.length < maxRocks) spawnRock(); G.spawnT = every * rand(0.75, 1.25); }
+  // Dark rocks: small, faster, unbreakable, dodge only. More of them at higher levels
+  G.darkT -= dt;
+  const maxDark = Math.min(1 + G.level, 6), darkEvery = Math.max(1.6, 4.2 - G.level * 0.35);
+  if (G.darkT <= 0) { if (G.darks.length < maxDark) spawnDark(); G.darkT = darkEvery * rand(0.7, 1.3); }
+  G.darks.forEach(o => { o.x += o.vx * dt; o.y += o.vy * dt; o.rot += o.vr * dt; o.pulse += dt * 3; });
+  G.darks = G.darks.filter(o => o.x > -60 && o.x < W + 80 && o.y > -80 && o.y < H + 60);
+  // Movement
+  G.rocks.forEach(o => { o.x += o.vx * dt; o.y += o.vy * dt; o.rot += o.vr * dt; if (o.flash > 0) o.flash -= dt; });
+  G.rocks = G.rocks.filter(o => land ? o.x > -o.r - 20 : o.y < H + o.r + 20);
+  G.bullets.forEach(b => { b.x += b.vx * dt; b.y += b.vy * dt; });
+  G.bullets = G.bullets.filter(b => b.x > -40 && b.x < W + 40 && b.y > -40 && b.y < H + 40 && !b.dead);
+  // Bullets that hit a dark rock are stopped (dark rocks never break)
+  for (const b of G.bullets) {
+    for (const o of G.darks) {
+      const rr = o.r + b.w;
+      if ((b.x - o.x) ** 2 + (b.y - o.y) ** 2 < rr * rr) { b.dead = true; o.flash = 0.12; burst(b.x, b.y, 3, '#ff8a6a', 90, 0.25); break; }
+    }
+  }
+  // Bullets that hit an asteroid
+  for (const b of G.bullets) {
+    if (b.dead) continue;
+    for (const o of G.rocks.slice()) {
+      if (b.hit.has(o.id)) continue;
+      const rr = o.r * 0.92 + b.w;
+      if ((b.x - o.x) ** 2 + (b.y - o.y) ** 2 < rr * rr) {
+        b.hit.add(o.id); damage(o, b.dmg);
+        if (!b.pierce) { b.dead = true; break; }
+      }
+    }
+  }
+  G.bullets = G.bullets.filter(b => !b.dead);
+  // A dark rock hits the ship: lose a life, the rock drifts on
+  if (G.inv <= 0) {
+    for (const o of G.darks) {
+      if (Math.hypot(o.x - s.x, o.y - s.y) < o.r * 0.9 + s.r * 0.7) {
+        G.lives--; G.inv = 2; sfx.hurt(); burst(s.x, s.y, 30, '#ff7a8a', 240, 0.8);
+        banner('Ouch, a dark rock! Those can only be dodged', '#ff9a8a');
+        if (G.lives <= 0) { gameOver(); return; }
+        break;
+      }
+    }
+  }
+  // An asteroid hits the ship
+  if (G.inv <= 0) {
+    for (const o of G.rocks) {
+      if (Math.hypot(o.x - s.x, o.y - s.y) < o.r * 0.85 + s.r * 0.7) {
+        G.lives--; G.inv = 2; sfx.hurt(); burst(s.x, s.y, 30, '#ff7a8a', 240, 0.8);
+        G.rocks.splice(G.rocks.indexOf(o), 1); shatter(o);
+        if (G.lives <= 0) { gameOver(); return; }
+        break;
+      }
+    }
+  }
+  // Effects
+  G.sparks.forEach(p => { p.t += dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vx *= 0.97; p.vy *= 0.97; });
+  G.sparks = G.sparks.filter(p => p.t < p.life);
+  G.frags.forEach(p => { p.t += dt; p.x += p.vx * dt; p.y += p.vy * dt; p.rot += p.vr * dt; });
+  G.frags = G.frags.filter(p => p.t < p.life);
+  G.pops.forEach(p => { p.t += dt; });
+  G.pops = G.pops.filter(p => p.t < p.life);
+  G.banners.forEach(p => p.t += dt);
+  G.banners = G.banners.filter(p => p.t < p.life);
+  paintHud();
+}
+
+/* ---------- Drawing ---------- */
+function drawBg(dt) {
+  const g = ctx.createLinearGradient(0, 0, W, H);
+  g.addColorStop(0, '#0b0f30'); g.addColorStop(0.6, '#070a24'); g.addColorStop(1, '#120a2c');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  const n1 = ctx.createRadialGradient(W * 0.78, H * 0.2, 0, W * 0.78, H * 0.2, Math.max(W, H) * 0.55);
+  n1.addColorStop(0, 'rgba(110,70,210,.22)'); n1.addColorStop(1, 'rgba(110,70,210,0)');
+  ctx.fillStyle = n1; ctx.fillRect(0, 0, W, H);
+  const n2 = ctx.createRadialGradient(W * 0.15, H * 0.9, 0, W * 0.15, H * 0.9, Math.max(W, H) * 0.45);
+  n2.addColorStop(0, 'rgba(40,120,180,.16)'); n2.addColorStop(1, 'rgba(40,120,180,0)');
+  ctx.fillStyle = n2; ctx.fillRect(0, 0, W, H);
+  // Stars drift against the flight direction (a feeling of speed)
+  const sp = (G && G.state === 'play') ? 1 : 0.25;
+  ctx.fillStyle = '#fff';
+  stars.forEach(st => {
+    const v = (12 + st.z * 70) * U * sp * dt;
+    if (land) { st.x -= v; if (st.x < 0) st.x += W; } else { st.y += v; if (st.y > H) st.y -= H; }
+    st.tw += dt * 2;
+    ctx.globalAlpha = 0.25 + st.z * 0.6 * (0.75 + 0.25 * Math.sin(st.tw));
+    ctx.fillRect(st.x, st.y, 0.6 + st.z * 1.4, 0.6 + st.z * 1.4);
+  });
+  ctx.globalAlpha = 1;
+}
+function drawShip() {
+  const s = G.ship, f = fwd();
+  if (G.inv > 0 && Math.floor(G.inv * 10) % 2 === 0) return;
+  ctx.save(); ctx.translate(s.x, s.y); ctx.rotate(Math.atan2(f.y, f.x) + s.tilt * 0.4);
+  const r = s.r;
+  // Engine flame
+  const fl = r * (0.9 + Math.random() * 0.5 + (input.fire ? 0.2 : 0));
+  const eg = ctx.createLinearGradient(-r * 0.7, 0, -r * 0.7 - fl, 0);
+  eg.addColorStop(0, 'rgba(255,240,180,.95)'); eg.addColorStop(0.4, 'rgba(255,150,60,.8)'); eg.addColorStop(1, 'rgba(255,80,40,0)');
+  ctx.fillStyle = eg; ctx.beginPath(); ctx.moveTo(-r * 0.6, -r * 0.32); ctx.lineTo(-r * 0.7 - fl, 0); ctx.lineTo(-r * 0.6, r * 0.32); ctx.closePath(); ctx.fill();
+  // Body and wings
+  ctx.shadowColor = 'rgba(127,231,255,.6)'; ctx.shadowBlur = 14 * U;
+  const bg = ctx.createLinearGradient(0, -r, 0, r); bg.addColorStop(0, '#e9f3ff'); bg.addColorStop(1, '#8aa2c8');
+  ctx.fillStyle = bg;
+  ctx.beginPath(); ctx.moveTo(r * 1.25, 0); ctx.lineTo(-r * 0.2, -r * 0.42); ctx.lineTo(-r * 0.75, -r * 0.3); ctx.lineTo(-r * 0.75, r * 0.3); ctx.lineTo(-r * 0.2, r * 0.42); ctx.closePath(); ctx.fill();
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = '#5a6ea8';
+  ctx.beginPath(); ctx.moveTo(r * 0.2, -r * 0.3); ctx.lineTo(-r * 0.55, -r * 1.05); ctx.lineTo(-r * 0.8, -r * 0.95); ctx.lineTo(-r * 0.5, -r * 0.25); ctx.closePath(); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(r * 0.2, r * 0.3); ctx.lineTo(-r * 0.55, r * 1.05); ctx.lineTo(-r * 0.8, r * 0.95); ctx.lineTo(-r * 0.5, r * 0.25); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = G.weapon === 'blaster' ? '#ff7a8a' : WEAPONS[G.weapon].color;
+  ctx.fillRect(-r * 0.62, -r * 1.0, r * 0.18, r * 0.12); ctx.fillRect(-r * 0.62, r * 0.88, r * 0.18, r * 0.12);
+  // Cockpit
+  const cg = ctx.createLinearGradient(r * 0.1, -r * 0.2, r * 0.7, r * 0.2); cg.addColorStop(0, '#7fe7ff'); cg.addColorStop(1, '#1d5f86');
+  ctx.fillStyle = cg; ctx.beginPath(); ctx.ellipse(r * 0.38, 0, r * 0.34, r * 0.16, 0, 0, 6.3); ctx.fill();
+  ctx.restore();
+}
+function draw(dt) {
+  drawBg(dt);
+  if (!G) return;
+  G.rocks.forEach(drawRock);
+  G.darks.forEach(drawDark);
+  // Debris
+  G.frags.forEach(p => {
+    const a = 1 - p.t / p.life;
+    ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot); ctx.globalAlpha = a;
+    ctx.beginPath(); p.pts.forEach((q, i) => { const x = Math.cos(q.a) * p.r * q.k, y = Math.sin(q.a) * p.r * q.k; i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); });
+    ctx.closePath();
+    ctx.fillStyle = p.special === 'gold' ? '#c99a3c' : p.special === 'violet' ? '#8a62c9' : p.special === 'cyan' ? '#3fa7bf' : `hsl(${p.hue},16%,40%)`;
+    ctx.fill(); ctx.restore();
+  });
+  ctx.globalAlpha = 1;
+  // Bullets
+  G.bullets.forEach(b => {
+    const sp = Math.hypot(b.vx, b.vy), ux = b.vx / sp, uy = b.vy / sp;
+    ctx.strokeStyle = b.color; ctx.lineWidth = b.w; ctx.lineCap = 'round';
+    ctx.shadowColor = b.color; ctx.shadowBlur = 10 * U;
+    ctx.beginPath(); ctx.moveTo(b.x, b.y); ctx.lineTo(b.x - ux * b.len, b.y - uy * b.len); ctx.stroke();
+  });
+  ctx.shadowBlur = 0;
+  drawShip();
+  // Sparks
+  G.sparks.forEach(p => { ctx.globalAlpha = 1 - p.t / p.life; ctx.fillStyle = p.color; ctx.fillRect(p.x, p.y, p.s, p.s); });
+  ctx.globalAlpha = 1;
+  // Meanings that burst out
+  G.pops.forEach(p => {
+    const a = p.t < 0.25 ? p.t / 0.25 : 1 - Math.max(0, p.t - p.life + 0.9) / 0.9, sc = p.t < 0.25 ? 0.7 + p.t * 1.2 : 1;
+    ctx.save(); ctx.globalAlpha = clamp(a, 0, 1);
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    const x = p.x, top = p.y - p.t * RISE * U - p.bh / 2;
+    // The word: big and bold
+    ctx.font = `800 ${WORD_PX * U * sc}px ${HEAD}`;
+    const wy = top + (WORD_PX / 2 + 4) * U;
+    ctx.lineWidth = 6 * U; ctx.strokeStyle = 'rgba(5,6,26,.9)'; ctx.strokeText(p.w, x, wy);
+    ctx.fillStyle = p.special === 'gold' ? '#ffd36e' : p.special === 'violet' ? '#e2cfff' : p.special === 'cyan' ? '#9df0ff' : '#ffffff';
+    ctx.fillText(p.w, x, wy);
+    // The meaning: small, underneath
+    ctx.font = `600 ${MEAN_PX * U}px ${FONT}`;
+    p.lines.forEach((l, i) => {
+      const y = top + (WORD_PX + 6 + MEAN_PX / 2 + 2 + i * (MEAN_PX + 4)) * U;
+      ctx.lineWidth = 4 * U; ctx.strokeStyle = 'rgba(5,6,26,.85)'; ctx.strokeText(l, x, y);
+      ctx.fillStyle = 'rgba(214,222,255,.92)'; ctx.fillText(l, x, y);
+    });
+    ctx.restore();
+  });
+  // Banner line (weapon change, level up)
+  G.banners.forEach((b, i) => {
+    const a = b.t < 0.2 ? b.t / 0.2 : 1 - Math.max(0, b.t - b.life + 0.5) / 0.5;
+    ctx.globalAlpha = clamp(a, 0, 1); ctx.textAlign = 'center';
+    ctx.font = `800 ${17 * U}px ${FONT}`; ctx.lineWidth = 4 * U; ctx.strokeStyle = 'rgba(5,6,26,.85)';
+    // Sideways: bottom centre (between the two controls). Upright: right under the top bar.
+    const y = land ? H - safe.b - 26 * U - i * 24 * U : safe.t + 70 * U + i * 24 * U;
+    ctx.strokeText(b.text, W / 2, y); ctx.fillStyle = b.color; ctx.fillText(b.text, W / 2, y);
+  });
+  ctx.globalAlpha = 1;
+}
+
+/* ---------- Top bar ---------- */
+let hudCache = '';
+function paintHud() {
+  const w = WEAPONS[G.weapon];
+  const key = `${G.score}|${G.level}|${G.lives}|${G.weapon}|${Math.ceil(G.wTime * 4)}`;
+  if (key === hudCache) return; hudCache = key;
+  $('#score').textContent = G.score; $('#level').textContent = `Level ${G.level} · ${G.learned.length} words`;
+  $('#lives').textContent = '♥'.repeat(Math.max(0, G.lives)) + '♡'.repeat(Math.max(0, 3 - G.lives));
+  const chip = $('#wchip');
+  chip.classList.toggle('show', G.weapon !== 'blaster');
+  chip.style.color = w.color; $('#wname').textContent = w.name;
+  $('#wbar').style.width = w.time ? `${clamp(G.wTime / w.time, 0, 1) * 100}%` : '0';
+}
+
+/* ---------- States: start / pause / game over ---------- */
+const show = (id, on) => $(id).classList.toggle('show', on);
+/* Phones only let a page talk after a tap: say one silent thing when Start is pressed, so broken words can be read aloud later */
+let speechOK = false;
+function unlockSpeech() { if (speechOK || !('speechSynthesis' in window)) return; speechOK = true; try { const u = new SpeechSynthesisUtterance(' '); u.volume = 0; speechSynthesis.speak(u); } catch (e) {} }
+function start() { audio(); unlockSpeech(); newGame(); show('#startOv', false); show('#overOv', false); show('#pauseOv', false); document.body.classList.add('playing'); }
+function pause() { if (!G || G.state !== 'play') return; G.state = 'pause'; show('#pauseOv', true); document.body.classList.remove('playing'); }
+function resume() { if (!G) return; G.state = 'play'; show('#pauseOv', false); document.body.classList.add('playing'); last = performance.now(); }
+function gameOver() {
+  G.state = 'over'; document.body.classList.remove('playing');
+  input.fire = false;
+  const best = Math.max(+store.get(BEST_KEY) || 0, G.score); store.set(BEST_KEY, best);
+  $('#oScore').textContent = G.score; $('#oWords').textContent = G.learned.length; $('#oBest').textContent = best;
+  $('#overTitle').textContent = G.score >= best && G.score > 0 ? 'New record!' : 'Game over!';
+  renderLearned(G.learned.slice(-40).reverse());
+  setTimeout(() => show('#overOv', true), 700);
+}
+/* The words cracked in this round (game-over card).
+   ☆ → ★: mark as "review this" (it becomes a gold asteroid, flies twice as often on the TV dashboard, shows under Saved words).
+   Swipe a word right → Delete: removes it from the games, the dashboard and every device (with Undo). */
+let LL = [];
+function rowHTML(o, i) {
+  if (o._gone) return `<div class="lw gone" data-i="${i}"><div class="in"><span>Deleted “${esc(o.w)}”</span><button class="undo" data-undo="${i}">Undo</button></div></div>`;
+  const on = SYNC && SYNC.isSaved(o.w);
+  return `<div class="lw" data-i="${i}"><button class="del" data-del="${i}">Delete</button><div class="in">
+    <div class="t"><div class="w">${esc(o.w)}</div><div class="v">${esc(meaningOf(o))}</div></div>
+    <button class="star${on ? ' on' : ''}" data-star="${i}" aria-label="Mark for review">${on ? '★' : '☆'}</button></div></div>`;
+}
+function renderLearned(list) {
+  if (list) LL = list.map(o => Object.assign({}, o));
+  $('#learned').innerHTML = LL.length ? `<h3>Words you cracked this round</h3>
+    <p class="hint">Tap a word to hear it. ☆ marks it for review (gold asteroid, flies more often on the TV). Swipe a word right to delete it from the games and the TV on every device.</p>`
+    + LL.map(rowHTML).join('') : '';
+}
+const lwBox = $('#learned');
+lwBox.addEventListener('click', e => {
+  if (!SYNC) return;
+  const star = e.target.closest('[data-star]'), del = e.target.closest('[data-del]'), undo = e.target.closest('[data-undo]');
+  if (star) {
+    const o = LL[+star.dataset.star];
+    if (SYNC.isSaved(o.w)) SYNC.removeWord(o.w);
+    else SYNC.saveWord({ w: o.w, pron: o.pron || '', pos: o.pos || '', en: o.en || '', ex: o.ex || '', ex_en: o.ex_en || '', col: o.col || [] });
+    renderLearned();
+  } else if (del) {
+    const o = LL[+del.dataset.del];
+    o._was = SYNC.isSaved(o.w) ? SYNC.words().find(x => x.w.toLowerCase() === o.w.toLowerCase()) : null;
+    SYNC.hideWord(o.w); o._gone = true; renderLearned();
+  } else if (undo) {
+    const o = LL[+undo.dataset.undo];
+    SYNC.unhideWord(o.w, o._was || null); o._gone = false; renderLearned();
+  } else if (!e.target.closest('.lw.armed')) {
+    lwBox.querySelectorAll('.lw.armed').forEach(r => r.classList.remove('armed'));
+    const row = e.target.closest('.lw'); if (row && LC && LL[+row.dataset.i] && !LL[+row.dataset.i]._gone) LC.speak(LL[+row.dataset.i].w);
+  }
+});
+// Swipe right: the row follows the finger; released past 60px, the Delete button shows on the left
+let sw = null;
+lwBox.addEventListener('pointerdown', e => {
+  const row = e.target.closest('.lw'); if (!row || row.classList.contains('gone') || e.target.closest('button')) return;
+  sw = { row, x: e.clientX, y: e.clientY, dx: 0, on: row.classList.contains('armed') };
+});
+lwBox.addEventListener('pointermove', e => {
+  if (!sw) return;
+  const dx = e.clientX - sw.x, dy = e.clientY - sw.y;
+  if (Math.abs(dy) > 12 && Math.abs(dy) > Math.abs(dx)) { sw.row.querySelector('.in').style.transform = ''; sw = null; return; }
+  sw.dx = dx;
+  const base = sw.on ? 96 : 0, x = clamp(base + dx, 0, 120);
+  const inn = sw.row.querySelector('.in'); inn.style.transition = 'none'; inn.style.transform = `translateX(${x}px)`;
+});
+const swEnd = () => {
+  if (!sw) return;
+  const { row, dx, on } = sw; sw = null;
+  const inn = row.querySelector('.in'); inn.style.transition = ''; inn.style.transform = '';
+  const open = on ? dx > -40 : dx > 60;
+  lwBox.querySelectorAll('.lw.armed').forEach(r => { if (r !== row) r.classList.remove('armed'); });
+  row.classList.toggle('armed', open);
+};
+lwBox.addEventListener('pointerup', swEnd); lwBox.addEventListener('pointercancel', swEnd);
+const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+$('#startBtn').onclick = start;
+$('#againBtn').onclick = async () => { await loadWords(); start(); };   // reload so deleted words are gone
+$('#pauseBtn').onclick = () => (G && G.state === 'pause') ? resume() : pause();
+$('#resumeBtn').onclick = resume;
+$('#quitBtn').onclick = () => { show('#pauseOv', false); G.state = 'play'; gameOver(); };
+document.addEventListener('visibilitychange', () => { if (document.hidden) pause(); });
+
+/* ---------- Run ---------- */
+let last = performance.now();
+function frame(now) {
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  if (G && G.state === 'play') update(dt);
+  draw(dt);
+  requestAnimationFrame(frame);
+}
+resize();
+loadWords();
+$('#intro').textContent = `Every asteroid carries a ${LI.name} word. Blast it open to see what it means. Bigger rocks take more shots.`;
+$('#langBtn').textContent = '🌏 ' + LI.native;
+if (!LC || LC.LANG_KEYS.length < 2) $('#langBtn').style.display = 'none';
+$('#langBtn').onclick = () => { if (LC) LC.setLang(LC.nextLang()); };
+if (SYNC) { SYNC.start(); SYNC.on(w => { if (w === 'data' && (!G || G.state !== 'play')) loadWords(); }); }
+requestAnimationFrame(frame);
+window.__game = { get G() { return G; }, input, start, spawnRock };   // for testing
+})();
+</script>
+</body>
+</html>

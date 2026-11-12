@@ -1,0 +1,143 @@
+{
+ "id": "OkvjNwoplCk",
+ "created": "2026-11-12",
+ "source": "youtube-manual",
+ "language": "zh-CN",
+ "ai": "gemini-3.7-flash",
+ "summary": "A married couple shares honest thoughts about cultural differences, sharing chores, and funny everyday habits. They also look back warmly on how they first met and what made them fall in love.",
+ "level": "HSK 3",
+ "phrases": [
+  {
+   "t": 13.57,
+   "d": 1.77,
+   "phrase": "第一印象",
+   "pron": "dì yī yìn xiàng",
+   "quote": "你对我的第一印象是什么",
+   "meaning": "first impression",
+   "usage": "Use this when meeting new people or talking about what someone seemed like when you first met.",
+   "example": "新老师给我的第一印象很好。",
+   "example_pron": "Xīn lǎoshī gěi wǒ de dì yī yìnxiàng hěn hǎo.",
+   "example_en": "My first impression of the new teacher was great."
+  },
+  {
+   "t": 30.77,
+   "d": 2.23,
+   "phrase": "刚开学",
+   "pron": "gāng kāi xué",
+   "quote": "就是刚开学那个时候",
+   "meaning": "school just started",
+   "usage": "Say this at the start of a new school term when everything is fresh and exciting.",
+   "example": "刚开学，作业还很少。",
+   "example_pron": "Gāng kāixué, zuòyè hái hěn shǎo.",
+   "example_en": "School just started, so there's not much homework yet."
+  },
+  {
+   "t": 143.33,
+   "d": 1.43,
+   "phrase": "很烦",
+   "pron": "hěn fán",
+   "quote": "就是很烦呀",
+   "meaning": "really annoying",
+   "usage": "Use this when something is bugging you or making you feel slightly frustrated.",
+   "example": "这个小虫子真的很烦。",
+   "example_pron": "Zhè ge xiǎo chóngzi zhēn de hěn fán.",
+   "example_en": "This little bug is really annoying."
+  },
+  {
+   "t": 159.4,
+   "d": 1.3,
+   "phrase": "家的感觉",
+   "pron": "jiā de gǎn jué",
+   "quote": "让我很有家的感觉",
+   "meaning": "feeling of home",
+   "usage": "Say this when a warm, cozy place or a friendly group makes you feel right at home.",
+   "example": "奶奶家总有家的感觉。",
+   "example_pron": "Nǎinai jiā zǒng yǒu jiā de gǎnjué.",
+   "example_en": "Grandma's house always feels like home."
+  },
+  {
+   "t": 357.7,
+   "d": 2.03,
+   "phrase": "零花钱",
+   "pron": "líng huā qián",
+   "quote": "零花钱",
+   "meaning": "pocket money / allowance",
+   "usage": "Use this everyday word when talking about saving or spending your own allowance.",
+   "example": "我把零花钱存起来了。",
+   "example_pron": "Wǒ bǎ línghuāqián cún qǐlái le.",
+   "example_en": "I saved up my pocket money."
+  },
+  {
+   "t": 401.33,
+   "d": 2.5,
+   "phrase": "不想吵",
+   "pron": "bù xiǎng chǎo",
+   "quote": "因为我一般肯定是不想吵",
+   "meaning": "don't want to argue",
+   "usage": "A peaceful phrase you can use when you want to avoid fighting with siblings or friends.",
+   "example": "我们别打了，我不想吵。",
+   "example_pron": "Wǒmen bié dǎ le, wǒ bù xiǎng chǎo.",
+   "example_en": "Let's stop fighting, I don't want to argue."
+  },
+  {
+   "t": 543.33,
+   "d": 2.53,
+   "phrase": "坐下来",
+   "pron": "zuò xià lai",
+   "quote": "两个人坐下来一起沟通",
+   "meaning": "sit down",
+   "usage": "A friendly invitation to tell someone to take a seat with you.",
+   "example": "快坐下来看电视吧。",
+   "example_pron": "Kuài zuò xiàlai kàn diànshì ba.",
+   "example_en": "Come sit down and watch TV!"
+  },
+  {
+   "t": 581.5,
+   "d": 2.67,
+   "phrase": "大扫除",
+   "pron": "dà sǎo chú",
+   "quote": "会来一次大扫除",
+   "meaning": "big clean-up / deep cleaning",
+   "usage": "Use this when your family rolls up their sleeves to tidy up the whole house.",
+   "example": "周末我们要全家大扫除。",
+   "example_pron": "Zhōumò wǒmen yào quánjiā dàsǎochú.",
+   "example_en": "We're doing a big family clean-up this weekend."
+  },
+  {
+   "t": 706.5,
+   "d": 1.57,
+   "phrase": "收拾收拾",
+   "pron": "shōu shi shōu shi",
+   "quote": "稍微收拾收拾",
+   "meaning": "tidy up a bit",
+   "usage": "Repeating the verb makes it gentle and friendly, like when asking someone to put away toys.",
+   "example": "快把你的玩具收拾收拾。",
+   "example_pron": "Kuài bǎ nǐ de wánjù shōushi shōushi.",
+   "example_en": "Hurry and tidy up your toys."
+  },
+  {
+   "t": 900.77,
+   "d": 2.07,
+   "phrase": "出去玩",
+   "pron": "chū qù wán",
+   "quote": "我们出去玩什么的",
+   "meaning": "go out to play",
+   "usage": "A super common phrase for going outside, hanging out at the park, or having fun with buddies.",
+   "example": "今天天气好，我们出去玩！",
+   "example_pron": "Jīntiān tiānqì hǎo, wǒmen chūqù wán!",
+   "example_en": "The weather is great today, let's go out and play!"
+  },
+  {
+   "t": 1023.77,
+   "d": 1.13,
+   "phrase": "好感动",
+   "pron": "hǎo gǎn dòng",
+   "quote": "好感动",
+   "meaning": "so touched",
+   "usage": "Use this warm phrase when someone gives you a sweet surprise or says something really heartwarming.",
+   "example": "听到你的话，我好感动。",
+   "example_pron": "Tīng dào nǐ de huà, wǒ hǎo gǎndòng.",
+   "example_en": "Hearing your words, I am so touched."
+  }
+ ]
+}

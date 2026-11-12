@@ -1,0 +1,64 @@
+name: Daily update (videos, phrases, words)
+
+on:
+  schedule:
+    - cron: "0 20 * * *"     # once a day (20:00 UTC). Change the hour to suit your time zone.
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: repo-commit
+  cancel-in-progress: false
+
+jobs:
+  daily:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install the two libraries
+        run: pip install -r scripts/requirements.txt
+
+      # Raw transcripts stay in the Actions cache; they are never committed to the public repo
+      - name: Transcript cache
+        uses: actions/cache@v4
+        with:
+          path: .cache/transcripts
+          key: transcripts-${{ github.run_id }}
+          restore-keys: transcripts-
+
+      # New words always work here. New videos work when YouTube lets this server read subtitles;
+      # when it does not, the home-computer run (scripts/run_local.sh or .bat) does that part.
+      - name: Find new videos, prepare phrases, add new words
+        env:
+          AI_PROVIDER: ${{ vars.AI_PROVIDER }}
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: ${{ vars.GEMINI_MODEL }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          CLAUDE_MODEL: ${{ vars.CLAUDE_MODEL }}
+        run: python -u scripts/daily.py --no-git
+
+      - name: Save the result in the repo
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/data video
+          if git diff --cached --quiet; then
+            echo "Nothing new."
+            exit 0
+          fi
+          git commit -m "Daily update $(date -u +%Y-%m-%d): new videos, phrases and words"
+          for i in 1 2 3; do
+            git pull --rebase && git push && exit 0
+            sleep 10
+          done
+          exit 1

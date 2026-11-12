@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Word bricks">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#070a24">
+<title>Word bricks</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@500;600;700;800&family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sat:env(safe-area-inset-top,0px); --sar:env(safe-area-inset-right,0px); --sab:env(safe-area-inset-bottom,0px); --sal:env(safe-area-inset-left,0px);
+  --ink:#eef0ff; --ink2:#a9b0de; --gold:#e8cc92; --violet:#c9b6f0; --cyan:#a3dbe3; --green:#b4dfbf; --bad:#ff7a8a;
+  --body:'Be Vietnam Pro',system-ui,-apple-system,sans-serif; --head:'Bricolage Grotesque','Be Vietnam Pro',system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:#070a24;color:var(--ink);font-family:var(--body);overflow:hidden;overscroll-behavior:none;
+  touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-text-size-adjust:100%}
+canvas#c{position:fixed;inset:0;width:100%;height:100%;display:block}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+
+/* ---------- Top bar ---------- */
+.hud{position:fixed;left:0;right:0;top:0;z-index:5;display:flex;align-items:center;gap:10px;pointer-events:none;
+  padding:calc(var(--sat) + 8px) calc(var(--sar) + 12px) 0 calc(var(--sal) + 12px)}
+.score{font-family:var(--head);font-weight:800;font-size:22px;min-width:80px;text-shadow:0 2px 10px rgba(0,0,0,.6)}
+.score small{display:block;font-family:var(--body);font-weight:600;font-size:11px;color:var(--ink2)}
+.powers{flex:1;display:flex;justify-content:center;gap:6px;flex-wrap:wrap}
+.pchip{display:flex;align-items:center;gap:6px;padding:4px 10px 4px 8px;border-radius:99px;background:rgba(10,14,46,.72);border:1px solid rgba(255,255,255,.15);font-weight:700;font-size:12px}
+.pchip i{display:block;width:42px;height:4px;border-radius:3px;background:rgba(255,255,255,.18);overflow:hidden}
+.pchip i b{display:block;height:100%;background:currentColor}
+.lives{font-size:17px;letter-spacing:2px;color:var(--bad);text-shadow:0 2px 8px rgba(0,0,0,.6)}
+.pbtn{pointer-events:auto;width:40px;height:40px;border-radius:50%;background:rgba(10,14,46,.6);border:1px solid rgba(255,255,255,.15);font-size:15px;font-weight:800}
+
+/* ---------- The two ◀ ▶ buttons (hold to move the paddle) ---------- */
+.mv{position:fixed;z-index:6;touch-action:none;width:96px;height:96px;border-radius:50%;display:grid;place-items:center;font-size:34px;color:#fff;
+  background:radial-gradient(circle at 50% 40%,rgba(190,205,230,.24),rgba(150,170,205,.08) 70%);border:1.5px solid rgba(200,212,235,.35);
+  box-shadow:0 8px 26px rgba(0,0,0,.4);transition:transform .06s,background .06s}
+.mv.on{transform:scale(.92);background:radial-gradient(circle at 50% 40%,rgba(210,222,240,.45),rgba(160,180,215,.2) 70%)}
+#left{left:calc(var(--sal) + 20px);bottom:calc(var(--sab) + 18px)}
+#right{right:calc(var(--sar) + 20px);bottom:calc(var(--sab) + 18px)}
+/* Sideways: the buttons sit on both sides, the field in the middle */
+@media (orientation:landscape){ .mv{bottom:calc(var(--sab) + 26px)} }
+@media (orientation:portrait){ .mv{width:78px;height:78px;font-size:28px;opacity:.9} }
+body:not(.playing) .mv{opacity:.35}
+
+/* ---------- Start / pause / game-over cards ---------- */
+.ov{position:fixed;inset:0;z-index:10;display:none;align-items:center;justify-content:center;background:rgba(4,5,22,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  padding:calc(var(--sat) + 14px) calc(var(--sar) + 14px) calc(var(--sab) + 14px) calc(var(--sal) + 14px)}
+.ov.show{display:flex}
+.card{width:min(520px,100%);max-height:100%;overflow:auto;border-radius:22px;background:linear-gradient(180deg,#141a4a,#0b0f30);border:1px solid rgba(255,255,255,.12);
+  box-shadow:0 20px 60px rgba(0,0,0,.5);padding:22px 22px 18px;text-align:center;touch-action:pan-y;-webkit-overflow-scrolling:touch}
+.card h1{font-family:var(--head);font-weight:800;font-size:28px;line-height:1.1}
+.card h1 span{color:var(--cyan)}
+.card p{color:var(--ink2);font-size:14px;line-height:1.5;margin-top:8px}
+.legend{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px;text-align:left;font-size:13px;color:var(--ink2)}
+.legend div{background:rgba(255,255,255,.05);border-radius:12px;padding:8px 10px}
+.legend b{color:var(--ink)}
+.big{display:block;width:100%;margin-top:16px;min-height:52px;border-radius:16px;background:linear-gradient(180deg,#e9d4a4,#b8945a);color:#2b1d06;font-weight:800;font-size:18px}
+.row2{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.row2 button,.row2 a{flex:1 1 30%;min-height:44px;border-radius:14px;background:rgba(255,255,255,.08);font-weight:700;font-size:14px;color:var(--ink);text-decoration:none;display:grid;place-items:center}
+.stats{display:flex;justify-content:center;gap:22px;margin-top:10px}
+.stats div{font-size:12px;color:var(--ink2)}
+.stats b{display:block;font-family:var(--head);font-size:26px;color:var(--ink)}
+.learned{margin-top:14px;text-align:left;border-top:1px solid rgba(255,255,255,.1)}
+.learned h3{font-size:13px;color:var(--ink2);font-weight:600;margin:12px 0 4px}
+.learned .hint{font-size:12px;color:var(--ink2);margin:0 0 6px;line-height:1.45}
+.lw{position:relative;overflow:hidden;border-bottom:1px solid rgba(255,255,255,.06)}
+.lw .del{position:absolute;left:0;top:0;bottom:0;width:96px;background:#d9534f;color:#fff;font-weight:700;font-size:14px}
+.lw .in{position:relative;display:flex;align-items:center;gap:10px;padding:7px 2px;background:#111641;transition:transform .2s ease;touch-action:pan-y}
+.lw.armed .in{transform:translateX(96px)}
+.lw .t{flex:1;min-width:0}
+.lw .w{font-weight:700;font-size:15px}
+.lw .v{font-size:13px;color:var(--ink2)}
+.lw .star{flex:none;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.07);font-size:17px;color:var(--ink2)}
+.lw .star.on{color:var(--gold)}
+.lw.gone .in{justify-content:space-between;color:var(--ink2);font-size:13px;min-height:50px}
+.lw.gone .undo{flex:none;padding:6px 12px;border-radius:99px;background:rgba(255,255,255,.08);font-weight:700;font-size:13px;color:var(--ink)}
+@media (orientation:landscape) and (max-height:500px){
+  .card{padding:16px 18px 14px;width:min(640px,100%)}
+  .card h1{font-size:24px}
+  .legend{grid-template-columns:repeat(4,1fr)}
+  .big{min-height:46px;margin-top:12px}
+  .mv{width:84px;height:84px;font-size:30px}
+}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<div class="hud">
+  <div class="score"><span id="score">0</span><small id="level">Stage 1</small></div>
+  <div class="powers" id="powers"></div>
+  <div class="lives" id="lives">♥♥♥</div>
+  <button class="pbtn" id="pauseBtn" aria-label="Pause">❚❚</button>
+</div>
+
+<div class="mv" id="left" aria-label="Left">◀</div>
+<div class="mv" id="right" aria-label="Right">▶</div>
+
+<div class="ov show" id="startOv"><div class="card">
+  <h1>Word <span>bricks</span></h1>
+  <p id="intro">Hold ◀ ▶ to move the paddle and bounce the ball into the bricks. Every brick is a word; break it to see what it means. Tap the screen to launch the ball.</p>
+  <div class="legend">
+    <div><b style="color:var(--gold)">★ Gold bricks</b><br>words you saved → 3 balls</div>
+    <div><b style="color:var(--violet)">◆ Violet bricks</b><br>tricky words → fireball through bricks</div>
+    <div><b style="color:var(--cyan)">⇔ Turquoise</b><br>longer paddle</div>
+    <div><b style="color:var(--green)">◎ Green</b><br>slower ball</div>
+    <div style="grid-column:1/-1"><b style="color:#c9d2df">▩ Steel bricks</b>: never break, they only block. Higher stages have smaller bricks, more of them, and nastier steel.</div>
+  </div>
+  <p id="wordInfo">Loading words…</p>
+  <button class="big" id="startBtn">Start</button>
+  <div class="row2"><button id="muteBtn">🔊 Sound: on</button><button id="langBtn">🌏</button><a href="game.html">☄︎ Asteroid game</a><a href="iphone.html">▶ Videos</a><a href="./">⌂ Start</a></div>
+</div></div>
+
+<div class="ov" id="pauseOv"><div class="card">
+  <h1>Paused</h1>
+  <button class="big" id="resumeBtn">Keep playing</button>
+  <div class="row2"><button id="muteBtn2">🔊 Sound</button><button id="quitBtn">End this round</button></div>
+</div></div>
+
+<div class="ov" id="overOv"><div class="card">
+  <h1 id="overTitle">Game over!</h1>
+  <div class="stats"><div><b id="oScore">0</b>points</div><div><b id="oLevel">1</b>stage</div><div><b id="oWords">0</b>words</div><div><b id="oBest">0</b>best</div></div>
+  <button class="big" id="againBtn">Play again</button>
+  <div class="learned" id="learned"></div>
+</div></div>
+
+<script src="config.js"></script>
+<script src="learn-core.js"></script>
+<script>
+(() => {
+'use strict';
+/* =====================================================================
+   Word bricks: move the paddle with the two ◀ ▶ buttons and bounce the ball into the bricks.
+   Every brick carries a word in the language being learned (data/<lang>/words.json + saved ★ words from the synced store, minus deleted words).
+   Plain bricks: simple words, one hit. Special bricks: tricky / saved words, tougher, and they give the ball a new power.
+   ===================================================================== */
+const $ = s => document.querySelector(s);
+const cv = $('#c'), ctx = cv.getContext('2d');
+const FONT = "'Be Vietnam Pro', system-ui, -apple-system, 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', sans-serif";
+const HEAD = "'Bricolage Grotesque', 'Be Vietnam Pro', system-ui, sans-serif";
+const rand = (a, b) => a + Math.random() * (b - a);
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
+const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const LC = window.LearnCore || null, SYNC = LC ? LC.Sync : null, LI = LC ? LC.langInfo : { name: 'Chinese', native: '中文' };
+const SHOW_PRON = !!LI.pronOnCards, BEST_KEY = 'bricks.best.' + (LC ? LC.LANG : 'zh');
+const meaningOf = o => (SHOW_PRON && o.pron ? o.pron + ' · ' : '') + (o.en || '');
+
+/* ---------- Screen & playing field ---------- */
+let W = 0, H = 0, DPR = 1, U = 1, land = false;
+const safe = { t: 0, r: 0, b: 0, l: 0 };
+const F = { x0: 0, x1: 0, y0: 0, padY: 0 };   // field: left, right, ceiling, paddle line
+function readSafe() {
+  const cs = getComputedStyle(document.documentElement);
+  ['t', 'r', 'b', 'l'].forEach(k => safe[k] = parseFloat(cs.getPropertyValue('--sa' + k)) || 0);
+}
+let stars = [];
+function layoutField() {
+  const btn = land ? 84 : 78;
+  if (land) { F.x0 = safe.l + btn + 34; F.x1 = W - safe.r - btn - 34; F.padY = H - safe.b - 34 * U; }
+  else { F.x0 = safe.l + 8; F.x1 = W - safe.r - 8; F.padY = H - safe.b - 18 - btn - 58; }   // leave room above the buttons
+  F.y0 = safe.t + 68;
+}
+function resize() {
+  const was = land;
+  W = innerWidth; H = innerHeight; DPR = Math.min(devicePixelRatio || 1, 2.5);
+  cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  U = clamp(Math.min(W, H) / 400, 0.8, 1.8);
+  land = W > H;
+  readSafe(); layoutField();
+  stars = Array.from({ length: Math.round(W * H / 3200) }, () => ({ x: Math.random() * W, y: Math.random() * H, z: Math.random(), tw: Math.random() * 6 }));
+  if (G && G.state !== 'over' && was !== land) { buildLevel(true); }   // phone turned: lay out the remaining bricks for the new field
+  if (G) { G.pad.y = F.padY; G.pad.x = clamp(G.pad.x, F.x0 + G.pad.w / 2, F.x1 - G.pad.w / 2); }
+}
+addEventListener('resize', resize);
+addEventListener('orientationchange', () => setTimeout(resize, 250));
+document.addEventListener('touchmove', e => { if (!e.target.closest('.card')) e.preventDefault(); }, { passive: false });
+document.addEventListener('gesturestart', e => e.preventDefault());
+document.addEventListener('dblclick', e => e.preventDefault());
+
+/* ---------- Words ---------- */
+const FALLBACK = (LC && LC.LANG === 'vi')
+  ? [{ w: 'xin chào', en: 'hello' }, { w: 'cảm ơn', en: 'thank you' }, { w: 'ngon', en: 'delicious' }, { w: 'cà phê', en: 'coffee' }, { w: 'bạn', en: 'friend; you' }, { w: 'tạm biệt', en: 'goodbye' }]
+  : [{ w: '你好', pron: 'nǐ hǎo', en: 'hello' }, { w: '谢谢', pron: 'xièxie', en: 'thank you' }, { w: '朋友', pron: 'péngyou', en: 'friend' }, { w: '喜欢', pron: 'xǐhuan', en: 'to like' }, { w: '好吃', pron: 'hǎochī', en: 'tasty' }, { w: '再见', pron: 'zàijiàn', en: 'goodbye' }];
+let POOL = { saved: [], simple: [], hard: [], all: [] };
+/* "Tricky" words (violet bricks): idioms, 4+ character Chinese words, phrases of 3+ words, long single words */
+const isHard = o => !!o.hard || /idiom/i.test(o.pos || '') || (/[\u3400-\u9fff]/.test(o.w) ? [...o.w].length >= 4 : (o.w.split(' ').length >= 3 || (!/\s/.test(o.w) && o.w.length >= 11)));
+const isSimple = o => !isHard(o) && o.w.length <= 12;
+async function loadWords() {
+  let base = [];
+  try { const r = await fetch(LC ? LC.dataUrl('words.json') : 'data/zh/words.json', { cache: 'no-store' }); if (r.ok) base = (await r.json()).filter(o => o && o.w && o.en); } catch (e) {}
+  if (!base.length) base = FALLBACK.slice();
+  const seen = new Set(), saved = [], rest = [];
+  (SYNC ? SYNC.words() : []).forEach(o => { const k = o.w.toLowerCase(); if (o.w && !seen.has(k)) { seen.add(k); saved.push(o); } });
+  base.forEach(o => { const k = o.w.toLowerCase(); if (!seen.has(k) && !(SYNC && SYNC.isHidden(o.w))) { seen.add(k); rest.push(o); } });
+  POOL = { saved, simple: rest.filter(isSimple), hard: rest.filter(isHard), all: rest };
+  $('#wordInfo').textContent = `${LI.native}: ${rest.length + saved.length} words · ${POOL.simple.length} simple · ◆ ${POOL.hard.length} tricky · ★ ${saved.length} saved`;
+}
+const used = new Set();
+function pick(list) {
+  if (!list.length) return null;
+  const fresh = list.filter(o => !used.has(o.w));
+  const src = fresh.length ? fresh : list;
+  const o = src[Math.floor(Math.random() * src.length)];
+  used.add(o.w); return o;
+}
+
+/* ---------- Sound (Web Audio) ---------- */
+let AC = null, muted = store.get('bricks.mute') === '1';
+function audio() {
+  if (muted) return null;
+  if (!AC) { try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return null; } }
+  if (AC.state === 'suspended') AC.resume();
+  return AC;
+}
+function tone(f, dur, type = 'square', vol = 0.035, f2 = 0) {
+  const a = audio(); if (!a) return;
+  const o = a.createOscillator(), g = a.createGain(), t = a.currentTime;
+  o.type = type; o.frequency.setValueAtTime(f, t); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + dur);
+  g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g).connect(a.destination); o.start(t); o.stop(t + dur);
+}
+const sfx = {
+  paddle: () => tone(330, 0.07, 'triangle', 0.05, 440),
+  wall: () => tone(220, 0.04, 'triangle', 0.03),
+  hit: () => tone(520, 0.05, 'square', 0.025, 380),
+  steel: () => tone(1250, 0.05, 'triangle', 0.03, 1100),
+  brk: hard => { tone(hard ? 660 : 880, 0.09, 'square', 0.03, hard ? 1320 : 1760); },
+  power: () => { tone(520, 0.12, 'triangle', 0.05, 1040); setTimeout(() => tone(780, 0.16, 'triangle', 0.05, 1560), 90); },
+  lose: () => tone(300, 0.4, 'sawtooth', 0.04, 80),
+  clear: () => [523, 659, 784, 1046].forEach((f, i) => setTimeout(() => tone(f, 0.14, 'triangle', 0.05), i * 110)),
+};
+function paintMute() { ['#muteBtn', '#muteBtn2'].forEach(s => $(s).textContent = muted ? '🔇 Sound: off' : '🔊 Sound: on'); }
+function toggleMute() { muted = !muted; store.set('bricks.mute', muted ? '1' : '0'); paintMute(); }
+$('#muteBtn').onclick = toggleMute; $('#muteBtn2').onclick = toggleMute; paintMute();
+
+/* ---------- Controls: hold ◀ ▶; tap the field to launch the ball; keyboard ← → / Space for trying it on a computer ---------- */
+const input = { left: false, right: false };
+function holdBtn(el, key) {
+  let pid = null;
+  el.addEventListener('pointerdown', e => { e.preventDefault(); pid = e.pointerId; input[key] = true; el.classList.add('on'); try { el.setPointerCapture(pid); } catch (x) {} audio(); });
+  const up = e => { if (e.pointerId !== pid) return; pid = null; input[key] = false; el.classList.remove('on'); };
+  el.addEventListener('pointerup', up); el.addEventListener('pointercancel', up); el.addEventListener('lostpointercapture', up);
+}
+holdBtn($('#left'), 'left'); holdBtn($('#right'), 'right');
+cv.addEventListener('pointerdown', () => { if (G && G.state === 'play') launch(); });
+addEventListener('keydown', e => {
+  if (e.key === 'ArrowLeft') input.left = true;
+  if (e.key === 'ArrowRight') input.right = true;
+  if (e.key === ' ') { e.preventDefault(); if (G && G.state === 'play') launch(); }
+  if ((e.key === 'p' || e.key === 'Escape') && G && G.state === 'play') pause();
+});
+addEventListener('keyup', e => { if (e.key === 'ArrowLeft') input.left = false; if (e.key === 'ArrowRight') input.right = false; });
+
+/* ---------- Round ---------- */
+let G = null;
+const POWERS = {
+  multi: { name: '★ 3 balls', color: '#e8cc92' },
+  fire:  { name: '◆ Fireball', color: '#c9b6f0', time: 8 },
+  wide:  { name: '⇔ Long paddle', color: '#a3dbe3', time: 15 },
+  slow:  { name: '◎ Slow ball', color: '#b4dfbf', time: 10 },
+};
+function newGame() {
+  used.clear();
+  G = { state: 'play', score: 0, lives: 3, level: 1, bricks: [], balls: [], sparks: [], pops: [], banners: [], learned: [],
+        pw: { fire: 0, wide: 0, slow: 0 }, launchT: 2.5, combo: 0 };
+  G.pad = { x: (F.x0 + F.x1) / 2, y: F.padY, w: 0, h: 14 * U, v: 0 };
+  buildLevel(); resetBall(); paintHud();
+}
+const baseSpeed = () => (300 + (G.level - 1) * 22) * U * (G.pw.slow > 0 ? 0.68 : 1);
+const padW = () => clamp((F.x1 - F.x0) * (land ? 0.17 : 0.27), 76 * U, 150 * U) * (G.pw.wide > 0 ? 1.55 : 1);
+function resetBall() {
+  G.pad.w = padW();
+  G.balls = [{ x: G.pad.x, y: G.pad.y - 9 * U, vx: 0, vy: 0, r: 8 * U, stuck: true, trail: [] }];
+  G.launchT = 2.5;
+}
+function launch() {
+  G.balls.forEach(b => {
+    if (!b.stuck) return;
+    const a = rand(-0.45, 0.45), s = baseSpeed();
+    b.vx = Math.sin(a) * s; b.vy = -Math.cos(a) * s; b.stuck = false;
+  });
+}
+
+/* ---------- Laying bricks: one word per brick, as wide as its text, each row justified ----------
+   Higher stages: smaller bricks (smaller text, lower rows), more rows, and steel bricks ▩ (unbreakable) in the way. */
+function levelSize(lv) {
+  return { fs: Math.max(10, 13 - (lv - 1) * 0.5) * U, rowH: Math.max(21, 30 - (lv - 1) * 1.6) * U,
+           gap: Math.max(3.5, 6 - (lv - 1) * 0.4) * U, pad: Math.max(12, 22 - (lv - 1) * 1.6) * U };
+}
+function brickFont() { return `700 ${G && G.sz ? G.sz.fs : 13 * U}px ${FONT}`; }
+/* Steel layouts, repeating after stage 6 (denser from stage 7):
+   1 none · 2 a few scattered · 3 a wall below with 3 gaps · 4 columns on both sides of every row
+   5 mixed in between the rows · 6 a wall with 2 gaps + side columns on top */
+function steelPlan(lv, rows) {
+  const P = ((lv - 1) % 6) + 1, tough = lv > 6;
+  const plan = Array.from({ length: rows }, () => ({ start: false, end: false, mid: 0 }));
+  let shield = 0;
+  if (P === 1 && tough) plan.forEach((q, i) => { if (i % 2 === 0) q.mid = 1; });
+  if (P === 2) { plan[rows - 1].mid = 1; plan[Math.floor(rows / 2)].mid = 1; }
+  if (P === 3) shield = 3;
+  if (P === 4) { plan.forEach(q => { q.start = q.end = true; }); plan[Math.floor(rows / 2)].mid = 1; }
+  if (P === 5) plan.forEach((q, i) => { if (i % 2 === 1) q.mid = 2; });
+  if (P === 6) { shield = 2; plan.slice(0, 2).forEach(q => { q.start = q.end = true; }); }
+  if (tough) { plan.forEach((q, i) => { if (i % 3 === 0) q.mid = Math.max(q.mid, 1); }); if (shield) shield = Math.max(2, shield - 1); }
+  return { plan, shield };
+}
+function buildLevel(keepRemaining) {
+  G.sz = levelSize(G.level);
+  const { rowH, gap, pad } = G.sz, fieldW = F.x1 - F.x0;
+  const share = Math.min(0.62, (land ? 0.5 : 0.46) + (G.level - 1) * 0.025);
+  const maxRows = Math.max(3, Math.floor(((F.padY - F.y0) * share) / (rowH + gap)));
+  const rows = Math.min(maxRows, 3 + G.level + (G.level > 3 ? 1 : 0));
+  const { plan, shield } = steelPlan(G.level, rows);
+  const wordRows = shield ? rows - 1 : rows;
+  const steelW = Math.max(24 * U, rowH * 1.15);
+  const steel = () => ({ kind: 'steel', item: null, hp: Infinity, maxHp: Infinity, w: steelW, flash: 0 });
+  ctx.font = brickFont();
+  const fits = o => ctx.measureText(o.w).width + pad <= fieldW - 2 * (steelW + gap) - 4;
+  let items;
+  if (keepRemaining) items = G.bricks.filter(b => b.kind !== 'steel').map(b => b.src);
+  else {
+    // More special bricks in later stages
+    const pHard = Math.min(0.06 + G.level * 0.04, 0.3), pGold = POOL.saved.length ? Math.min(0.06 + G.level * 0.02, 0.18) : 0, pRare = 0.08;
+    items = [];
+    const target = wordRows * (land ? 9 : 6) + 4;
+    for (let i = 0; i < target * 3 && items.length < target; i++) {
+      const r = Math.random(); let o, kind;
+      if (r < pGold) { o = pick(POOL.saved); kind = 'gold'; }
+      else if (r < pGold + pHard) { o = pick(POOL.hard); kind = 'violet'; }
+      else { o = pick(POOL.simple.length ? POOL.simple : POOL.all); kind = Math.random() < pRare ? (Math.random() < 0.5 ? 'cyan' : 'green') : 'normal'; }
+      if (!o || !fits(o)) continue;
+      items.push({ item: o, kind });
+    }
+  }
+  // Fill the rows: reserve room for that row's steel, share the rest between the word bricks
+  const out = []; let row = [], rowW = 0, r = 0;
+  const reserve = i => i < plan.length ? (plan[i].start ? steelW + gap : 0) + (plan[i].end ? steelW + gap : 0) + plan[i].mid * (steelW + gap) : 0;
+  const flush = () => {
+    if (!row.length || r >= wordRows) return;
+    const q = plan[r], seq = [];
+    if (q.start) seq.push(steel());
+    const at = new Set(Array.from({ length: q.mid }, (_, m) => Math.round(row.length * (m + 1) / (q.mid + 1))));
+    row.forEach((b, i) => { if (i > 0 && at.has(i)) seq.push(steel()); seq.push(b); });
+    if (row.length < 2) for (let m = 0; m < q.mid; m++) seq.push(steel());
+    if (q.end) seq.push(steel());
+    const used = seq.reduce((a, b) => a + b.w + gap, -gap), nWords = seq.filter(b => b.kind !== 'steel').length;
+    const extra = Math.max(0, fieldW - used) / Math.max(1, nWords);
+    let x = F.x0;
+    seq.forEach(b => { const w = b.w + (b.kind === 'steel' ? 0 : extra); out.push(Object.assign(b, { x, y: F.y0 + r * (rowH + gap), w, h: rowH })); x += w + gap; });
+    row = []; rowW = 0; r++;
+  };
+  for (const it of items) {
+    if (r >= wordRows) break;
+    const w = ctx.measureText(it.item.w).width + pad;
+    if (rowW + w + reserve(r) > fieldW && row.length) { flush(); if (r >= wordRows) break; }
+    const hp = it.kind === 'violet' ? (G.level >= 4 ? 3 : 2) : it.kind === 'gold' ? 2 : 1;
+    const old = keepRemaining ? G.bricks.find(b => b.src === it) : null;
+    row.push({ src: it, item: it.item, kind: it.kind, hp: old ? old.hp : hp, maxHp: old ? old.maxHp : hp, w, flash: 0 });
+    rowW += w + gap;
+  }
+  flush();
+  // Steel wall underneath: closed, with a few gaps just wide enough for the ball
+  if (shield) {
+    const y = F.y0 + r * (rowH + gap) + gap * 3, hole = Math.max(46 * U, (F.x1 - F.x0) * 0.1);   // a gap just wide enough for the ball (16 across)
+    const segs = shield + 1, segW = (fieldW - shield * hole) / segs;
+    let x = F.x0;
+    for (let i = 0; i < segs; i++) { out.push(Object.assign(steel(), { x, y, w: segW, h: rowH * 0.65 })); x += segW + hole; }
+  }
+  G.bricks = out;
+}
+const wordBricksLeft = () => G.bricks.some(b => b.kind !== 'steel');
+
+/* ---------- Effects ---------- */
+function burst(x, y, n, color, speed = 160, life = 0.6) {
+  for (let i = 0; i < n && G.sparks.length < 500; i++) {
+    const a = rand(0, 6.3), v = rand(0.3, 1) * speed * U;
+    G.sparks.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, t: 0, life: rand(life * 0.5, life), color, s: rand(1.5, 3.2) * U });
+  }
+}
+function banner(text, color) {
+  const same = G.banners.find(b => b.text === text);
+  if (same) { same.t = Math.min(same.t, 0.2); return; }
+  G.banners.push({ text, color, t: 0, life: 2 });
+  if (G.banners.length > 2) G.banners.shift();
+}
+function wrapText(text, maxW) {
+  const words = String(text).split(' '), lines = []; let cur = '';
+  words.forEach(w => { const t = cur ? cur + ' ' + w : w; if (ctx.measureText(t).width > maxW && cur) { lines.push(cur); cur = w; } else cur = t; });
+  if (cur) lines.push(cur);
+  return lines.slice(0, 2);
+}
+/* Big word + compact meaning: they appear where the brick broke, then FALL STRAIGHT down under light gravity
+   (slow at first, a little faster, never sideways); near the paddle they fade out. */
+const WORD_PX = 22, MEAN_PX = 13;
+const POP_V0 = 18, POP_G = 46, POP_VMAX = 150;     // px/s, px/s², top speed (times U)
+const easeInOut = t => 0.5 - 0.5 * Math.cos(Math.PI * t);
+function popMeaning(b) {
+  ctx.font = `800 ${WORD_PX * U}px ${HEAD}`;
+  const ww = ctx.measureText(b.item.w).width;
+  ctx.font = `600 ${MEAN_PX * U}px ${FONT}`;
+  const lines = wrapText(meaningOf(b.item), Math.max(ww, Math.min(W * 0.6, 230 * U)));
+  const bw = Math.max(ww, ...lines.map(l => ctx.measureText(l).width), 60 * U) + 16 * U;
+  const bh = (WORD_PX + 6 + lines.length * (MEAN_PX + 4)) * U + 6 * U;
+  const x0 = Math.max(F.x0, safe.l + 8) + bw / 2, x1 = Math.max(x0, Math.min(F.x1, W - safe.r - 8) - bw / 2);
+  let x = clamp(b.x + b.w / 2, x0, x1);
+  const y = b.y + b.h / 2;
+  // If it would cover another falling word nearby, shift it sideways to free space (only on appearing; then it falls straight)
+  const near = q => Math.abs(q.y - y) < (q.bh + bh) / 2 && Math.abs(q.x - x) < (q.bw + bw) / 2;
+  if (G.pops.some(near)) {
+    const xs = []; for (let xx = x0; xx <= x1 + 0.1; xx += Math.max(bw * 0.25, 16)) xs.push(xx);
+    xs.sort((a, c) => Math.abs(a - x) - Math.abs(c - x));
+    const free = xs.find(xx => !G.pops.some(q => Math.abs(q.y - y) < (q.bh + bh) / 2 && Math.abs(q.x - xx) < (q.bw + bw) / 2));
+    if (free !== undefined) x = free;
+  }
+  G.pops.push({ x, y, vy: POP_V0 * U, w: b.item.w, lines, bw, bh, t: 0, a: 0, kind: b.kind });
+  if (G.pops.length > 7) G.pops.shift();
+}
+
+/* ---------- Collisions ---------- */
+function breakBrick(b) {
+  G.bricks.splice(G.bricks.indexOf(b), 1);
+  if (!muted && LC && b.item) LC.speak(b.item.w, 1);   // say the word aloud (when sound is on)
+  G.combo++;
+  G.score += (b.maxHp * 10 + (b.kind !== 'normal' ? 20 : 0)) * Math.min(1 + G.combo * 0.1, 2.5) | 0;
+  const col = KCOL[b.kind];
+  burst(b.x + b.w / 2, b.y + b.h / 2, 18, col.accent, 200, 0.6);
+  popMeaning(b); sfx.brk(b.kind !== 'normal');
+  if (!G.learned.some(x => x.w === b.item.w)) G.learned.push(b.item);
+  const power = { gold: 'multi', violet: 'fire', cyan: 'wide', green: 'slow' }[b.kind];
+  if (power) givePower(power);
+  if (!wordBricksLeft()) levelClear();
+}
+function givePower(p) {
+  sfx.power(); banner(POWERS[p].name + (POWERS[p].time ? ` · ${POWERS[p].time}s` : ''), POWERS[p].color);
+  if (p === 'multi') {
+    const src = G.balls.find(b => !b.stuck) || G.balls[0];
+    const s = Math.hypot(src.vx, src.vy) || baseSpeed();
+    for (const a of [-0.5, 0.5]) {
+      if (G.balls.length >= 7) break;
+      const ang = Math.atan2(src.vy || -1, src.vx) + a;
+      G.balls.push({ x: src.x, y: src.y, vx: Math.cos(ang) * s, vy: Math.sin(ang) * s, r: src.r, stuck: false, trail: [] });
+    }
+    G.balls.forEach(b => { if (b.stuck) launch(); });
+  } else {
+    G.pw[p] = POWERS[p].time;
+    if (p === 'wide') G.pad.w = padW();
+    if (p === 'slow') G.balls.forEach(b => { const s = Math.hypot(b.vx, b.vy); if (s) { b.vx *= baseSpeed() / s; b.vy *= baseSpeed() / s; } });
+  }
+}
+function levelClear() {
+  sfx.clear(); G.score += 100 * G.level;
+  banner(`Stage ${G.level} cleared! +${100 * G.level}`, '#9df0ff');
+  G.level++;
+  G.state = 'between'; G.betweenT = 1.6;
+}
+function circleRect(b, r) {
+  const cx = clamp(b.x, r.x, r.x + r.w), cy = clamp(b.y, r.y, r.y + r.h);
+  const dx = b.x - cx, dy = b.y - cy;
+  return dx * dx + dy * dy <= b.r * b.r ? { dx, dy, cx, cy } : null;
+}
+function stepBall(b, dt) {
+  b.x += b.vx * dt; b.y += b.vy * dt;
+  // Walls and ceiling
+  if (b.x < F.x0 + b.r) { b.x = F.x0 + b.r; b.vx = Math.abs(b.vx); sfx.wall(); }
+  if (b.x > F.x1 - b.r) { b.x = F.x1 - b.r; b.vx = -Math.abs(b.vx); sfx.wall(); }
+  if (b.y < F.y0 - 6 * U + b.r) { b.y = F.y0 - 6 * U + b.r; b.vy = Math.abs(b.vy); sfx.wall(); }
+  // Paddle: the bounce angle depends on where the ball lands (centre → straight up, edge → slanted)
+  const p = G.pad;
+  if (b.vy > 0 && b.y + b.r >= p.y && b.y - b.r <= p.y + p.h && b.x >= p.x - p.w / 2 - b.r && b.x <= p.x + p.w / 2 + b.r) {
+    const rel = clamp((b.x - p.x) / (p.w / 2), -1, 1), a = rel * 1.05, s = baseSpeed();
+    b.vx = Math.sin(a) * s + p.v * 0.12; b.vy = -Math.abs(Math.cos(a) * s);
+    b.y = p.y - b.r; G.combo = 0; sfx.paddle();
+  }
+  // Bricks
+  for (const k of G.bricks) {
+    const c = circleRect(b, k); if (!c) continue;
+    if (G.pw.fire > 0 && k.kind !== 'steel') { k.hp = 0; breakBrick(k); return; }   // fireball: goes through word bricks, still bounces off steel
+    let nx = c.dx, ny = c.dy;
+    if (!nx && !ny) { ny = -Math.sign(b.vy) || -1; }
+    if (Math.abs(nx) > Math.abs(ny)) { b.vx = Math.sign(nx) * Math.abs(b.vx); b.x = c.cx + Math.sign(nx) * b.r; }
+    else { b.vy = Math.sign(ny) * Math.abs(b.vy); b.y = c.cy + Math.sign(ny) * b.r; }
+    if (k.kind === 'steel') {                                       // steel: never breaks; nudge the angle so the ball cannot get stuck
+      k.flash = 0.08; sfx.steel(); burst(c.cx, c.cy, 4, '#cfd8e6', 110, 0.25);
+      const a = rand(-0.09, 0.09), vx = b.vx, vy = b.vy;
+      b.vx = vx * Math.cos(a) - vy * Math.sin(a); b.vy = vx * Math.sin(a) + vy * Math.cos(a);
+      return;
+    }
+    k.hp--; k.flash = 0.1;
+    if (k.hp <= 0) breakBrick(k); else { sfx.hit(); burst(c.cx, c.cy, 5, '#fff', 120, 0.3); }
+    return;
+  }
+}
+function keepAngle(b) {
+  const s = Math.hypot(b.vx, b.vy) || baseSpeed(), want = baseSpeed();
+  b.vx *= want / s; b.vy *= want / s;
+  if (Math.abs(b.vy) < want * 0.3) { b.vy = Math.sign(b.vy || -1) * want * 0.3; b.vx = Math.sign(b.vx || 1) * Math.sqrt(want * want - b.vy * b.vy); }
+}
+
+/* ---------- Update ---------- */
+function update(dt) {
+  if (G.state === 'between') {
+    G.betweenT -= dt; tickFx(dt);
+    if (G.betweenT <= 0) { G.state = 'play'; G.pw = { fire: 0, wide: 0, slow: 0 }; buildLevel(); resetBall(); }
+    paintHud(); return;
+  }
+  // Paddle: holding a button accelerates smoothly up to a moderate speed
+  const p = G.pad, dir = (input.right ? 1 : 0) - (input.left ? 1 : 0), maxV = (land ? 420 : 360) * U;
+  p.v += (dir * maxV - p.v) * Math.min(1, dt * (dir ? 9 : 14));
+  p.x = clamp(p.x + p.v * dt, F.x0 + p.w / 2, F.x1 - p.w / 2);
+  if (Math.abs(p.x - (F.x0 + p.w / 2)) < 0.5 || Math.abs(p.x - (F.x1 - p.w / 2)) < 0.5) p.v *= 0.5;
+  // Active powers
+  for (const k of ['fire', 'wide', 'slow']) if (G.pw[k] > 0) {
+    G.pw[k] -= dt;
+    if (G.pw[k] <= 0) { G.pw[k] = 0; if (k === 'wide') p.w = padW(); }
+  }
+  // Balls
+  for (const b of G.balls.slice()) {
+    if (b.stuck) { b.x = p.x; b.y = p.y - b.r - 1; continue; }
+    const dist = Math.hypot(b.vx, b.vy) * dt, n = Math.max(1, Math.ceil(dist / (b.r * 0.5)));
+    for (let i = 0; i < n && G.state === 'play'; i++) stepBall(b, dt / n);
+    keepAngle(b);
+    b.trail.push({ x: b.x, y: b.y }); if (b.trail.length > 8) b.trail.shift();
+    if (b.y - b.r > H) G.balls.splice(G.balls.indexOf(b), 1);
+  }
+  if (G.state !== 'play') { paintHud(); return; }
+  if (G.balls.some(b => b.stuck)) { G.launchT -= dt; if (G.launchT <= 0) launch(); }
+  if (!G.balls.length) {
+    G.lives--; sfx.lose(); burst(p.x, p.y, 24, '#ff7a8a', 200, 0.7);
+    if (G.lives <= 0) { gameOver(); return; }
+    G.pw = { fire: 0, wide: 0, slow: 0 }; resetBall(); banner('Ball lost! Tap the screen for a new one', '#ff9aa8');
+  }
+  tickFx(dt);
+  paintHud();
+}
+function tickFx(dt) {
+  G.bricks.forEach(k => { if (k.flash > 0) k.flash -= dt; });
+  G.sparks.forEach(s => { s.t += dt; s.x += s.vx * dt; s.y += s.vy * dt; s.vy += 220 * U * dt; });
+  G.sparks = G.sparks.filter(s => s.t < s.life);
+  // Words fall straight: speed grows under light gravity; they fade near the paddle
+  const fadeFrom = F.padY - 70 * U, fadeTo = F.padY - 8 * U;
+  G.pops.forEach(q => {
+    q.t += dt;
+    q.vy = Math.min(q.vy + POP_G * U * dt, POP_VMAX * U);
+    q.y += q.vy * dt;
+    const fin = q.t < 0.35 ? easeInOut(q.t / 0.35) : 1;
+    const out = 1 - easeInOut(clamp((q.y - fadeFrom) / (fadeTo - fadeFrom), 0, 1));
+    q.a = fin * out;
+  });
+  G.pops = G.pops.filter(q => q.y < fadeTo && q.t < 12);
+  G.banners.forEach(q => q.t += dt); G.banners = G.banners.filter(q => q.t < q.life);
+}
+
+/* ---------- Drawing ---------- */
+/* Muted jewel-tone palette: plain bricks in navy/indigo by row; specials: brass, amethyst,
+   deep turquoise, jade. accent = the shimmer colour for icons, thin outlines and the meaning that pops out */
+const KCOL = {
+  normal: { c1: '#2c3a66', c2: '#161c38', text: '#e6e9f5', accent: '#aeb8dc' },
+  gold:   { c1: '#c3a062', c2: '#6f5222', text: '#fff6e2', accent: '#e8cc92', icon: '★' },
+  violet: { c1: '#775cb0', c2: '#3a2a66', text: '#f3edff', accent: '#c9b6f0', icon: '◆' },
+  cyan:   { c1: '#3d8a97', c2: '#1b4851', text: '#e9fbff', accent: '#a3dbe3', icon: '⇔' },
+  green:  { c1: '#57966b', c2: '#284d36', text: '#effbf1', accent: '#b4dfbf', icon: '◎' },
+};
+const ROWTINT = ['#2c3a66', '#2a4a5e', '#363a6a', '#2c4e5b', '#3b3462', '#2e4366', '#33405e', '#2b505f'];
+function rrect(x, y, w, h, r) {
+  ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+}
+/* Fine grain (made once), laid over the bricks in overlay mode for a real-material feel */
+let GRAIN = null;
+function grain() {
+  if (GRAIN && GRAIN.dpr === DPR) return GRAIN.pat;
+  const n = 180, c = document.createElement('canvas'); c.width = c.height = n;
+  const g = c.getContext('2d'), img = g.createImageData(n, n);
+  for (let i = 0; i < img.data.length; i += 4) {
+    const v = 90 + Math.random() * 120; img.data[i] = img.data[i + 1] = img.data[i + 2] = v; img.data[i + 3] = 60 + Math.random() * 70;
+  }
+  g.putImageData(img, 0, 0);
+  const pat = ctx.createPattern(c, 'repeat');
+  try { pat.setTransform(new DOMMatrix().scale(1 / DPR)); } catch (e) {}   // grain in real pixels, not scaled up
+  GRAIN = { pat, dpr: DPR };
+  return pat;
+}
+function finish(x, y, w, h, rad, strength = 1) {
+  // Grain
+  ctx.save(); rrect(x, y, w, h, rad); ctx.clip();
+  ctx.globalCompositeOperation = 'overlay'; ctx.globalAlpha = 0.55 * strength;
+  ctx.fillStyle = grain(); ctx.fillRect(x, y, w, h);
+  ctx.restore();
+  // Bevel: lighter top edge, darker bottom edge
+  const bev = ctx.createLinearGradient(0, y, 0, y + h);
+  bev.addColorStop(0, 'rgba(255,255,255,.26)'); bev.addColorStop(0.35, 'rgba(255,255,255,0)');
+  bev.addColorStop(0.7, 'rgba(0,0,0,0)'); bev.addColorStop(1, 'rgba(0,0,0,.38)');
+  rrect(x + 0.75, y + 0.75, w - 1.5, h - 1.5, Math.max(1, rad - 0.75));
+  ctx.lineWidth = 1.5; ctx.strokeStyle = bev; ctx.stroke();
+}
+function drawSteel(k) {
+  const rad = Math.min(4 * U, k.h * 0.25);
+  ctx.shadowColor = 'rgba(0,0,0,.5)'; ctx.shadowBlur = 6 * U; ctx.shadowOffsetY = 2 * U;
+  const g = ctx.createLinearGradient(k.x, k.y, k.x, k.y + k.h);
+  g.addColorStop(0, '#8b93a1'); g.addColorStop(0.5, '#565e6c'); g.addColorStop(1, '#353b46');
+  rrect(k.x, k.y, k.w, k.h, rad); ctx.fillStyle = g; ctx.fill();
+  ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
+  // Faint diagonal stripes + rivets
+  ctx.save(); rrect(k.x, k.y, k.w, k.h, rad); ctx.clip();
+  ctx.strokeStyle = 'rgba(20,24,32,.22)'; ctx.lineWidth = 2 * U;
+  for (let x = k.x - k.h; x < k.x + k.w; x += 9 * U) { ctx.beginPath(); ctx.moveTo(x, k.y + k.h); ctx.lineTo(x + k.h, k.y); ctx.stroke(); }
+  ctx.restore();
+  finish(k.x, k.y, k.w, k.h, rad, 1.2);
+  const rv = Math.min(2 * U, k.h * 0.11);
+  [[k.x + 5 * U, k.y + 5 * U], [k.x + k.w - 5 * U, k.y + 5 * U], [k.x + 5 * U, k.y + k.h - 5 * U], [k.x + k.w - 5 * U, k.y + k.h - 5 * U]]
+    .forEach(([x, y]) => {
+      ctx.beginPath(); ctx.arc(x, y, rv, 0, 6.3); ctx.fillStyle = 'rgba(25,28,36,.75)'; ctx.fill();
+      ctx.beginPath(); ctx.arc(x - rv * 0.3, y - rv * 0.3, rv * 0.45, 0, 6.3); ctx.fillStyle = 'rgba(255,255,255,.18)'; ctx.fill();
+    });
+  if (k.flash > 0) { rrect(k.x, k.y, k.w, k.h, rad); ctx.fillStyle = `rgba(255,255,255,${k.flash * 4})`; ctx.fill(); }
+}
+function drawBrick(k, i) {
+  if (k.kind === 'steel') { drawSteel(k); return; }
+  const c = KCOL[k.kind], special = k.kind !== 'normal';
+  const top = k.kind === 'normal' ? ROWTINT[Math.round((k.y - F.y0) / (G.sz.rowH + G.sz.gap)) % ROWTINT.length] : c.c1;
+  const g = ctx.createLinearGradient(0, k.y, 0, k.y + k.h);
+  g.addColorStop(0, top); g.addColorStop(1, c.c2);
+  const rad = Math.min(6 * U, k.h * 0.28);
+  // Soft shadow (special bricks: a very light shimmer halo)
+  ctx.shadowColor = special ? c.accent + '55' : 'rgba(0,0,0,.45)'; ctx.shadowBlur = (special ? 10 : 6) * U; ctx.shadowOffsetY = special ? 0 : 2 * U;
+  rrect(k.x, k.y, k.w, k.h, rad); ctx.fillStyle = g; ctx.fill();
+  ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
+  // A slight metallic sheen for brass
+  if (k.kind === 'gold') {
+    ctx.save(); rrect(k.x, k.y, k.w, k.h, rad); ctx.clip();
+    const sh = ctx.createLinearGradient(k.x, k.y, k.x + k.w, k.y + k.h);
+    sh.addColorStop(0, 'rgba(255,240,200,0)'); sh.addColorStop(0.45, 'rgba(255,240,200,.16)'); sh.addColorStop(0.55, 'rgba(255,240,200,0)');
+    ctx.fillStyle = sh; ctx.fillRect(k.x, k.y, k.w, k.h); ctx.restore();
+  }
+  finish(k.x, k.y, k.w, k.h, rad);
+  // Thin shimmer outline for special bricks
+  if (special) { rrect(k.x + 2, k.y + 2, k.w - 4, k.h - 4, Math.max(1, rad - 2)); ctx.lineWidth = 0.8; ctx.strokeStyle = c.accent + '66'; ctx.stroke(); }
+  if (k.hp < k.maxHp) {
+    ctx.strokeStyle = 'rgba(0,0,0,.5)'; ctx.lineWidth = 1.2 * U; ctx.beginPath();
+    const m = k.x + k.w * 0.5;
+    ctx.moveTo(m - 8 * U, k.y + 3 * U); ctx.lineTo(m + 2 * U, k.y + k.h * 0.5); ctx.lineTo(m - 4 * U, k.y + k.h - 3 * U);
+    if (k.maxHp - k.hp > 1) { ctx.moveTo(k.x + k.w * 0.2, k.y + k.h); ctx.lineTo(k.x + k.w * 0.3, k.y + k.h * 0.4); }
+    ctx.stroke();
+  }
+  if (k.flash > 0) { rrect(k.x, k.y, k.w, k.h, rad); ctx.fillStyle = `rgba(255,255,255,${k.flash * 4})`; ctx.fill(); }
+  // Text: pale cream with a soft shadow; icons in the shimmer colour
+  ctx.font = brickFont(); ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
+  const cy = k.y + k.h / 2 + 1, ww = ctx.measureText(k.item.w).width;
+  const icon = c.icon ? c.icon + ' ' : '', iw = icon ? ctx.measureText(icon).width : 0;
+  const showIcon = icon && iw + ww < k.w - 8;
+  let x = k.x + (k.w - (showIcon ? iw + ww : ww)) / 2;
+  ctx.shadowColor = 'rgba(0,0,0,.5)'; ctx.shadowBlur = 2 * U; ctx.shadowOffsetY = 1;
+  if (showIcon) { ctx.fillStyle = c.accent; ctx.fillText(icon, x, cy); x += iw; }
+  ctx.fillStyle = c.text; ctx.fillText(k.item.w, x, cy);
+  ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
+}
+function draw(dt) {
+  const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#0d1238'); g.addColorStop(1, '#060820');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = '#fff';
+  stars.forEach(s => { s.tw += dt * 1.6; ctx.globalAlpha = 0.18 + s.z * 0.5 * (0.7 + 0.3 * Math.sin(s.tw)); ctx.fillRect(s.x, s.y, 0.6 + s.z, 0.6 + s.z); });
+  ctx.globalAlpha = 0.07; ctx.fillStyle = grain(); ctx.fillRect(0, 0, W, H);
+  ctx.globalAlpha = 1;
+  const vg = ctx.createRadialGradient(W / 2, H * 0.45, Math.min(W, H) * 0.3, W / 2, H * 0.45, Math.max(W, H) * 0.75);
+  vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,.45)');
+  ctx.fillStyle = vg; ctx.fillRect(0, 0, W, H);
+  if (!G) return;
+  // Field outline
+  ctx.strokeStyle = 'rgba(160,180,220,.13)'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(F.x0 - 2, H); ctx.lineTo(F.x0 - 2, F.y0 - 8 * U); ctx.lineTo(F.x1 + 2, F.y0 - 8 * U); ctx.lineTo(F.x1 + 2, H); ctx.stroke();
+  G.bricks.forEach(drawBrick);
+  // Word + meaning from a broken brick (drawn before the paddle and ball so the ball stays on top)
+  G.pops.forEach(q => {
+    const a = q.a, sc = 1;
+    ctx.save(); ctx.globalAlpha = clamp(a, 0, 1) * 0.95; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    const top = q.y - q.bh / 2;
+    ctx.font = `800 ${WORD_PX * U * sc}px ${HEAD}`;
+    const wy = top + (WORD_PX / 2 + 3) * U;
+    ctx.lineWidth = 6 * U; ctx.strokeStyle = 'rgba(5,6,26,.9)'; ctx.strokeText(q.w, q.x, wy);
+    const kc = KCOL[q.kind]; ctx.fillStyle = q.kind === 'normal' ? '#ffffff' : kc.accent; ctx.fillText(q.w, q.x, wy);
+    ctx.font = `600 ${MEAN_PX * U}px ${FONT}`;
+    q.lines.forEach((l, i) => {
+      const y = top + (WORD_PX + 5 + MEAN_PX / 2 + 2 + i * (MEAN_PX + 4)) * U;
+      ctx.lineWidth = 4 * U; ctx.strokeStyle = 'rgba(5,6,26,.85)'; ctx.strokeText(l, q.x, y);
+      ctx.fillStyle = 'rgba(214,222,255,.92)'; ctx.fillText(l, q.x, y);
+    });
+    ctx.restore();
+  });
+  // Paddle
+  const p = G.pad;
+  const pg = ctx.createLinearGradient(0, p.y, 0, p.y + p.h); pg.addColorStop(0, '#eef2f8'); pg.addColorStop(1, '#8ea3bf');
+  ctx.shadowColor = G.pw.wide > 0 ? 'rgba(163,219,227,.6)' : 'rgba(0,0,0,.5)'; ctx.shadowBlur = 10 * U; ctx.shadowOffsetY = G.pw.wide > 0 ? 0 : 2 * U;
+  rrect(p.x - p.w / 2, p.y, p.w, p.h, p.h / 2); ctx.fillStyle = pg; ctx.fill(); ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
+  finish(p.x - p.w / 2, p.y, p.w, p.h, p.h / 2, 0.6);
+  // Ball + trail
+  G.balls.forEach(b => {
+    const fire = G.pw.fire > 0;
+    b.trail.forEach((t, i) => { ctx.globalAlpha = (i + 1) / b.trail.length * 0.35; ctx.fillStyle = fire ? '#ff9a5a' : '#bdefff';
+      ctx.beginPath(); ctx.arc(t.x, t.y, b.r * (0.4 + i / b.trail.length * 0.5), 0, 6.3); ctx.fill(); });
+    ctx.globalAlpha = 1;
+    const bg = ctx.createRadialGradient(b.x - b.r * 0.35, b.y - b.r * 0.35, b.r * 0.1, b.x, b.y, b.r);
+    if (fire) { bg.addColorStop(0, '#fff3c0'); bg.addColorStop(0.5, '#ff9a3c'); bg.addColorStop(1, '#d4311f'); ctx.shadowColor = '#ff7a3c'; }
+    else { bg.addColorStop(0, '#ffffff'); bg.addColorStop(1, '#8fdcff'); ctx.shadowColor = '#7fe7ff'; }
+    ctx.shadowBlur = 16 * U; ctx.fillStyle = bg; ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, 6.3); ctx.fill(); ctx.shadowBlur = 0;
+  });
+  // Sparks
+  G.sparks.forEach(s => { ctx.globalAlpha = 1 - s.t / s.life; ctx.fillStyle = s.color; ctx.fillRect(s.x, s.y, s.s, s.s); });
+  ctx.globalAlpha = 1;
+  // Banner (just above the paddle)
+  G.banners.forEach((bn, i) => {
+    const a = bn.t < 0.2 ? bn.t / 0.2 : 1 - Math.max(0, bn.t - bn.life + 0.5) / 0.5;
+    ctx.globalAlpha = clamp(a, 0, 1); ctx.textAlign = 'center';
+    ctx.font = `800 ${15 * U}px ${FONT}`; ctx.lineWidth = 4 * U; ctx.strokeStyle = 'rgba(5,6,26,.85)';
+    const bb = G.bricks.reduce((m, q) => Math.max(m, q.y + q.h), F.y0);
+    const y = bb + (F.padY - bb) * 0.28 + i * 22 * U, x = (F.x0 + F.x1) / 2;
+    ctx.strokeText(bn.text, x, y); ctx.fillStyle = bn.color; ctx.fillText(bn.text, x, y);
+  });
+  ctx.globalAlpha = 1;
+  if (G.state === 'play' && G.balls.some(b => b.stuck)) {
+    ctx.textAlign = 'center'; ctx.font = `600 ${13 * U}px ${FONT}`; ctx.fillStyle = 'rgba(214,222,255,.8)';
+    ctx.fillText('Tap the screen to launch the ball', (F.x0 + F.x1) / 2, land ? G.pad.y - 30 * U : G.pad.y + G.pad.h + 18 * U);
+  }
+}
+
+/* ---------- Top bar ---------- */
+let hudKey = '';
+function paintHud() {
+  const k = `${G.score}|${G.level}|${G.lives}|${Math.ceil(G.pw.fire * 4)}|${Math.ceil(G.pw.wide * 4)}|${Math.ceil(G.pw.slow * 4)}|${G.learned.length}`;
+  if (k === hudKey) return; hudKey = k;
+  $('#score').textContent = G.score; $('#level').textContent = `Stage ${G.level} · ${G.learned.length} words`;
+  $('#lives').textContent = '♥'.repeat(Math.max(0, G.lives)) + '♡'.repeat(Math.max(0, 3 - G.lives));
+  $('#powers').innerHTML = ['fire', 'wide', 'slow'].filter(p => G.pw[p] > 0).map(p =>
+    `<div class="pchip" style="color:${POWERS[p].color}">${POWERS[p].name}<i><b style="width:${clamp(G.pw[p] / POWERS[p].time, 0, 1) * 100}%"></b></i></div>`).join('');
+}
+
+/* ---------- Start / pause / game over ---------- */
+const show = (id, on) => $(id).classList.toggle('show', on);
+/* Phones only let a page talk after a tap: say one silent thing when Start is pressed, so broken words can be read aloud later */
+let speechOK = false;
+function unlockSpeech() { if (speechOK || !('speechSynthesis' in window)) return; speechOK = true; try { const u = new SpeechSynthesisUtterance(' '); u.volume = 0; speechSynthesis.speak(u); } catch (e) {} }
+function start() { audio(); unlockSpeech(); newGame(); show('#startOv', false); show('#overOv', false); show('#pauseOv', false); document.body.classList.add('playing'); }
+function pause() { if (!G || G.state !== 'play') return; G.state = 'pause'; show('#pauseOv', true); document.body.classList.remove('playing'); }
+function resume() { if (!G) return; G.state = 'play'; show('#pauseOv', false); document.body.classList.add('playing'); last = performance.now(); }
+function gameOver() {
+  G.state = 'over'; document.body.classList.remove('playing'); input.left = input.right = false;
+  const best = Math.max(+store.get(BEST_KEY) || 0, G.score); store.set(BEST_KEY, best);
+  $('#oScore').textContent = G.score; $('#oLevel').textContent = G.level; $('#oWords').textContent = G.learned.length; $('#oBest').textContent = best;
+  $('#overTitle').textContent = G.score >= best && G.score > 0 ? 'New record!' : 'Game over!';
+  renderLearned(G.learned.slice(-40).reverse());
+  setTimeout(() => show('#overOv', true), 600);
+}
+/* Words cracked this round: ☆ marks one for review; swipe right → Delete (hidden in the games, the dashboard, every device; with Undo) */
+let LL = [];
+function rowHTML(o, i) {
+  if (o._gone) return `<div class="lw gone"><div class="in"><span>Deleted “${esc(o.w)}”</span><button class="undo" data-undo="${i}">Undo</button></div></div>`;
+  const on = SYNC && SYNC.isSaved(o.w);
+  return `<div class="lw" data-i="${i}"><button class="del" data-del="${i}">Delete</button><div class="in">
+    <div class="t"><div class="w">${esc(o.w)}</div><div class="v">${esc(meaningOf(o))}</div></div>
+    <button class="star${on ? ' on' : ''}" data-star="${i}" aria-label="Mark for review">${on ? '★' : '☆'}</button></div></div>`;
+}
+function renderLearned(list) {
+  if (list) LL = list.map(o => Object.assign({}, o));
+  $('#learned').innerHTML = LL.length ? `<h3>Words you cracked this round</h3>
+    <p class="hint">☆ marks a word for review (gold brick, flies more often on the TV). Swipe a word right to delete it from the games and the TV on every device.</p>`
+    + LL.map(rowHTML).join('') : '';
+}
+const lwBox = $('#learned');
+lwBox.addEventListener('click', e => {
+  if (!SYNC) return;
+  const star = e.target.closest('[data-star]'), del = e.target.closest('[data-del]'), undo = e.target.closest('[data-undo]');
+  if (star) {
+    const o = LL[+star.dataset.star];
+    if (SYNC.isSaved(o.w)) SYNC.removeWord(o.w);
+    else SYNC.saveWord({ w: o.w, pron: o.pron || '', pos: o.pos || '', en: o.en || '', ex: o.ex || '', ex_en: o.ex_en || '', col: o.col || [] });
+    renderLearned();
+  } else if (del) {
+    const o = LL[+del.dataset.del];
+    o._was = SYNC.isSaved(o.w) ? SYNC.words().find(x => x.w.toLowerCase() === o.w.toLowerCase()) : null;
+    SYNC.hideWord(o.w); o._gone = true; renderLearned();
+  } else if (undo) {
+    const o = LL[+undo.dataset.undo];
+    SYNC.unhideWord(o.w, o._was || null); o._gone = false; renderLearned();
+  }
+});
+let sw = null;
+lwBox.addEventListener('pointerdown', e => {
+  const row = e.target.closest('.lw'); if (!row || row.classList.contains('gone') || e.target.closest('button')) return;
+  sw = { row, x: e.clientX, y: e.clientY, dx: 0, on: row.classList.contains('armed') };
+});
+lwBox.addEventListener('pointermove', e => {
+  if (!sw) return;
+  const dx = e.clientX - sw.x, dy = e.clientY - sw.y;
+  if (Math.abs(dy) > 12 && Math.abs(dy) > Math.abs(dx)) { sw.row.querySelector('.in').style.transform = ''; sw = null; return; }
+  sw.dx = dx;
+  const inn = sw.row.querySelector('.in'); inn.style.transition = 'none'; inn.style.transform = `translateX(${clamp((sw.on ? 96 : 0) + dx, 0, 120)}px)`;
+});
+const swEnd = () => {
+  if (!sw) return;
+  const { row, dx, on } = sw; sw = null;
+  const inn = row.querySelector('.in'); inn.style.transition = ''; inn.style.transform = '';
+  lwBox.querySelectorAll('.lw.armed').forEach(r => { if (r !== row) r.classList.remove('armed'); });
+  row.classList.toggle('armed', on ? dx > -40 : dx > 60);
+};
+lwBox.addEventListener('pointerup', swEnd); lwBox.addEventListener('pointercancel', swEnd);
+
+$('#startBtn').onclick = start;
+$('#againBtn').onclick = async () => { await loadWords(); start(); };
+$('#pauseBtn').onclick = () => (G && G.state === 'pause') ? resume() : pause();
+$('#resumeBtn').onclick = resume;
+$('#quitBtn').onclick = () => { show('#pauseOv', false); G.state = 'play'; gameOver(); };
+document.addEventListener('visibilitychange', () => { if (document.hidden) pause(); });
+
+/* ---------- Run ---------- */
+let last = performance.now();
+function frame(now) {
+  const dt = Math.min(0.033, (now - last) / 1000); last = now;
+  if (G && (G.state === 'play' || G.state === 'between')) update(dt);
+  draw(dt);
+  requestAnimationFrame(frame);
+}
+resize();
+loadWords();
+$('#intro').textContent = `Hold ◀ ▶ to move the paddle and bounce the ball into the bricks. Every brick is a ${LI.name} word; break it to see what it means. Tap the screen to launch the ball.`;
+$('#langBtn').textContent = '🌏 ' + LI.native;
+if (!LC || LC.LANG_KEYS.length < 2) $('#langBtn').style.display = 'none';
+$('#langBtn').onclick = () => { if (LC) LC.setLang(LC.nextLang()); };
+if (SYNC) { SYNC.start(); SYNC.on(w => { if (w === 'data' && (!G || G.state === 'over')) loadWords(); }); }
+requestAnimationFrame(frame);
+window.__bricks = { get G() { return G; }, input, start, launch, givePower, buildLevel, resetBall };   // for testing
+})();
+</script>
+</body>
+</html>
